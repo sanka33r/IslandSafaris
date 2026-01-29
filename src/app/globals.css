@@ -1,0 +1,25 @@
+@import "tailwindcss";
+@config "../../tailwind.config.js";
+
+@layer base {
+  body {
+    @apply bg-secondary-50 text-safari-950 antialiased font-sans;
+  }
+}
+
+/* Custom scrollbar for webkit */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-safari-300 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-safari-400;
+}

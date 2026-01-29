@@ -1,0 +1,53 @@
+
+> temp-app@0.1.0 lint
+> eslint
+
+
+D:\dev\IslandSafaris\IslandSafaris\src\app\(public)\destinations\page.tsx
+  4:10  warning  'cn' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\dev\IslandSafaris\IslandSafaris\src\app\(public)\gallery\page.tsx
+   2:10  warning  'notFound' is defined but never used      @typescript-eslint/no-unused-vars
+  36:43  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\dev\IslandSafaris\IslandSafaris\src\app\admin\bookings\page.tsx
+   2:10  warning  'Booking' is defined but never used              @typescript-eslint/no-unused-vars
+   3:10  warning  'redirect' is defined but never used             @typescript-eslint/no-unused-vars
+   4:8   warning  'BookingStatusBadge' is defined but never used   @typescript-eslint/no-unused-vars
+   5:10  warning  'format' is defined but never used               @typescript-eslint/no-unused-vars
+   6:10  warning  'updateBookingStatus' is defined but never used  @typescript-eslint/no-unused-vars
+  45:54  error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+
+D:\dev\IslandSafaris\IslandSafaris\src\app\admin\login\page.tsx
+  32:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\dev\IslandSafaris\IslandSafaris\src\app\admin\reviews\page.tsx
+   2:10  warning  'redirect' is defined but never used      @typescript-eslint/no-unused-vars
+  17:48  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:49  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  46:58  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  63:71  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\dev\IslandSafaris\IslandSafaris\src\app\api\admin\login\route.ts
+  3:10  warning  'rateLimit' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\dev\IslandSafaris\IslandSafaris\src\components\admin\BookingRow.tsx
+  5:29  warning  'Clock' is defined but never used         @typescript-eslint/no-unused-vars
+  9:60  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\dev\IslandSafaris\IslandSafaris\src\components\admin\ReviewRow.tsx
+  7:75  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\dev\IslandSafaris\IslandSafaris\src\components\booking\BookingWizard.tsx
+  216:90  error  Parsing error: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+
+D:\dev\IslandSafaris\IslandSafaris\src\components\reviews\ReviewForm.tsx
+  6:10  warning  'cn' is defined but never used      @typescript-eslint/no-unused-vars
+  7:10  warning  'motion' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\dev\IslandSafaris\IslandSafaris\src\lib\actions\booking.ts
+   4:26  warning  'supabaseAdmin' is defined but never used  @typescript-eslint/no-unused-vars
+  57:48  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+✖ 24 problems (10 errors, 14 warnings)
+

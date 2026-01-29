@@ -1,0 +1,29 @@
+import type { Metadata } from 'next';
+import { Outfit } from 'next/font/google';
+import './globals.css';
+import { cn } from '@/lib/utils';
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-outfit',
+  display: 'swap',
+});
+
+export const metadata: Metadata = {
+  title: 'Island Safaris Sri Lanka',
+  description: 'Premium Safari Experiences',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" className="scroll-smooth">
+      <body className={cn(outfit.variable, "font-sans min-h-screen bg-safari-50 text-safari-900")}>
+        {children}
+      </body>
+    </html>
+  );
+}
