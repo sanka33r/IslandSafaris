@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, Star, Shield, Leaf, MapPin, Clock, Camera, ChevronRight } from 'lucide-react';
 import { getDestinationsWithImages } from '@/lib/queries/destinations';
+import HeroSection from '@/components/home/HeroSection';
 
 export const revalidate = 3600;
 
@@ -9,54 +10,7 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0">
-          <img
-            src="https://res.cloudinary.com/dxau42ovy/image/upload/v1770663701/IMG_6199.JPG_mxebtr.jpg"
-            alt="Hero Background"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-safari-900/90 via-safari-800/80 to-safari-900/90" />
-        </div>
-
-        <div className="relative z-20 text-center px-6 max-w-5xl mx-auto text-white">
-          <div className="inline-flex items-center gap-2 bg-secondary-600/20 backdrop-blur-sm border border-secondary-400/30 rounded-full px-4 py-2 mb-8">
-            <span className="w-2 h-2 bg-secondary-400 rounded-full animate-pulse" />
-            <span className="text-secondary-300 text-sm font-medium">The Great Elephant Gathering Awaits</span>
-          </div>
-
-          <h1 className="text-5xl md:text-8xl font-bold mb-6 md:mb-8 tracking-tight leading-[1.05]">
-            Discover the<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary-300 via-secondary-400 to-secondary-500">Wild Heart</span> of<br />
-            Sri Lanka
-          </h1>
-
-          <p className="text-lg md:text-xl text-safari-200 mb-10 md:mb-12 font-light max-w-2xl mx-auto leading-relaxed">
-            Exclusive jeep safaris through the legendary Minneriya-Kaudulla-Hurulu corridor.
-            Where hundreds of Asian elephants roam free.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/booking"
-              className="group bg-secondary-600 hover:bg-secondary-500 text-white font-bold py-4 px-10 rounded-full transition-all transform hover:scale-105 shadow-2xl shadow-secondary-900/50 active:scale-95 inline-flex items-center justify-center gap-3"
-            >
-              Book Your Safari
-              <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              href="/destinations"
-              className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold py-4 px-8 rounded-full transition-all border border-white/20 hover:border-white/40"
-            >
-              Explore Destinations
-            </Link>
-          </div>
-        </div>
-
-
-      </section>
+      <HeroSection />
 
       {/* About Section */}
       <section className="py-20 md:py-28 bg-secondary-50">

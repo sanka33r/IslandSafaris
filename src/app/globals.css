@@ -18,6 +18,7 @@
 }
 
 @layer components {
+
   /* Animated gradient background */
   .animated-gradient {
     background: linear-gradient(-45deg, #2b3d26, #5b6339, #a25b27, #d5a054);
@@ -26,9 +27,17 @@
   }
 
   @keyframes gradient {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+
+    100% {
+      background-position: 0% 50%;
+    }
   }
 
   /* Fade in animation */
@@ -41,6 +50,7 @@
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -48,17 +58,34 @@
   }
 
   /* Stagger children animation */
-  .stagger-children > * {
+  .stagger-children>* {
     opacity: 0;
     animation: fadeIn 0.5s ease-out forwards;
   }
 
-  .stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
-  .stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
-  .stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
-  .stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
-  .stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
-  .stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
+  .stagger-children>*:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+
+  .stagger-children>*:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .stagger-children>*:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  .stagger-children>*:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+
+  .stagger-children>*:nth-child(5) {
+    animation-delay: 0.5s;
+  }
+
+  .stagger-children>*:nth-child(6) {
+    animation-delay: 0.6s;
+  }
 
   /* Glass effect */
   .glass {
@@ -68,6 +95,135 @@
   /* Text gradient */
   .text-gradient {
     @apply text-transparent bg-clip-text bg-gradient-to-r from-secondary-400 via-secondary-500 to-secondary-600;
+  }
+
+  /* ── Hero 3D Section Animations ── */
+
+  /* Floating particles (fireflies / dust motes) */
+  .hero-particle {
+    position: absolute;
+    background: radial-gradient(circle, #d5a054 0%, transparent 70%);
+    border-radius: 50%;
+    animation: heroFloat 5s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+
+  @keyframes heroFloat {
+    0% {
+      transform: translate3d(0, 0, 0) scale(1);
+      opacity: 0.2;
+    }
+
+    50% {
+      opacity: 0.7;
+    }
+
+    100% {
+      transform: translate3d(20px, -30px, 0) scale(1.4);
+      opacity: 0.15;
+    }
+  }
+
+  /* Mist drift bands */
+  .hero-mist-drift {
+    animation: mistDrift 12s ease-in-out infinite alternate;
+  }
+
+  .hero-mist-drift-slow {
+    animation: mistDrift 18s ease-in-out infinite alternate-reverse;
+  }
+
+  @keyframes mistDrift {
+    0% {
+      transform: translateX(-5%) scaleX(1);
+      opacity: 0.4;
+    }
+
+    100% {
+      transform: translateX(5%) scaleX(1.1);
+      opacity: 0.8;
+    }
+  }
+
+  /* Scroll indicator dot */
+  .hero-scroll-dot {
+    animation: scrollBounce 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollBounce {
+
+    0%,
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    50% {
+      transform: translateY(8px);
+      opacity: 0.3;
+    }
+  }
+
+  /* Button shine sweep */
+  .hero-btn-shine {
+    background: linear-gradient(105deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.15) 45%,
+        rgba(255, 255, 255, 0.05) 50%,
+        transparent 55%);
+    background-size: 250% 100%;
+    animation: btnShine 4s ease-in-out infinite;
+  }
+
+  @keyframes btnShine {
+    0% {
+      background-position: 200% 0;
+    }
+
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  /* Text shimmer on "Wild Heart" */
+  .hero-text-shimmer {
+    background-size: 200% auto;
+    animation: textShimmer 5s linear infinite;
+  }
+
+  @keyframes textShimmer {
+    0% {
+      background-position: 0% center;
+    }
+
+    100% {
+      background-position: 200% center;
+    }
+  }
+
+  /* Bird flight animation */
+  .bird-fly {
+    animation: birdFly 35s linear infinite;
+  }
+
+  @keyframes birdFly {
+    0% {
+      transform: translate(-10vw, 10vh) scale(0.6);
+      opacity: 0;
+    }
+
+    10% {
+      opacity: 0.8;
+    }
+
+    90% {
+      opacity: 0.8;
+    }
+
+    100% {
+      transform: translate(110vw, -40vh) scale(0.6);
+      opacity: 0;
+    }
   }
 }
 
@@ -102,18 +258,17 @@
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
 }
 
 .shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.2) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0) 100%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -129,6 +284,7 @@ textarea:focus-visible {
 
 /* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -136,7 +292,7 @@ textarea:focus-visible {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  
+
   html {
     scroll-behavior: auto;
   }

@@ -20,6 +20,8 @@ export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const pathname = usePathname();
+    // const isHome = pathname === '/';
+    const isHome = false; // Always use standard dark colors
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -35,7 +37,9 @@ export default function Header() {
                     'fixed w-full z-40 transition-all duration-500',
                     scrolled
                         ? 'bg-white/80 backdrop-blur-xl shadow-[0_2px_20px_rgba(0,0,0,0.06)] border-b border-safari-100/50'
-                        : 'bg-[#faf8f4]/90 backdrop-blur-md border-b border-safari-100/30'
+                        : isHome
+                            ? 'bg-transparent border-b border-white/10'
+                            : 'bg-[#faf8f4]/90 backdrop-blur-md border-b border-safari-100/30'
                 )}
             >
                 <div className="container mx-auto px-6">
@@ -49,7 +53,9 @@ export default function Header() {
                                         ? 'bg-secondary-600 shadow-md'
                                         : isOpen
                                             ? 'bg-secondary-600'
-                                            : 'bg-secondary-600/10 border border-secondary-200'
+                                            : isHome
+                                                ? 'bg-white/20 backdrop-blur-md border border-white/30'
+                                                : 'bg-secondary-600/10 border border-secondary-200'
                                 )}
                             >
                                 <Compass
@@ -64,14 +70,16 @@ export default function Header() {
                                         ? 'text-safari-900'
                                         : isOpen
                                             ? 'text-white'
-                                            : 'text-safari-900'
+                                            : isHome
+                                                ? 'text-white'
+                                                : 'text-safari-900'
                                 )}
                             >
                                 ISLAND
                                 <span
                                     className={cn(
                                         'transition-colors duration-500',
-                                        scrolled ? 'text-secondary-600' : 'text-secondary-600'
+                                        scrolled ? 'text-secondary-600' : isHome ? 'text-secondary-400' : 'text-secondary-600'
                                     )}
                                 >
                                     SAFARIS
@@ -86,7 +94,9 @@ export default function Header() {
                                     'flex items-center gap-1 px-2 py-1.5 rounded-full transition-all duration-500',
                                     scrolled
                                         ? 'bg-safari-50 border border-safari-100'
-                                        : 'bg-safari-100/50 border border-safari-200/50'
+                                        : isHome
+                                            ? 'bg-white/10 border border-white/20 backdrop-blur-md'
+                                            : 'bg-safari-100/50 border border-safari-200/50'
                                 )}
                             >
                                 {navItems.map((item) => (
@@ -98,10 +108,14 @@ export default function Header() {
                                             pathname === item.href
                                                 ? scrolled
                                                     ? 'bg-white text-secondary-600 shadow-sm'
-                                                    : 'bg-white text-secondary-600 shadow-sm'
+                                                    : isHome
+                                                        ? 'bg-secondary-600 text-white shadow-sm'
+                                                        : 'bg-white text-secondary-600 shadow-sm'
                                                 : scrolled
                                                     ? 'text-safari-600 hover:text-safari-900 hover:bg-white/60'
-                                                    : 'text-safari-600 hover:text-safari-900 hover:bg-white/60'
+                                                    : isHome
+                                                        ? 'text-white/80 hover:text-white hover:bg-white/10'
+                                                        : 'text-safari-600 hover:text-safari-900 hover:bg-white/60'
                                         )}
                                     >
                                         {item.name}
@@ -134,7 +148,9 @@ export default function Header() {
                                     ? 'bg-white/10'
                                     : scrolled
                                         ? 'bg-safari-50 border border-safari-100'
-                                        : 'bg-safari-100/50 border border-safari-200/50'
+                                        : isHome
+                                            ? 'bg-white/10 border border-white/20 backdrop-blur-md'
+                                            : 'bg-safari-100/50 border border-safari-200/50'
                             )}
                             onClick={() => setIsOpen(!isOpen)}
                             aria-label="Toggle Menu"
@@ -146,7 +162,7 @@ export default function Header() {
                                     size={22}
                                     className={cn(
                                         'transition-colors',
-                                        scrolled ? 'text-safari-800' : 'text-safari-800'
+                                        scrolled ? 'text-safari-800' : isHome ? 'text-white' : 'text-safari-800'
                                     )}
                                 />
                             )}
