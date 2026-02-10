@@ -23,6 +23,10 @@ export default function BookingRow({ booking }: { booking: any }) {
         cancelled: 'bg-red-100 text-red-700',
     };
 
+    const formatPackageName = (type: string) => {
+        return type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    };
+
     return (
         <tr className="hover:bg-safari-50/50 transition-colors">
             <td className="p-4 font-mono text-xs text-safari-400">{booking.id.slice(0, 8)}</td>
@@ -31,7 +35,15 @@ export default function BookingRow({ booking }: { booking: any }) {
                 <div className="text-xs text-safari-500">{booking.email}</div>
                 <div className="text-xs text-safari-500">{booking.phone}</div>
             </td>
-            <td className="p-4 text-safari-800">{booking.destinations?.name || 'Unknown'}</td>
+            <td className="p-4 text-safari-800">
+                {booking.package_type ? (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                        {formatPackageName(booking.package_type)}
+                    </span>
+                ) : (
+                    booking.destinations?.name || 'Unknown'
+                )}
+            </td>
             <td className="p-4">
                 <div className="font-medium text-safari-900">
                     {new Date(booking.date).toLocaleDateString('en-US', {

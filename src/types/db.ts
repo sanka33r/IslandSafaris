@@ -33,7 +33,8 @@ export interface Destination {
 
 export interface Booking {
     id: string
-    destination_id: string
+    destination_id?: string | null
+    package_type?: 'cooking-class' | 'village-tour' | 'bicycle-rent' | null
     date: string
     time: string
     group_size: number
@@ -43,7 +44,11 @@ export interface Booking {
     customer_name: string
     email: string
     phone: string
+    country?: string | null
     message?: string | null
+    special_requests?: string | null
+    advance_payment_amount?: number
+    advance_payment_status?: 'pending' | 'paid' | 'refunded'
     status: 'new' | 'confirmed' | 'cancelled'
     created_at: string
 }

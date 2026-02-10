@@ -1,31 +1,179 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { useGlobalData } from '@/providers/GlobalDataProvider';
+import { notFound, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { getDestinationBySlug, getDestinationImages } from '@/lib/queries/destinations';
-import { getApprovedReviews } from '@/lib/queries/reviews';
 import { cn } from '@/lib/utils';
-import { Clock, Ticket, Car, Camera, DollarSign } from 'lucide-react';
+import {
+    Clock, Ticket, Car, Camera, DollarSign,
+    MapPin, Star, Repeat, Compass, Sparkles, Sun,
+    FileText, Lightbulb, Heart, CheckCircle, Info
+} from 'lucide-react';
 import ReviewList from '@/components/reviews/ReviewList';
 import ReviewForm from '@/components/reviews/ReviewForm';
+import { useEffect, useState } from 'react';
+import { getApprovedReviews } from '@/lib/queries/reviews';
+import { Review } from '@/types/db';
 
-interface PageProps {
-    params: Promise<{ slug: string }>;
-}
+const toTitle = (value: string) =>
+    value
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
 
-export const revalidate = 3600;
+const getSectionIcon = (key: string) => {
+    switch (key) {
+        case 'intro': return <Info className="w-5 h-5 text-secondary-600" />;
+        case 'main_event': return <Star className="w-5 h-5 text-secondary-600" />;
+        case 'migration_cycle': return <Repeat className="w-5 h-5 text-secondary-600" />;
+        case 'experience': return <Compass className="w-5 h-5 text-secondary-600" />;
+        case 'highlights': return <Sparkles className="w-5 h-5 text-secondary-600" />;
+        case 'best_time':
+        case 'best_times': return <Sun className="w-5 h-5 text-secondary-600" />;
+        case 'safari_details': return <FileText className="w-5 h-5 text-secondary-600" />;
+        case 'safari_tips':
+        case 'pro_traveler_tips': return <Lightbulb className="w-5 h-5 text-secondary-600" />;
+        case 'why_choose_hurulu': return <Heart className="w-5 h-5 text-secondary-600" />;
+        default: return <CheckCircle className="w-5 h-5 text-secondary-600" />;
+    }
+};
 
-export default async function DestinationDetailPage(props: PageProps) {
-    const params = await props.params;
-    const destination = await getDestinationBySlug(params.slug);
+const renderKeyValueList = (record: Record<string, unknown>) => (
+    <div className="grid gap-3 sm:grid-cols-2 mt-4">
+        {Object.entries(record).map(([key, value]) => (
+            <div key={key} className="flex items-start gap-3 p-3 rounded-xl bg-safari-50 border border-safari-100/50 hover:border-safari-200 transition-colors">
+                <div className="mt-0.5 min-w-[4px] h-[4px] rounded-full bg-secondary-500" />
+                <div className="flex flex-col gap-0.5">
+                    <span className="text-xs font-bold uppercase tracking-wider text-safari-400">{toTitle(key)}</span>
+                    <span className="text-sm font-medium text-safari-800">{String(value)}</span>
+                </div>
+            </div>
+        ))}
+    </div>
+);
 
-    if (!destination) {
-        notFound();
+const renderDescriptionSections = (sections: Record<string, unknown>) => {
+    const preferredOrder = [
+        'intro',
+        'main_event',
+        'migration_cycle',
+        'experience',
+        'highlights',
+        'best_time',
+        'best_times',
+        'safari_details',
+        'safari_tips',
+        'pro_traveler_tips',
+        'why_choose_hurulu'
+    ];
+
+    const entries = Object.entries(sections);
+    const ordered = [
+        ...preferredOrder.flatMap(key => entries.filter(([entryKey]) => entryKey === key)),
+        ...entries.filter(([entryKey]) => !preferredOrder.includes(entryKey))
+    ];
+
+    return (
+        <div className="grid gap-6">
+            {ordered.map(([key, value]) => {
+                const sectionTitle = toTitle(key);
+                const icon = getSectionIcon(key);
+
+                if (Array.isArray(value)) {
+                    return (
+                        <div key={key} className="group rounded-3xl border border-safari-100 bg-white p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-2 rounded-xl bg-safari-50 text-secondary-600 group-hover:bg-secondary-50 transition-colors">
+                                    {icon}
+                                </div>
+                                <h3 className="text-xl md:text-2xl font-bold text-safari-900">{sectionTitle}</h3>
+                            </div>
+                            <ul className="space-y-3">
+                                {value.map((item, idx) => (
+                                    <li key={`${key}-${idx}`} className="flex items-start gap-3 text-safari-700/90 leading-relaxed">
+                                        <span className="mt-2 min-w-[6px] h-[6px] rounded-full bg-secondary-400 shrink-0" />
+                                        <span>{String(item)}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    );
+                }
+
+                if (value && typeof value === 'object') {
+                    const record = value as Record<string, unknown>;
+                    const title = typeof record.title === 'string' ? record.title : sectionTitle;
+                    const content = typeof record.content === 'string' ? record.content : null;
+                    const extraKeys = Object.keys(record).filter(k => !['title', 'content'].includes(k));
+
+                    return (
+                        <div key={key} className="group rounded-3xl border border-safari-100 bg-white p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-2 rounded-xl bg-safari-50 text-secondary-600 group-hover:bg-secondary-50 transition-colors">
+                                    {icon}
+                                </div>
+                                <h3 className="text-xl md:text-2xl font-bold text-safari-900">{title}</h3>
+                            </div>
+                            {content ? <p className="text-base md:text-lg text-safari-700/90 mb-6 leading-relaxed">{content}</p> : null}
+                            {extraKeys.length > 0 ? (
+                                renderKeyValueList(
+                                    extraKeys.reduce<Record<string, unknown>>((acc, entryKey) => {
+                                        acc[entryKey] = record[entryKey];
+                                        return acc;
+                                    }, {})
+                                )
+                            ) : null}
+                        </div>
+                    );
+                }
+
+                return (
+                    <div key={key} className="group rounded-3xl border border-safari-100 bg-white p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 rounded-xl bg-safari-50 text-secondary-600 group-hover:bg-secondary-50 transition-colors">
+                                {icon}
+                            </div>
+                            <h3 className="text-xl md:text-2xl font-bold text-safari-900">{sectionTitle}</h3>
+                        </div>
+                        <p className="text-base md:text-lg text-safari-700/90 leading-relaxed">{String(value)}</p>
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
+export default function DestinationDetailPage() {
+    const params = useParams();
+    const slug = params?.slug as string;
+    const { destinations, isLoading: isGlobalLoading } = useGlobalData();
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+
+    const destination = destinations.find(d => d.slug === slug);
+
+    useEffect(() => {
+        if (destination?.id) {
+            getApprovedReviews(destination.id).then((data) => {
+                setReviews(data);
+                setIsLoadingReviews(false);
+            });
+        }
+    }, [destination?.id]);
+
+    if (isGlobalLoading) {
+        return (
+            <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary-600"></div>
+            </div>
+        );
     }
 
-    const [reviews, images] = await Promise.all([
-        getApprovedReviews(destination.id),
-        getDestinationImages(destination.id)
-    ]);
+    if (!destination) {
+        return notFound();
+    }
 
+    const images = destination.images || [];
     // Use the first image as hero if available
     const heroImage = images.length > 0 ? images[0].secure_url : null;
 
@@ -34,118 +182,40 @@ export default async function DestinationDetailPage(props: PageProps) {
             ? destination.description_sections
             : null;
 
-    const toTitle = (value: string) =>
-        value
-            .split('_')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
-
-    const renderKeyValueList = (record: Record<string, unknown>) => (
-        <ul className="grid gap-2 sm:grid-cols-2">
-            {Object.entries(record).map(([key, value]) => (
-                <li key={key} className="flex flex-col gap-1 rounded-xl border border-safari-100 bg-safari-50 px-3 py-2">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-safari-500">{toTitle(key)}</span>
-                    <span className="text-sm text-safari-700">{String(value)}</span>
-                </li>
-            ))}
-        </ul>
-    );
-
-    const renderDescriptionSections = (sections: Record<string, unknown>) => {
-        const preferredOrder = [
-            'intro',
-            'main_event',
-            'migration_cycle',
-            'experience',
-            'highlights',
-            'best_time',
-            'best_times',
-            'safari_details',
-            'safari_tips',
-            'pro_traveler_tips',
-            'why_choose_hurulu'
-        ];
-
-        const entries = Object.entries(sections);
-        const ordered = [
-            ...preferredOrder.flatMap(key => entries.filter(([entryKey]) => entryKey === key)),
-            ...entries.filter(([entryKey]) => !preferredOrder.includes(entryKey))
-        ];
-
-        return (
-            <div className="space-y-6 text-safari-700 leading-relaxed">
-                {ordered.map(([key, value]) => {
-                    const sectionTitle = toTitle(key);
-                    if (Array.isArray(value)) {
-                        return (
-                            <div key={key} className="rounded-2xl border border-safari-100 bg-white p-5 shadow-sm">
-                                <h3 className="text-lg md:text-xl font-bold text-safari-900 mb-4">{sectionTitle}</h3>
-                                <ul className="grid gap-2">
-                                    {value.map((item, idx) => (
-                                        <li key={`${key}-${idx}`} className="rounded-xl border border-safari-100 bg-safari-50 px-3 py-2 text-sm text-safari-700">
-                                            {String(item)}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        );
-                    }
-
-                    if (value && typeof value === 'object') {
-                        const record = value as Record<string, unknown>;
-                        const title = typeof record.title === 'string' ? record.title : sectionTitle;
-                        const content = typeof record.content === 'string' ? record.content : null;
-                        const extraKeys = Object.keys(record).filter(k => !['title', 'content'].includes(k));
-
-                        return (
-                            <div key={key} className="rounded-2xl border border-safari-100 bg-white p-5 shadow-sm">
-                                <h3 className="text-lg md:text-xl font-bold text-safari-900 mb-3">{title}</h3>
-                                {content ? <p className="text-sm md:text-base text-safari-700 mb-4">{content}</p> : null}
-                                {extraKeys.length > 0 ? (
-                                    renderKeyValueList(
-                                        extraKeys.reduce<Record<string, unknown>>((acc, entryKey) => {
-                                            acc[entryKey] = record[entryKey];
-                                            return acc;
-                                        }, {})
-                                    )
-                                ) : null}
-                            </div>
-                        );
-                    }
-
-                    return (
-                        <div key={key} className="rounded-2xl border border-safari-100 bg-white p-5 shadow-sm">
-                            <h3 className="text-lg md:text-xl font-bold text-safari-900 mb-3">{sectionTitle}</h3>
-                            <p className="text-sm md:text-base text-safari-700">{String(value)}</p>
-                        </div>
-                    );
-                })}
-            </div>
-        );
-    };
 
     return (
         <div className="bg-safari-50 min-h-screen pb-20">
             {/* Hero Header */}
-            <div className="relative h-[60vh] bg-safari-800 text-white overflow-hidden">
-                <div className="absolute inset-0 bg-black/40 z-10" />
+            <div className="relative h-[85vh] bg-safari-900 text-white overflow-hidden group">
+                <div className="absolute inset-0 bg-black/30 z-10" />
+                <div className="absolute inset-0 bg-gradient-to-t from-safari-950 via-transparent to-transparent z-20 opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent z-20" />
+
                 {heroImage ? (
                     <img
                         src={heroImage}
                         alt={destination.name}
-                        className="absolute inset-0 w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-[20s] ease-in-out group-hover:scale-110"
                     />
                 ) : (
                     <div className="absolute inset-0 bg-gradient-to-r from-safari-900/50 to-secondary-900/30" />
                 )}
 
-                <div className="absolute inset-0 flex flex-col items-center justify-center z-20 container mx-auto px-4 text-center">
-                    <span className="inline-block py-1 px-3 rounded-full bg-secondary-600 text-xs font-bold uppercase tracking-wider mb-4">
-                        Safari Destination
-                    </span>
-                    <h1 className="text-5xl md:text-7xl font-bold mb-6 font-display">
-                        {destination.name}
-                    </h1>
+                <div className="absolute inset-0 flex flex-col items-center justify-center z-30 container mx-auto px-4 text-center">
+                    <div className="animate-fade-in-up">
+                        <span className="inline-block py-1.5 px-4 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-[0.2em] mb-6 text-white/90">
+                            Safari Destination
+                        </span>
+                        <h1 className="text-5xl md:text-7xl lg:text-9xl font-bold mb-6 font-display tracking-tight text-white drop-shadow-lg">
+                            {destination.name}
+                        </h1>
+                    </div>
+                </div>
+
+                {/* Scroll Indicator */}
+                <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 z-30 flex flex-col items-center animate-bounce text-white/70">
+                    <span className="text-xs uppercase tracking-widest mb-2 font-medium">Explore</span>
+                    <div className="w-[1px] h-12 bg-gradient-to-b from-white to-transparent"></div>
                 </div>
             </div>
 
@@ -275,50 +345,67 @@ export default async function DestinationDetailPage(props: PageProps) {
                                 </span>
                             </div>
 
-                            <ReviewList reviews={reviews} />
+                            {isLoadingReviews ? (
+                                <div className="flex justify-center p-8">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-secondary-600"></div>
+                                </div>
+                            ) : (
+                                <ReviewList reviews={reviews} />
+                            )}
                             <ReviewForm destinationId={destination.id} />
                         </div>
                     </div>
 
                     {/* Sidebar / Pricing */}
-                    <div className="space-y-6">
-                        <div className="bg-white rounded-3xl p-8 shadow-lg border border-safari-100 sticky top-24">
-                            <h3 className="text-xl font-bold text-safari-900 mb-6">Trip Details</h3>
+                    <div className="space-y-6 lg:col-span-1">
+                        <div className="bg-white rounded-3xl p-6 shadow-xl border border-safari-100 sticky top-24">
+                            <div className="mb-6 pb-6 border-b border-safari-50">
+                                <span className="text-sm font-bold uppercase tracking-wider text-secondary-600 mb-2 block">Starting from</span>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-4xl font-bold text-safari-900">
+                                        Rs. {destination.vehicle_price_up_to_3.toLocaleString()}
+                                    </span>
+                                    <span className="text-safari-500 font-medium">/ jeep</span>
+                                </div>
+                                <p className="text-xs text-safari-400 mt-2 font-medium">
+                                    Best price guaranteed • Instant confirmation
+                                </p>
+                            </div>
 
-                            <div className="space-y-4 mb-8">
-                                <div className="flex items-start gap-4">
-                                    <div className="bg-safari-100 p-2 rounded-lg text-safari-700">
+                            <div className="space-y-6 mb-8">
+                                <div className="flex items-start gap-4 p-3 hover:bg-safari-50 rounded-xl transition-colors">
+                                    <div className="bg-safari-100 p-2.5 rounded-xl text-safari-700 shrink-0">
                                         <Clock size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-sm text-safari-500 font-medium">Duration</p>
-                                        <p className="text-safari-900 font-semibold">{destination.standard_duration_hours} Hours</p>
+                                        <p className="text-xs text-safari-500 font-bold uppercase tracking-wider mb-0.5">Duration</p>
+                                        <p className="text-safari-900 font-bold">{destination.standard_duration_hours} Hours</p>
                                     </div>
                                 </div>
 
-                                <div className="flex items-start gap-4">
-                                    <div className="bg-safari-100 p-2 rounded-lg text-safari-700">
+                                <div className="flex items-start gap-4 p-3 hover:bg-safari-50 rounded-xl transition-colors">
+                                    <div className="bg-safari-100 p-2.5 rounded-xl text-safari-700 shrink-0">
                                         <Ticket size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-sm text-safari-500 font-medium">Entrance Ticket</p>
-                                        <p className="text-safari-900 font-semibold">
+                                        <p className="text-xs text-safari-500 font-bold uppercase tracking-wider mb-0.5">Entrance Ticket</p>
+                                        <p className="text-safari-900 font-bold">
                                             Rs. {destination.ticket_price.toLocaleString()}
                                             <span className="text-sm font-normal text-safari-500">
                                                 {destination.ticket_pricing_type === 'per_person' ? ' / person' : ' flat rate'}
                                             </span>
                                         </p>
-                                        <p className="text-xs text-secondary-600 mt-1">*Paid at gate</p>
+                                        <p className="text-[10px] text-secondary-600 font-bold uppercase mt-1 bg-secondary-50 inline-block px-1.5 py-0.5 rounded">Paid at gate</p>
                                     </div>
                                 </div>
 
-                                <div className="flex items-start gap-4">
-                                    <div className="bg-safari-100 p-2 rounded-lg text-safari-700">
+                                <div className="flex items-start gap-4 p-3 hover:bg-safari-50 rounded-xl transition-colors">
+                                    <div className="bg-safari-100 p-2.5 rounded-xl text-safari-700 shrink-0">
                                         <Car size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-sm text-safari-500 font-medium">Jeep Fee</p>
-                                        <p className="text-safari-900 font-semibold">
+                                        <p className="text-xs text-safari-500 font-bold uppercase tracking-wider mb-0.5">Jeep Fee</p>
+                                        <p className="text-safari-900 font-bold">
                                             Rs. {destination.vehicle_price_up_to_3.toLocaleString()}
                                             <span className="text-sm font-normal text-safari-500"> (up to 3 pax)</span>
                                         </p>
@@ -328,19 +415,22 @@ export default async function DestinationDetailPage(props: PageProps) {
 
                             <Link
                                 href={`/booking?destination=${destination.slug}`}
-                                className="w-full block text-center bg-secondary-600 hover:bg-secondary-700 text-white font-bold py-4 rounded-xl transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0"
+                                className="w-full block text-center bg-gradient-to-r from-secondary-600 to-secondary-500 hover:from-secondary-700 hover:to-secondary-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-secondary-200 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 text-lg"
                             >
                                 Book This Safari
                             </Link>
-                            <div className="mt-5 rounded-xl border border-secondary-200 bg-secondary-50 p-4 flex items-start gap-3">
-                                <div className="bg-secondary-100 p-1.5 rounded-lg text-secondary-700 shrink-0 mt-0.5">
-                                    <DollarSign size={18} />
-                                </div>
-                                <div>
-                                    <p className="text-sm font-semibold text-safari-900">$5 Advance Booking Fee</p>
-                                    <p className="text-xs text-safari-500 mt-1">
-                                        A small booking fee is charged at the time of reservation. Remaining balance is paid on arrival.
-                                    </p>
+
+                            <div className="mt-6 bg-safari-50/50 rounded-xl p-4 border border-safari-100">
+                                <div className="flex items-start gap-3">
+                                    <div className="bg-white p-1.5 rounded-lg text-secondary-600 shadow-sm shrink-0 border border-safari-100">
+                                        <DollarSign size={16} />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-bold text-safari-900">Reservations</p>
+                                        <p className="text-xs text-safari-600 mt-1 leading-relaxed">
+                                            Secure your spot with just a <span className="font-bold text-secondary-700">$5 advance fee</span>. Pay the rest comfortably upon arrival.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

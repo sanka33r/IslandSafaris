@@ -23,6 +23,10 @@ export default function BookingCard({ booking }: { booking: any }) {
         cancelled: 'bg-red-100 text-red-700',
     };
 
+    const formatPackageName = (type: string) => {
+        return type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    };
+
     return (
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-safari-100 space-y-4">
             <div className="flex justify-between items-start">
@@ -44,8 +48,16 @@ export default function BookingCard({ booking }: { booking: any }) {
                 <div className="flex items-start gap-2">
                     <MapPin size={16} className="text-safari-400 mt-0.5" />
                     <div>
-                        <p className="text-[10px] font-bold text-safari-400 uppercase">Destination</p>
-                        <p className="text-safari-800 font-medium leading-tight">{booking.destinations?.name || 'Unknown'}</p>
+                        <p className="text-[10px] font-bold text-safari-400 uppercase">
+                            {booking.package_type ? 'Package' : 'Destination'}
+                        </p>
+                        <p className="text-safari-800 font-medium leading-tight">
+                            {booking.package_type ? (
+                                <span className="text-purple-700">{formatPackageName(booking.package_type)}</span>
+                            ) : (
+                                booking.destinations?.name || 'Unknown'
+                            )}
+                        </p>
                     </div>
                 </div>
 

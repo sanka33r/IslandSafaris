@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
+import GlobalDataProvider from '@/providers/GlobalDataProvider';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -22,7 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={cn(outfit.variable, "font-sans min-h-screen bg-safari-50 text-safari-900")}>
-        {children}
+        <GlobalDataProvider>
+          {children}
+        </GlobalDataProvider>
       </body>
     </html>
   );

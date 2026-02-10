@@ -20,6 +20,7 @@ export default function AdminSidebar() {
 
     const navItems = [
         { name: 'Bookings', href: '/admin/bookings', icon: LayoutDashboard },
+        { name: 'Package Bookings', href: '/admin/package-bookings', icon: LayoutDashboard },
         { name: 'Destinations', href: '/admin/destinations', icon: MapPin },
         { name: 'Reviews', href: '/admin/reviews', icon: MessageSquare },
     ];
