@@ -3,12 +3,13 @@
 
 @layer base {
   body {
-    @apply bg-secondary-50 text-safari-950 antialiased font-sans;
+    @apply bg-safari-950 text-secondary-50 antialiased font-sans;
   }
 
   /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
+    @apply bg-safari-950;
   }
 
   /* Selection styling */

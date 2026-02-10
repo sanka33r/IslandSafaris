@@ -42,7 +42,7 @@ export default function HeroSection() {
         <section
             ref={heroRef}
             className="relative min-h-screen flex items-center justify-center overflow-hidden bg-safari-900"
-            style={{ perspective: '1200px', backgroundColor: '#fef2d0' }}
+            style={{ perspective: '1200px', backgroundColor: '#1e2b1b' }}
         >
             {/* ── Deep Background Layer (moves slowest) ── */}
             <div

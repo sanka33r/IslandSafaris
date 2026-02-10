@@ -20,8 +20,6 @@ export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const pathname = usePathname();
-    // const isHome = pathname === '/';
-    const isHome = false; // Always use standard dark colors
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -34,88 +32,45 @@ export default function Header() {
         <>
             <header
                 className={cn(
-                    'fixed w-full z-40 transition-all duration-500',
+                    'fixed w-full z-50 transition-all duration-500 border-b border-white/5',
                     scrolled
-                        ? 'bg-white/80 backdrop-blur-xl shadow-[0_2px_20px_rgba(0,0,0,0.06)] border-b border-safari-100/50'
-                        : isHome
-                            ? 'bg-transparent border-b border-white/10'
-                            : 'bg-[#faf8f4]/90 backdrop-blur-md border-b border-safari-100/30'
+                        ? 'bg-safari-950/90 backdrop-blur-xl shadow-lg py-3'
+                        : 'bg-safari-950/70 backdrop-blur-md py-5'
                 )}
             >
                 <div className="container mx-auto px-6">
-                    <div className="h-16 md:h-20 flex items-center justify-between">
+                    <div className="flex items-center justify-between">
                         {/* Logo */}
-                        <Link href="/" className="flex items-center gap-2.5 relative z-[60] group">
+                        <Link href="/" className="flex items-center gap-3 group relative z-[60]">
                             <div
                                 className={cn(
-                                    'w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-500',
-                                    scrolled
-                                        ? 'bg-secondary-600 shadow-md'
-                                        : isOpen
-                                            ? 'bg-secondary-600'
-                                            : isHome
-                                                ? 'bg-white/20 backdrop-blur-md border border-white/30'
-                                                : 'bg-secondary-600/10 border border-secondary-200'
+                                    'w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 border',
+                                    'bg-white/5 border-white/10 group-hover:bg-secondary-500/20 group-hover:border-secondary-500/30'
                                 )}
                             >
                                 <Compass
-                                    size={18}
-                                    className="text-white group-hover:rotate-45 transition-transform duration-500"
+                                    size={20}
+                                    className="text-secondary-400 group-hover:rotate-45 transition-transform duration-500"
                                 />
                             </div>
-                            <span
-                                className={cn(
-                                    'text-lg md:text-xl font-bold tracking-tight transition-colors duration-500',
-                                    scrolled
-                                        ? 'text-safari-900'
-                                        : isOpen
-                                            ? 'text-white'
-                                            : isHome
-                                                ? 'text-white'
-                                                : 'text-safari-900'
-                                )}
-                            >
+                            <span className="text-xl font-bold tracking-tight text-secondary-100 transition-colors">
                                 ISLAND
-                                <span
-                                    className={cn(
-                                        'transition-colors duration-500',
-                                        scrolled ? 'text-secondary-600' : isHome ? 'text-secondary-400' : 'text-secondary-600'
-                                    )}
-                                >
-                                    SAFARIS
-                                </span>
+                                <span className="text-secondary-400 ml-0.5">SAFARIS</span>
                             </span>
                         </Link>
 
                         {/* Desktop Nav */}
-                        <nav className="hidden md:flex items-center">
-                            <div
-                                className={cn(
-                                    'flex items-center gap-1 px-2 py-1.5 rounded-full transition-all duration-500',
-                                    scrolled
-                                        ? 'bg-safari-50 border border-safari-100'
-                                        : isHome
-                                            ? 'bg-white/10 border border-white/20 backdrop-blur-md'
-                                            : 'bg-safari-100/50 border border-safari-200/50'
-                                )}
-                            >
+                        <nav className="hidden md:flex items-center gap-6">
+                            <div className="flex items-center gap-1 p-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm shadow-inner shadow-black/20">
                                 {navItems.map((item) => (
                                     <Link
                                         key={item.href}
                                         href={item.href}
                                         className={cn(
-                                            'relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-300',
+                                            'px-5 py-2 rounded-full text-sm font-medium transition-all duration-300',
                                             pathname === item.href
-                                                ? scrolled
-                                                    ? 'bg-white text-secondary-600 shadow-sm'
-                                                    : isHome
-                                                        ? 'bg-secondary-600 text-white shadow-sm'
-                                                        : 'bg-white text-secondary-600 shadow-sm'
-                                                : scrolled
-                                                    ? 'text-safari-600 hover:text-safari-900 hover:bg-white/60'
-                                                    : isHome
-                                                        ? 'text-white/80 hover:text-white hover:bg-white/10'
-                                                        : 'text-safari-600 hover:text-safari-900 hover:bg-white/60'
+                                                ? 'bg-secondary-600 text-white shadow-lg shadow-secondary-900/40'
+                                                : 'text-secondary-100/70 hover:text-white hover:bg-white/5'
                                         )}
                                     >
                                         {item.name}
@@ -125,46 +80,25 @@ export default function Header() {
 
                             <Link
                                 href="/booking"
-                                className={cn(
-                                    'ml-4 group flex items-center gap-2 px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 active:scale-95',
-                                    scrolled
-                                        ? 'bg-safari-900 hover:bg-safari-800 text-white shadow-lg'
-                                        : 'bg-safari-900 hover:bg-safari-800 text-white shadow-lg'
-                                )}
+                                className="group flex items-center gap-2 pl-6 pr-2 py-2 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 active:scale-95 text-white"
                             >
-                                Book Now
-                                <ArrowRight
-                                    size={14}
-                                    className="group-hover:translate-x-0.5 transition-transform"
-                                />
+                                <span className="text-secondary-100 group-hover:text-white transition-colors">Book Now</span>
+                                <div className="w-8 h-8 rounded-full bg-secondary-600 flex items-center justify-center group-hover:bg-secondary-500 transition-colors shadow-lg shadow-secondary-900/50">
+                                    <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                                </div>
                             </Link>
                         </nav>
 
                         {/* Mobile Menu Button */}
                         <button
-                            className={cn(
-                                'md:hidden relative z-[60] w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300',
-                                isOpen
-                                    ? 'bg-white/10'
-                                    : scrolled
-                                        ? 'bg-safari-50 border border-safari-100'
-                                        : isHome
-                                            ? 'bg-white/10 border border-white/20 backdrop-blur-md'
-                                            : 'bg-safari-100/50 border border-safari-200/50'
-                            )}
+                            className="md:hidden relative z-[60] w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 bg-white/5 border border-white/10 hover:bg-white/10 text-secondary-100"
                             onClick={() => setIsOpen(!isOpen)}
                             aria-label="Toggle Menu"
                         >
                             {isOpen ? (
                                 <X size={22} className="text-white" />
                             ) : (
-                                <Menu
-                                    size={22}
-                                    className={cn(
-                                        'transition-colors',
-                                        scrolled ? 'text-safari-800' : isHome ? 'text-white' : 'text-safari-800'
-                                    )}
-                                />
+                                <Menu size={22} className="text-secondary-100" />
                             )}
                         </button>
                     </div>
@@ -179,14 +113,22 @@ export default function Header() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="fixed inset-0 z-50 bg-safari-900/95 backdrop-blur-xl flex flex-col md:hidden"
+                        className="fixed inset-0 z-50 bg-safari-950/98 backdrop-blur-xl flex flex-col md:hidden"
                     >
+                        {/* Close Button */}
+                        <button
+                            onClick={() => setIsOpen(false)}
+                            className="absolute top-5 right-6 z-[70] w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 border border-white/10 text-secondary-100 hover:bg-white/10 transition-all"
+                            aria-label="Close Menu"
+                        >
+                            <X size={22} />
+                        </button>
                         {/* Decorative elements */}
-                        <div className="absolute top-0 right-0 w-80 h-80 bg-secondary-600/10 rounded-full blur-3xl" />
-                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary-500/5 rounded-full blur-3xl" />
+                        <div className="absolute top-0 right-0 w-80 h-80 bg-secondary-600/10 rounded-full blur-3xl pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary-500/5 rounded-full blur-3xl pointer-events-none" />
 
                         <div className="flex-1 flex flex-col justify-center px-8 relative">
-                            <div className="space-y-2">
+                            <div className="space-y-4">
                                 {navItems.map((item, index) => (
                                     <motion.div
                                         key={item.href}
@@ -201,10 +143,10 @@ export default function Header() {
                                             href={item.href}
                                             onClick={() => setIsOpen(false)}
                                             className={cn(
-                                                'block py-3 text-3xl font-bold transition-all duration-300',
+                                                'block py-2 text-4xl font-bold transition-all duration-300 tracking-tight',
                                                 pathname === item.href
                                                     ? 'text-secondary-400'
-                                                    : 'text-white/60 hover:text-white hover:translate-x-2'
+                                                    : 'text-white/40 hover:text-white hover:translate-x-2'
                                             )}
                                         >
                                             {item.name}
@@ -217,15 +159,15 @@ export default function Header() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.5 }}
-                                className="mt-10"
+                                className="mt-12"
                             >
                                 <Link
                                     href="/booking"
                                     onClick={() => setIsOpen(false)}
-                                    className="inline-flex items-center gap-3 bg-secondary-600 text-white py-4 px-8 rounded-full text-lg font-bold shadow-xl hover:bg-secondary-500 active:scale-95 transition-all"
+                                    className="inline-flex items-center gap-4 bg-secondary-600 text-white py-4 px-10 rounded-full text-lg font-bold shadow-xl shadow-secondary-900/50 hover:bg-secondary-500 active:scale-95 transition-all w-full justify-center group"
                                 >
                                     Book Your Safari
-                                    <ArrowRight size={20} />
+                                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                                 </Link>
                             </motion.div>
                         </div>
@@ -235,10 +177,10 @@ export default function Header() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.6 }}
-                            className="px-8 pb-8 text-white/30 text-xs"
+                            className="px-8 pb-10 text-white/20 text-xs font-medium tracking-widest uppercase"
                         >
-                            <p>© 2024 Island Safaris Sri Lanka</p>
-                            <p>Authentic Wildlife Experiences</p>
+                            <p className="mb-1">© 2026Island Safaris</p>
+                            <p>Wild Heart of Sri Lanka</p>
                         </motion.div>
                     </motion.div>
                 )}
