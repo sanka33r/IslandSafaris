@@ -13,10 +13,38 @@ interface DestinationFormProps {
     images: Image[];
 }
 
+interface DescriptionSectionsFormState {
+    introTitle: string;
+    introContent: string;
+    experienceTitle: string;
+    experienceContent: string;
+    bestTimeMorning: string;
+    bestTimeAfternoon: string;
+    migrationCycle: string[];
+    whyChooseHurulu: string[];
+}
+
 export default function DestinationForm({ destination, images }: DestinationFormProps) {
     const isNew = destination.id === 'new';
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState(destination);
+    const [descriptionSections, setDescriptionSections] = useState<DescriptionSectionsFormState>(() => {
+        const raw = destination.description_sections;
+        const obj = raw && typeof raw === 'object' ? (raw as Record<string, any>) : {};
+        const intro = obj.intro ?? {};
+        const experience = obj.experience ?? {};
+        const bestTimes = obj.best_times ?? {};
+        return {
+            introTitle: typeof intro.title === 'string' ? intro.title : '',
+            introContent: typeof intro.content === 'string' ? intro.content : '',
+            experienceTitle: typeof experience.title === 'string' ? experience.title : '',
+            experienceContent: typeof experience.content === 'string' ? experience.content : '',
+            bestTimeMorning: typeof bestTimes.morning === 'string' ? bestTimes.morning : '',
+            bestTimeAfternoon: typeof bestTimes.afternoon === 'string' ? bestTimes.afternoon : '',
+            migrationCycle: Array.isArray(obj.migration_cycle) ? obj.migration_cycle.map(String) : [''],
+            whyChooseHurulu: Array.isArray(obj.why_choose_hurulu) ? obj.why_choose_hurulu.map(String) : ['']
+        };
+    });
     const [newImageUrl, setNewImageUrl] = useState('');
     const [newImageAlt, setNewImageAlt] = useState('');
     const [imageLoading, setImageLoading] = useState<string | null>(null);
@@ -26,15 +54,53 @@ export default function DestinationForm({ destination, images }: DestinationForm
         e.preventDefault();
         setLoading(true);
 
+        const trimmedMigration = descriptionSections.migrationCycle
+            .map(item => item.trim())
+            .filter(Boolean);
+        const trimmedWhyChoose = descriptionSections.whyChooseHurulu
+            .map(item => item.trim())
+            .filter(Boolean);
+
+        const builtSections: Record<string, any> = {};
+        if (descriptionSections.introTitle || descriptionSections.introContent) {
+            builtSections.intro = {
+                title: descriptionSections.introTitle || undefined,
+                content: descriptionSections.introContent || undefined
+            };
+        }
+        if (descriptionSections.bestTimeMorning || descriptionSections.bestTimeAfternoon) {
+            builtSections.best_times = {
+                morning: descriptionSections.bestTimeMorning || undefined,
+                afternoon: descriptionSections.bestTimeAfternoon || undefined
+            };
+        }
+        if (descriptionSections.experienceTitle || descriptionSections.experienceContent) {
+            builtSections.experience = {
+                title: descriptionSections.experienceTitle || undefined,
+                content: descriptionSections.experienceContent || undefined
+            };
+        }
+        if (trimmedMigration.length > 0) {
+            builtSections.migration_cycle = trimmedMigration;
+        }
+        if (trimmedWhyChoose.length > 0) {
+            builtSections.why_choose_hurulu = trimmedWhyChoose;
+        }
+
+        const payload = {
+            ...formData,
+            description_sections: Object.keys(builtSections).length > 0 ? builtSections : null
+        };
+
         if (isNew) {
-            const result = await createDestination(formData);
+            const result = await createDestination(payload);
             setLoading(false);
             if (result.success && result.data) {
                 router.push(`/admin/destinations/${result.data.id}`);
                 router.refresh();
             }
         } else {
-            const result = await updateDestination(destination.id, formData);
+            const result = await updateDestination(destination.id, payload);
             setLoading(false);
             if (result.success) {
                 router.refresh();
@@ -126,6 +192,149 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                     className="w-full p-4 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 focus:bg-white outline-none transition-all min-h-[200px]"
                                     required
                                 />
+                            </div>
+                            <div className="md:col-span-2 space-y-6">
+                                <label className="block text-sm font-bold text-safari-700 ml-1">Structured Sections</label>
+
+                                <div className="rounded-2xl border border-safari-100 bg-white p-5 space-y-4">
+                                    <h4 className="font-bold text-safari-900">Intro</h4>
+                                    <input
+                                        type="text"
+                                        value={descriptionSections.introTitle}
+                                        onChange={(e) => setDescriptionSections({ ...descriptionSections, introTitle: e.target.value })}
+                                        placeholder="Section title"
+                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all"
+                                    />
+                                    <textarea
+                                        value={descriptionSections.introContent}
+                                        onChange={(e) => setDescriptionSections({ ...descriptionSections, introContent: e.target.value })}
+                                        placeholder="Section content"
+                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all min-h-[140px]"
+                                    />
+                                </div>
+
+                                <div className="rounded-2xl border border-safari-100 bg-white p-5 space-y-4">
+                                    <h4 className="font-bold text-safari-900">Best Times</h4>
+                                    <input
+                                        type="text"
+                                        value={descriptionSections.bestTimeMorning}
+                                        onChange={(e) => setDescriptionSections({ ...descriptionSections, bestTimeMorning: e.target.value })}
+                                        placeholder="Morning"
+                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={descriptionSections.bestTimeAfternoon}
+                                        onChange={(e) => setDescriptionSections({ ...descriptionSections, bestTimeAfternoon: e.target.value })}
+                                        placeholder="Afternoon"
+                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all"
+                                    />
+                                </div>
+
+                                <div className="rounded-2xl border border-safari-100 bg-white p-5 space-y-4">
+                                    <h4 className="font-bold text-safari-900">Experience</h4>
+                                    <input
+                                        type="text"
+                                        value={descriptionSections.experienceTitle}
+                                        onChange={(e) => setDescriptionSections({ ...descriptionSections, experienceTitle: e.target.value })}
+                                        placeholder="Section title"
+                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all"
+                                    />
+                                    <textarea
+                                        value={descriptionSections.experienceContent}
+                                        onChange={(e) => setDescriptionSections({ ...descriptionSections, experienceContent: e.target.value })}
+                                        placeholder="Section content"
+                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all min-h-[140px]"
+                                    />
+                                </div>
+
+                                <div className="rounded-2xl border border-safari-100 bg-white p-5 space-y-4">
+                                    <h4 className="font-bold text-safari-900">Migration Cycle</h4>
+                                    {descriptionSections.migrationCycle.map((item, idx) => (
+                                        <div key={`migration-${idx}`} className="flex gap-3">
+                                            <input
+                                                type="text"
+                                                value={item}
+                                                onChange={(e) => {
+                                                    const updated = [...descriptionSections.migrationCycle];
+                                                    updated[idx] = e.target.value;
+                                                    setDescriptionSections({ ...descriptionSections, migrationCycle: updated });
+                                                }}
+                                                className="flex-1 p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const updated = descriptionSections.migrationCycle.filter((_, i) => i !== idx);
+                                                    setDescriptionSections({
+                                                        ...descriptionSections,
+                                                        migrationCycle: updated.length > 0 ? updated : ['']
+                                                    });
+                                                }}
+                                                className="px-3 rounded-2xl border border-safari-100 text-safari-500 hover:text-safari-900"
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setDescriptionSections({
+                                                ...descriptionSections,
+                                                migrationCycle: [...descriptionSections.migrationCycle, '']
+                                            })
+                                        }
+                                        className="inline-flex items-center gap-2 text-secondary-600 font-semibold text-sm"
+                                    >
+                                        <Plus size={14} />
+                                        Add item
+                                    </button>
+                                </div>
+
+                                <div className="rounded-2xl border border-safari-100 bg-white p-5 space-y-4">
+                                    <h4 className="font-bold text-safari-900">Why Choose Hurulu</h4>
+                                    {descriptionSections.whyChooseHurulu.map((item, idx) => (
+                                        <div key={`why-${idx}`} className="flex gap-3">
+                                            <input
+                                                type="text"
+                                                value={item}
+                                                onChange={(e) => {
+                                                    const updated = [...descriptionSections.whyChooseHurulu];
+                                                    updated[idx] = e.target.value;
+                                                    setDescriptionSections({ ...descriptionSections, whyChooseHurulu: updated });
+                                                }}
+                                                className="flex-1 p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const updated = descriptionSections.whyChooseHurulu.filter((_, i) => i !== idx);
+                                                    setDescriptionSections({
+                                                        ...descriptionSections,
+                                                        whyChooseHurulu: updated.length > 0 ? updated : ['']
+                                                    });
+                                                }}
+                                                className="px-3 rounded-2xl border border-safari-100 text-safari-500 hover:text-safari-900"
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setDescriptionSections({
+                                                ...descriptionSections,
+                                                whyChooseHurulu: [...descriptionSections.whyChooseHurulu, '']
+                                            })
+                                        }
+                                        className="inline-flex items-center gap-2 text-secondary-600 font-semibold text-sm"
+                                    >
+                                        <Plus size={14} />
+                                        Add item
+                                    </button>
+                                </div>
                             </div>
                         </div>
 

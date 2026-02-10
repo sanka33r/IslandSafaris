@@ -11,6 +11,18 @@ export interface Destination {
     slug: string
     name: string
     description: string
+    summary?: string | null
+    sections?: {
+        title: string
+        body?: string | null
+        bullets?: string[] | null
+    }[] | null
+    seasonal_calendar?: {
+        months: string
+        note: string
+    }[] | null
+    tips?: string[] | null
+    description_sections?: Json | null
     ticket_price: number
     ticket_pricing_type: 'per_person' | 'flat'
     vehicle_price_up_to_3: number

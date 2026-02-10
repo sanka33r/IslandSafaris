@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { getDestinationBySlug, getDestinationImages } from '@/lib/queries/destinations';
 import { getApprovedReviews } from '@/lib/queries/reviews';
 import { cn } from '@/lib/utils';
-import { Clock, Ticket, Car, Camera } from 'lucide-react';
+import { Clock, Ticket, Car, Camera, DollarSign } from 'lucide-react';
 import ReviewList from '@/components/reviews/ReviewList';
 import ReviewForm from '@/components/reviews/ReviewForm';
 
@@ -28,6 +28,101 @@ export default async function DestinationDetailPage(props: PageProps) {
 
     // Use the first image as hero if available
     const heroImage = images.length > 0 ? images[0].secure_url : null;
+
+    const descriptionSections =
+        destination.description_sections && typeof destination.description_sections === 'object'
+            ? destination.description_sections
+            : null;
+
+    const toTitle = (value: string) =>
+        value
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+
+    const renderKeyValueList = (record: Record<string, unknown>) => (
+        <ul className="grid gap-2 sm:grid-cols-2">
+            {Object.entries(record).map(([key, value]) => (
+                <li key={key} className="flex flex-col gap-1 rounded-xl border border-safari-100 bg-safari-50 px-3 py-2">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-safari-500">{toTitle(key)}</span>
+                    <span className="text-sm text-safari-700">{String(value)}</span>
+                </li>
+            ))}
+        </ul>
+    );
+
+    const renderDescriptionSections = (sections: Record<string, unknown>) => {
+        const preferredOrder = [
+            'intro',
+            'main_event',
+            'migration_cycle',
+            'experience',
+            'highlights',
+            'best_time',
+            'best_times',
+            'safari_details',
+            'safari_tips',
+            'pro_traveler_tips',
+            'why_choose_hurulu'
+        ];
+
+        const entries = Object.entries(sections);
+        const ordered = [
+            ...preferredOrder.flatMap(key => entries.filter(([entryKey]) => entryKey === key)),
+            ...entries.filter(([entryKey]) => !preferredOrder.includes(entryKey))
+        ];
+
+        return (
+            <div className="space-y-6 text-safari-700 leading-relaxed">
+                {ordered.map(([key, value]) => {
+                    const sectionTitle = toTitle(key);
+                    if (Array.isArray(value)) {
+                        return (
+                            <div key={key} className="rounded-2xl border border-safari-100 bg-white p-5 shadow-sm">
+                                <h3 className="text-lg md:text-xl font-bold text-safari-900 mb-4">{sectionTitle}</h3>
+                                <ul className="grid gap-2">
+                                    {value.map((item, idx) => (
+                                        <li key={`${key}-${idx}`} className="rounded-xl border border-safari-100 bg-safari-50 px-3 py-2 text-sm text-safari-700">
+                                            {String(item)}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        );
+                    }
+
+                    if (value && typeof value === 'object') {
+                        const record = value as Record<string, unknown>;
+                        const title = typeof record.title === 'string' ? record.title : sectionTitle;
+                        const content = typeof record.content === 'string' ? record.content : null;
+                        const extraKeys = Object.keys(record).filter(k => !['title', 'content'].includes(k));
+
+                        return (
+                            <div key={key} className="rounded-2xl border border-safari-100 bg-white p-5 shadow-sm">
+                                <h3 className="text-lg md:text-xl font-bold text-safari-900 mb-3">{title}</h3>
+                                {content ? <p className="text-sm md:text-base text-safari-700 mb-4">{content}</p> : null}
+                                {extraKeys.length > 0 ? (
+                                    renderKeyValueList(
+                                        extraKeys.reduce<Record<string, unknown>>((acc, entryKey) => {
+                                            acc[entryKey] = record[entryKey];
+                                            return acc;
+                                        }, {})
+                                    )
+                                ) : null}
+                            </div>
+                        );
+                    }
+
+                    return (
+                        <div key={key} className="rounded-2xl border border-safari-100 bg-white p-5 shadow-sm">
+                            <h3 className="text-lg md:text-xl font-bold text-safari-900 mb-3">{sectionTitle}</h3>
+                            <p className="text-sm md:text-base text-safari-700">{String(value)}</p>
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    };
 
     return (
         <div className="bg-safari-50 min-h-screen pb-20">
@@ -61,9 +156,76 @@ export default async function DestinationDetailPage(props: PageProps) {
                     <div className="lg:col-span-2 space-y-12">
                         <div className="bg-white rounded-3xl p-8 shadow-sm border border-safari-100">
                             <h2 className="text-2xl font-bold text-safari-900 mb-4">About this Park</h2>
-                            <div className="prose prose-safari max-w-none text-safari-700 leading-relaxed whitespace-pre-line">
-                                {destination.description}
-                            </div>
+                            {(() => {
+                                if (descriptionSections) {
+                                    return renderDescriptionSections(descriptionSections as Record<string, unknown>);
+                                }
+
+                                const sections = Array.isArray(destination.sections) ? destination.sections : [];
+                                const seasonalCalendar = Array.isArray(destination.seasonal_calendar)
+                                    ? destination.seasonal_calendar
+                                    : [];
+                                const tips = Array.isArray(destination.tips) ? destination.tips : [];
+                                const hasStructured =
+                                    Boolean(destination.summary) ||
+                                    sections.length > 0 ||
+                                    seasonalCalendar.length > 0 ||
+                                    tips.length > 0;
+
+                                if (!hasStructured) {
+                                    return (
+                                        <div className="prose prose-safari max-w-none text-safari-700 leading-relaxed whitespace-pre-line">
+                                            {destination.description}
+                                        </div>
+                                    );
+                                }
+
+                                return (
+                                    <div className="space-y-8 text-safari-700 leading-relaxed">
+                                        {destination.summary ? (
+                                            <p className="text-base md:text-lg">{destination.summary}</p>
+                                        ) : null}
+
+                                        {sections.map((section, idx) => (
+                                            <div key={`${section.title}-${idx}`} className="space-y-3">
+                                                <h3 className="text-xl font-bold text-safari-900">{section.title}</h3>
+                                                {section.body ? <p>{section.body}</p> : null}
+                                                {Array.isArray(section.bullets) && section.bullets.length > 0 ? (
+                                                    <ul className="list-disc pl-6 space-y-2">
+                                                        {section.bullets.map((item, itemIdx) => (
+                                                            <li key={`${section.title}-bullet-${itemIdx}`}>{item}</li>
+                                                        ))}
+                                                    </ul>
+                                                ) : null}
+                                            </div>
+                                        ))}
+
+                                        {seasonalCalendar.length > 0 ? (
+                                            <div className="space-y-3">
+                                                <h3 className="text-xl font-bold text-safari-900">Seasonal Calendar</h3>
+                                                <ul className="list-disc pl-6 space-y-2">
+                                                    {seasonalCalendar.map((entry, entryIdx) => (
+                                                        <li key={`calendar-${entryIdx}`}>
+                                                            <span className="font-semibold">{entry.months}:</span> {entry.note}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        ) : null}
+
+                                        {tips.length > 0 ? (
+                                            <div className="space-y-3">
+                                                <h3 className="text-xl font-bold text-safari-900">Pro-Traveler Tips</h3>
+                                                <ul className="list-disc pl-6 space-y-2">
+                                                    {tips.map((tip, tipIdx) => (
+                                                        <li key={`tip-${tipIdx}`}>{tip}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        ) : null}
+                                    </div>
+                                );
+                            })()}
                         </div>
 
                         {/* Gallery Section */}
@@ -170,9 +332,17 @@ export default async function DestinationDetailPage(props: PageProps) {
                             >
                                 Book This Safari
                             </Link>
-                            <p className="text-xs text-center text-safari-400 mt-4">
-                                No payment required online. Pay on arrival.
-                            </p>
+                            <div className="mt-5 rounded-xl border border-secondary-200 bg-secondary-50 p-4 flex items-start gap-3">
+                                <div className="bg-secondary-100 p-1.5 rounded-lg text-secondary-700 shrink-0 mt-0.5">
+                                    <DollarSign size={18} />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-semibold text-safari-900">$5 Advance Booking Fee</p>
+                                    <p className="text-xs text-safari-500 mt-1">
+                                        A small booking fee is charged at the time of reservation. Remaining balance is paid on arrival.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

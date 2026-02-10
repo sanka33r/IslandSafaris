@@ -7,6 +7,7 @@ export default function NewDestinationPage() {
         slug: '',
         name: '',
         description: '',
+        description_sections: null,
         ticket_price: 0,
         ticket_pricing_type: 'per_person' as const,
         vehicle_price_up_to_3: 0,
