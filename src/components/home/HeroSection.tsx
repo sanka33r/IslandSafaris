@@ -41,7 +41,7 @@ export default function HeroSection() {
     return (
         <section
             ref={heroRef}
-            className="relative min-h-screen flex items-center justify-center overflow-hidden bg-safari-900"
+            className="relative min-h-[100dvh] md:min-h-screen flex flex-col items-center justify-start md:justify-center overflow-hidden bg-safari-900 pt-32 pb-32 md:py-0"
             style={{ perspective: '1200px', backgroundColor: '#1e2b1b' }}
         >
             {/* ── Deep Background Layer (moves slowest) ── */}
@@ -133,7 +133,7 @@ export default function HeroSection() {
 
             {/* ── Main Content with 3D depth ── */}
             <div
-                className="relative z-20 text-center px-6 max-w-5xl mx-auto text-white"
+                className="relative z-40 text-center px-6 max-w-5xl mx-auto text-white mt-10 md:mt-0"
                 style={{
                     transform: `translate3d(${mousePos.x * 12}px, ${mousePos.y * 8 - parallaxFg}px, 50px)`,
                     transition: 'transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1)',
@@ -155,7 +155,7 @@ export default function HeroSection() {
 
                 {/* Heading with staggered entrance */}
                 <h1
-                    className={`text-5xl md:text-7xl lg:text-[5.5rem] font-bold mb-6 md:mb-8 tracking-tight leading-[1.05] transition-all duration-1000 delay-200 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                    className={`text-4xl md:text-7xl lg:text-[5.5rem] font-bold mb-6 md:mb-8 tracking-tight leading-[1.05] transition-all duration-1000 delay-200 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                         }`}
                 >
                     <span className="block">Discover the</span>
