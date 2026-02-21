@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, MessageSquare, MapPin, LogOut, Shield, Menu, X } from 'lucide-react';
+import { LayoutDashboard, BarChart3, MessageSquare, MapPin, LogOut, Shield, Menu, X, CalendarDays, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -12,6 +12,8 @@ export default function AdminSidebar() {
     const pathname = usePathname();
     const router = useRouter();
 
+    // Trigger re-render check for sidebar items
+
     const handleLogout = async () => {
         await fetch('/api/admin/logout', { method: 'POST' });
         router.push('/admin/login');
@@ -19,13 +21,20 @@ export default function AdminSidebar() {
     };
 
     const navItems = [
+        { name: 'Dashboard', href: '/admin', icon: BarChart3 },
         { name: 'Bookings', href: '/admin/bookings', icon: LayoutDashboard },
         { name: 'Package Bookings', href: '/admin/package-bookings', icon: LayoutDashboard },
+        { name: 'Calendar', href: '/admin/calendar', icon: CalendarDays },
         { name: 'Destinations', href: '/admin/destinations', icon: MapPin },
+        { name: 'Promo Codes', href: '/admin/promo-codes', icon: Tag },
         { name: 'Reviews', href: '/admin/reviews', icon: MessageSquare },
     ];
 
-    const currentNavItem = navItems.find(item => pathname.startsWith(item.href)) || { name: 'Admin', icon: Shield };
+    const currentNavItem = [...navItems]
+        .sort((a, b) => b.href.length - a.href.length)
+        .find(item =>
+            item.href === '/admin' ? (pathname === '/admin' || pathname === '/admin/') : pathname.startsWith(item.href)
+        ) || { name: 'Admin', icon: Shield };
 
     const SidebarContent = () => (
         <div className="flex flex-col h-full bg-safari-900 border-r border-safari-800/10 shadow-2xl">
@@ -45,7 +54,9 @@ export default function AdminSidebar() {
             <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto mt-4">
                 {navItems.map((item) => {
                     const Icon = item.icon;
-                    const isActive = pathname.startsWith(item.href);
+                    const isActive = item.href === '/admin'
+                        ? (pathname === '/admin' || pathname === '/admin/')
+                        : pathname.startsWith(item.href);
                     return (
                         <Link
                             key={item.href}

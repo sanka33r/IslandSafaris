@@ -26,7 +26,7 @@ export default async function BookingPage(props: PageProps) {
                     <h1 className="text-4xl font-bold text-safari-900 mb-4">Plan Your Safari</h1>
                     <p className="text-safari-600 max-w-2xl mx-auto">
                         Fill out the form below to request a booking.
-                        We will confirm availability and get back to you shortly.
+                        Secure your spot with just a USD 8 advance payment. We will confirm availability shortly.
                     </p>
                 </div>
 

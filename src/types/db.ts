@@ -44,9 +44,14 @@ export interface Booking {
     customer_name: string
     email: string
     phone: string
+    passport_number?: string | null
     country?: string | null
     message?: string | null
     special_requests?: string | null
+    pickup_location?: string | null
+    dropoff_location?: string | null
+    promo_code?: string | null
+    discount_amount?: number
     advance_payment_amount?: number
     advance_payment_status?: 'pending' | 'paid' | 'refunded'
     status: 'new' | 'confirmed' | 'cancelled'
@@ -72,3 +77,20 @@ export interface Image {
     sort_order: number
     created_at: string
 }
+
+export interface PromoCode {
+    id: string
+    code: string
+    type: 'fixed' | 'percentage'
+    value: number
+    min_order_value: number
+    max_discount?: number | null
+    start_date: string
+    end_date: string
+    usage_limit?: number | null
+    usage_count: number
+    status: 'active' | 'inactive'
+    applicable_scope: string[]
+    created_at: string
+}
+

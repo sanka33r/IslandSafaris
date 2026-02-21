@@ -15,7 +15,11 @@ export const bookingSchema = z.object({
 
     customer_name: z.string().min(2, "Name is required"),
     email: z.string().email("Invalid email address"),
+    country_code: z.string().default('+94'),
     phone: z.string().min(10, "Valid phone number is required"),
+    passport_number: z.string().optional(),
+    pickup_location: z.string().optional(),
+    promo_code: z.string().optional(),
     message: z.string().optional(),
 }).refine((data) => {
     if (data.pickup_required && !data.hotel_name) return false;

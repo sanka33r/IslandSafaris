@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { PACKAGE_INFO } from '@/lib/constants';
 
 export async function POST(request: NextRequest) {
     try {
@@ -18,8 +19,10 @@ export async function POST(request: NextRequest) {
             pickup_required,
             hotel_name,
             special_requests,
+            promo_code,
             advance_payment_amount,
         } = body;
+
 
         if (!package_type || !date || !time || !group_size || !customer_name || !email || !phone || !country) {
             return NextResponse.json(
@@ -52,7 +55,75 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Insert booking
+        // Validate promo code if provided
+        let discountAmount = 0;
+        if (promo_code) {
+            const { data: promo, error: promoError } = await supabaseAdmin
+                .from('promo_codes')
+                .select('*')
+                .eq('code', promo_code)
+                .eq('status', 'active')
+                .single();
+
+            if (promoError || !promo) {
+                return NextResponse.json(
+                    { error: 'Invalid promo code' },
+                    { status: 400 }
+                );
+            }
+
+            // Check expiry
+            const now = new Date();
+            if (new Date(promo.start_date) > now || new Date(promo.end_date) < now) {
+                return NextResponse.json(
+                    { error: 'Promo code expired' },
+                    { status: 400 }
+                );
+            }
+
+            // Check usage limit
+            if (promo.usage_limit && promo.usage_count >= promo.usage_limit) {
+                return NextResponse.json(
+                    { error: 'Promo code usage limit reached' },
+                    { status: 400 }
+                );
+            }
+
+            // Check scope
+            // scope for packages is in `package_type`
+            const scope = package_type;
+            if (!promo.applicable_scope.includes('all') && !promo.applicable_scope.includes(scope)) {
+                return NextResponse.json(
+                    { error: 'Promo code not applicable for this package' },
+                    { status: 400 }
+                );
+            }
+
+            // Increment usage count
+            await supabaseAdmin
+                .from('promo_codes')
+                .update({ usage_count: promo.usage_count + 1 })
+                .eq('id', promo.id);
+
+            // ... code ...
+
+            // Calculate discount amount for storage
+            const packageInfo = PACKAGE_INFO[package_type as keyof typeof PACKAGE_INFO];
+            const price = packageInfo ? packageInfo.price : 0;
+            const total = price * parseInt(group_size);
+
+            if (promo.type === 'percentage') {
+                discountAmount = (total * promo.value) / 100;
+                if (promo.max_discount && discountAmount > promo.max_discount) {
+                    discountAmount = promo.max_discount;
+                }
+            } else {
+                discountAmount = promo.value;
+            }
+            if (discountAmount > total) discountAmount = total;
+        }
+
+        // Insert booking - omit passport_number, pickup_location, promo_code, discount_amount if columns don't exist
         const { data: booking, error } = await supabaseAdmin
             .from('bookings')
             .insert({

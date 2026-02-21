@@ -14,7 +14,10 @@ export async function updateBookingStatus(id: string, status: 'new' | 'confirmed
         return { success: false, message: 'Failed to update status' };
     }
 
+    revalidatePath('/admin');
     revalidatePath('/admin/bookings');
+    revalidatePath('/admin/package-bookings');
+    revalidatePath('/admin/calendar');
     return { success: true };
 }
 

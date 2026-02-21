@@ -34,7 +34,7 @@ export default function PackageBookingPage({ searchParams }: BookingPageProps) {
                         </span>
                     </h1>
                     <p className="text-safari-600 text-base sm:text-lg max-w-2xl mx-auto">
-                        Secure your spot with just a USD 5 advance payment. Complete the form below and we&apos;ll confirm your booking within 24 hours.
+                        Secure your spot with just a USD 5 advance payment (non-refundable). Complete the form below and we&apos;ll confirm your booking within 24 hours.
                     </p>
                 </div>
 
@@ -65,8 +65,8 @@ export default function PackageBookingPage({ searchParams }: BookingPageProps) {
                                         <Calendar size={20} className="text-secondary-600" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-safari-900 mb-1">Flexible Cancellation</h4>
-                                        <p className="text-safari-600 text-sm">Free cancellation up to 24 hours before your experience.</p>
+                                        <h4 className="font-bold text-safari-900 mb-1">Non-Refundable Advance</h4>
+                                        <p className="text-safari-600 text-sm">The advance payment secures your spot and is non-refundable.</p>
                                     </div>
                                 </div>
 

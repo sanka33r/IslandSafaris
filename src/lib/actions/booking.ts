@@ -69,11 +69,16 @@ export async function submitBooking(prevState: any, formData: BookingFormData) {
             group_size: result.data.group_size,
             pickup_required: result.data.pickup_required,
             hotel_name: result.data.hotel_name,
+            pickup_location: result.data.pickup_location || null,
             extra_hours: result.data.extra_hours,
             customer_name: result.data.customer_name,
             email: result.data.email,
             phone: result.data.phone,
+            passport_number: result.data.passport_number || null,
+            promo_code: result.data.promo_code || null,
             message: result.data.message,
+            advance_payment_amount: 8,
+            advance_payment_status: 'pending',
             status: 'new'
         });
 

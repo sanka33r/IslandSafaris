@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { updateBookingStatus } from '@/lib/actions/admin';
-import { Loader2, Check, X, User, MapPin, Calendar, Users, Phone } from 'lucide-react';
+import { Loader2, Check, X, User, MapPin, Calendar, Users, Phone, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { PACKAGE_INFO } from '@/lib/constants';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function BookingCard({ booking }: { booking: any }) {
+export default function BookingCard({ booking, onViewDetails }: { booking: any; onViewDetails?: () => void }) {
     const [loading, setLoading] = useState(false);
 
     const handleUpdate = async (status: 'confirmed' | 'cancelled') => {
@@ -28,7 +29,10 @@ export default function BookingCard({ booking }: { booking: any }) {
     };
 
     return (
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-safari-100 space-y-4">
+        <div
+            className={cn("bg-white rounded-3xl p-6 shadow-sm border border-safari-100 space-y-4", onViewDetails && "cursor-pointer hover:ring-2 hover:ring-secondary-200 transition-all")}
+            onClick={onViewDetails}
+        >
             <div className="flex justify-between items-start">
                 <div className="space-y-1">
                     <div className="flex items-center gap-2 text-safari-400 font-mono text-xs">
@@ -86,9 +90,38 @@ export default function BookingCard({ booking }: { booking: any }) {
                         <p className="text-safari-800 font-medium truncate text-xs">{booking.phone}</p>
                     </div>
                 </div>
+
+                {/* Price Breakdown */}
+                <div className="col-span-2 mt-2 pt-2 border-t border-dashed border-safari-100">
+                    <div className="flex justify-between items-center text-xs">
+                        <span className="text-safari-500">Total Price:</span>
+                        <span className="font-bold text-safari-900">
+                            ${booking.package_type ? (PACKAGE_INFO[booking.package_type as keyof typeof PACKAGE_INFO]?.price * booking.group_size) : booking.ticket_price}
+                        </span>
+                    </div>
+                    {booking.discount_amount > 0 && (
+                        <div className="flex justify-between items-center text-xs text-green-600 font-medium">
+                            <span className="flex items-center gap-1">
+                                <Tag size={10} />
+                                Promo ({booking.promo_code}):
+                            </span>
+                            <span>-${booking.discount_amount}</span>
+                        </div>
+                    )}
+                    <div className="flex justify-between items-center text-xs">
+                        <span className="text-safari-500">Advance Paid:</span>
+                        <span className="font-bold text-safari-900">${booking.advance_payment_amount || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs mt-1 pt-1 border-t border-safari-100">
+                        <span className="font-bold text-secondary-700">Balance Due:</span>
+                        <span className="font-bold text-secondary-700">
+                            ${Math.max(0, (booking.package_type ? (PACKAGE_INFO[booking.package_type as keyof typeof PACKAGE_INFO]?.price * booking.group_size) : booking.ticket_price) - (booking.discount_amount || 0) - (booking.advance_payment_amount || 0))}
+                        </span>
+                    </div>
+                </div>
             </div>
 
-            <div className="pt-4 flex gap-2">
+            <div className="pt-4 flex gap-2" onClick={(e) => e.stopPropagation()}>
                 {booking.status !== 'confirmed' && booking.status !== 'cancelled' && (
                     <>
                         <button

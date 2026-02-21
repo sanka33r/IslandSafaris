@@ -6,7 +6,7 @@ import { Loader2, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function BookingRow({ booking }: { booking: any }) {
+export default function BookingRow({ booking, onSelect }: { booking: any; onSelect?: () => void }) {
     const [loading, setLoading] = useState(false);
 
     const handleUpdate = async (status: 'confirmed' | 'cancelled') => {
@@ -28,7 +28,10 @@ export default function BookingRow({ booking }: { booking: any }) {
     };
 
     return (
-        <tr className="hover:bg-safari-50/50 transition-colors">
+        <tr
+            className={cn("hover:bg-safari-50/50 transition-colors", onSelect && "cursor-pointer")}
+            onClick={onSelect}
+        >
             <td className="p-4 font-mono text-xs text-safari-400">{booking.id.slice(0, 8)}</td>
             <td className="p-4">
                 <div className="font-semibold text-safari-900">{booking.customer_name}</div>
@@ -60,7 +63,7 @@ export default function BookingRow({ booking }: { booking: any }) {
                     {booking.status}
                 </span>
             </td>
-            <td className="p-4">
+            <td className="p-4" onClick={(e) => e.stopPropagation()}>
                 <div className="flex gap-2">
                     {booking.status !== 'confirmed' && booking.status !== 'cancelled' && (
                         <>

@@ -4,9 +4,43 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Destination } from '@/types/db';
 import { submitBooking } from '@/lib/actions/booking';
+import { validatePromoCode } from '@/lib/actions/promo-codes';
 import { BookingFormData, bookingSchema } from '@/lib/schemas/booking';
-import { Loader2, CheckCircle, Calendar, Users, Clock, Car, MapPin } from 'lucide-react';
+import { Loader2, CheckCircle, Calendar, Users, Clock, Car, MapPin, ExternalLink, Tag, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+const COUNTRY_CODES = [
+    { code: '+94', country: 'Sri Lanka', flag: '🇱🇰' },
+    { code: '+1', country: 'USA / Canada', flag: '🇺🇸' },
+    { code: '+44', country: 'United Kingdom', flag: '🇬🇧' },
+    { code: '+61', country: 'Australia', flag: '🇦🇺' },
+    { code: '+91', country: 'India', flag: '🇮🇳' },
+    { code: '+49', country: 'Germany', flag: '🇩🇪' },
+    { code: '+33', country: 'France', flag: '🇫🇷' },
+    { code: '+39', country: 'Italy', flag: '🇮🇹' },
+    { code: '+81', country: 'Japan', flag: '🇯🇵' },
+    { code: '+86', country: 'China', flag: '🇨🇳' },
+    { code: '+82', country: 'South Korea', flag: '🇰🇷' },
+    { code: '+65', country: 'Singapore', flag: '🇸🇬' },
+    { code: '+60', country: 'Malaysia', flag: '🇲🇾' },
+    { code: '+971', country: 'UAE', flag: '🇦🇪' },
+    { code: '+966', country: 'Saudi Arabia', flag: '🇸🇦' },
+    { code: '+27', country: 'South Africa', flag: '🇿🇦' },
+    { code: '+55', country: 'Brazil', flag: '🇧🇷' },
+    { code: '+7', country: 'Russia', flag: '🇷🇺' },
+    { code: '+34', country: 'Spain', flag: '🇪🇸' },
+    { code: '+31', country: 'Netherlands', flag: '🇳🇱' },
+    { code: '+46', country: 'Sweden', flag: '🇸🇪' },
+    { code: '+47', country: 'Norway', flag: '🇳🇴' },
+    { code: '+41', country: 'Switzerland', flag: '🇨🇭' },
+    { code: '+64', country: 'New Zealand', flag: '🇳🇿' },
+    { code: '+66', country: 'Thailand', flag: '🇹🇭' },
+    { code: '+62', country: 'Indonesia', flag: '🇮🇩' },
+    { code: '+63', country: 'Philippines', flag: '🇵🇭' },
+    { code: '+90', country: 'Turkey', flag: '🇹🇷' },
+    { code: '+48', country: 'Poland', flag: '🇵🇱' },
+    { code: '+380', country: 'Ukraine', flag: '🇺🇦' },
+];
 
 interface BookingWizardProps {
     destinations: Destination[];
@@ -29,11 +63,19 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
         extra_hours: 0,
         pickup_required: false,
         time: '06:00',
+        country_code: '+94',
+        pickup_location: '',
+        passport_number: '',
+        promo_code: '',
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitResult, setSubmitResult] = useState<any>(null);
     const [estimatedPrice, setEstimatedPrice] = useState<any>(null);
+
+    const [discount, setDiscount] = useState<{ amount: number; code: string } | null>(null);
+    const [validatingPromo, setValidatingPromo] = useState(false);
+    const [promoMessage, setPromoMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
     useEffect(() => {
         if (preselectedDestinationId && currentStep === 1) {
@@ -61,6 +103,35 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
         }
     }, [formData, destinations]);
 
+    // Clear discount when price-affecting factors change
+    useEffect(() => {
+        setDiscount(null);
+        setPromoMessage(null);
+    }, [formData.destination_id, formData.group_size, formData.extra_hours]);
+
+    const handleApplyPromo = async () => {
+        const code = (formData as any).promo_code?.trim();
+        if (!code || !estimatedPrice) return;
+        setValidatingPromo(true);
+        setPromoMessage(null);
+        try {
+            const result = await validatePromoCode(code, estimatedPrice.total, 'safari');
+            if (result.valid && result.discount != null) {
+                setDiscount({ amount: result.discount, code: result.code! });
+                updateField('promo_code' as any, result.code!);
+                setPromoMessage({ type: 'success', text: `Applied! You saved Rs. ${result.discount.toLocaleString()}` });
+            } else {
+                setDiscount(null);
+                setPromoMessage({ type: 'error', text: result.message || 'Invalid promo code' });
+            }
+        } catch {
+            setDiscount(null);
+            setPromoMessage({ type: 'error', text: 'Failed to validate promo code' });
+        } finally {
+            setValidatingPromo(false);
+        }
+    };
+
     const updateField = (field: keyof BookingFormData, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
@@ -78,7 +149,14 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
-            const res = await submitBooking(null, formData as BookingFormData);
+            const fullPhone = formData.country_code && formData.phone
+                ? `${formData.country_code} ${formData.phone}`
+                : formData.phone || '';
+            const submitData = {
+                ...formData,
+                phone: fullPhone,
+            } as BookingFormData;
+            const res = await submitBooking(null, submitData);
             if (res.success) {
                 setSubmitResult(res);
             } else {
@@ -252,7 +330,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
                                         </label>
                                     </div>
                                     {formData.pickup_required && (
-                                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
+                                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-3">
                                             <input
                                                 type="text"
                                                 placeholder="Enter Hotel Name"
@@ -260,6 +338,59 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
                                                 value={formData.hotel_name || ''}
                                                 onChange={(e) => updateField('hotel_name', e.target.value)}
                                             />
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                {/* Pickup Location */}
+                                                <div className="space-y-1">
+                                                    <label className="text-xs font-semibold text-safari-600">Pickup Location</label>
+                                                    <div className="relative">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Paste Google Maps link or type location"
+                                                            className="w-full p-3 pr-9 text-sm rounded-lg border border-safari-200 focus:ring-2 focus:ring-secondary-500 outline-none"
+                                                            value={(formData as any).pickup_location || ''}
+                                                            onChange={(e) => updateField('pickup_location' as any, e.target.value)}
+                                                        />
+                                                        <MapPin size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-safari-400" />
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <a
+                                                            href="https://www.google.com/maps/@7.8731,80.7718,9z"
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-secondary-600 hover:text-secondary-700 bg-secondary-50 hover:bg-secondary-100 px-2 py-1 rounded-md transition-colors"
+                                                        >
+                                                            <MapPin size={10} />
+                                                            Pick on Maps
+                                                        </a>
+                                                        {(formData as any).pickup_location && (formData as any).pickup_location.includes('google.com/maps') && (
+                                                            <a
+                                                                href={(formData as any).pickup_location}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-green-600 hover:text-green-700"
+                                                            >
+                                                                <ExternalLink size={10} />
+                                                                View on Maps
+                                                            </a>
+                                                        )}
+                                                    </div>
+                                                    {(formData as any).pickup_location && (formData as any).pickup_location.includes('google.com/maps') && (
+                                                        <div className="rounded-lg overflow-hidden border border-safari-100">
+                                                            <iframe
+                                                                src={`https://maps.google.com/maps?q=${encodeURIComponent((formData as any).pickup_location)}&output=embed`}
+                                                                width="100%"
+                                                                height="120"
+                                                                style={{ border: 0 }}
+                                                                allowFullScreen
+                                                                loading="lazy"
+                                                                referrerPolicy="no-referrer-when-downgrade"
+                                                                className="rounded-lg"
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </motion.div>
                                     )}
                                 </div>
@@ -291,8 +422,37 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
                                         value={formData.customer_name || ''} onChange={e => updateField('customer_name', e.target.value)} />
                                     <input type="email" placeholder="Email Address" className="p-3 rounded-lg border border-safari-200 focus:ring-2 focus:ring-secondary-500 outline-none"
                                         value={formData.email || ''} onChange={e => updateField('email', e.target.value)} />
-                                    <input type="tel" placeholder="Phone Number" className="p-3 rounded-lg border border-safari-200 focus:ring-2 focus:ring-secondary-500 outline-none"
-                                        value={formData.phone || ''} onChange={e => updateField('phone', e.target.value)} />
+
+                                    <div className="space-y-1">
+                                        <label className="text-sm font-semibold text-safari-700">Contact Number</label>
+                                        <div className="flex gap-2">
+                                            <div className="relative w-[100px]">
+                                                <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm font-semibold text-safari-800">
+                                                    {COUNTRY_CODES.find(cc => cc.code === ((formData as any).country_code || '+94'))?.flag} {(formData as any).country_code || '+94'}
+                                                </div>
+                                                <select
+                                                    value={(formData as any).country_code || '+94'}
+                                                    onChange={(e) => updateField('country_code' as any, e.target.value)}
+                                                    className="w-full p-3 text-sm rounded-lg border border-safari-200 focus:ring-2 focus:ring-secondary-500 outline-none text-transparent cursor-pointer appearance-none"
+                                                >
+                                                    {COUNTRY_CODES.map((cc) => (
+                                                        <option key={cc.code} value={cc.code} className="text-safari-800">
+                                                            {cc.flag} {cc.code} {cc.country}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <input type="tel" placeholder="Phone Number" className="flex-1 p-3 rounded-lg border border-safari-200 focus:ring-2 focus:ring-secondary-500 outline-none"
+                                                value={formData.phone || ''} onChange={e => updateField('phone', e.target.value)} />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="text-sm font-semibold text-safari-700">Passport Number</label>
+                                        <input type="text" placeholder="e.g. N1234567" className="w-full p-3 rounded-lg border border-safari-200 focus:ring-2 focus:ring-secondary-500 outline-none"
+                                            value={(formData as any).passport_number || ''} onChange={e => updateField('passport_number' as any, e.target.value)} />
+                                    </div>
+
                                     <textarea placeholder="Message (Optional)" className="p-3 rounded-lg border border-safari-200 focus:ring-2 focus:ring-secondary-500 outline-none min-h-[100px]"
                                         value={formData.message || ''} onChange={e => updateField('message', e.target.value)} />
                                 </div>
@@ -311,13 +471,65 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
                                         <span className="text-safari-500">Date & Time</span>
                                         <span className="font-semibold">{formData.date} at {formData.time}</span>
                                     </div>
-                                    <div className="flex justify-between pb-2">
+                                    <div className="flex justify-between border-b pb-2 border-safari-200">
                                         <span className="text-safari-500">Contact</span>
                                         <span className="font-semibold text-right">{formData.customer_name}<br />{formData.email}</span>
                                     </div>
+                                    <div className="flex justify-between pb-2">
+                                        <span className="text-safari-500">Advance Payment</span>
+                                        <span className="font-bold text-secondary-600">USD 8</span>
+                                    </div>
                                 </div>
+
+                                {/* Promo Code */}
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-safari-700 flex items-center gap-2">
+                                        <Tag size={14} className="text-secondary-600" />
+                                        Promo Code (Optional)
+                                    </label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Enter promo code"
+                                            className="flex-1 p-3 rounded-lg border border-safari-200 focus:ring-2 focus:ring-secondary-500 outline-none uppercase tracking-wider font-semibold"
+                                            value={(formData as any).promo_code || ''}
+                                            onChange={(e) => {
+                                                updateField('promo_code' as any, e.target.value.toUpperCase());
+                                                if (discount) {
+                                                    setDiscount(null);
+                                                    setPromoMessage(null);
+                                                }
+                                            }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleApplyPromo}
+                                            disabled={validatingPromo || !(formData as any).promo_code?.trim() || !estimatedPrice}
+                                            className="px-6 py-3 rounded-lg bg-safari-900 text-white font-bold hover:bg-safari-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 shrink-0"
+                                        >
+                                            {validatingPromo ? <Loader2 className="animate-spin" size={18} /> : 'Apply'}
+                                        </button>
+                                    </div>
+                                    {promoMessage && (
+                                        <div className={`text-sm font-semibold flex items-center gap-2 ${promoMessage.type === 'success' ? 'text-green-600' : 'text-red-500'}`}>
+                                            {promoMessage.type === 'success' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+                                            {promoMessage.text}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Non-refundable Notice */}
+                                <div className="bg-red-50 border border-red-200 p-4 rounded-xl text-xs text-red-800">
+                                    <p className="flex items-start gap-2">
+                                        <AlertCircle size={14} className="text-red-500 flex-shrink-0 mt-0.5" />
+                                        <span>
+                                            <strong>Non-Refundable Advance:</strong> The advance payment of USD 8 is non-refundable. Remaining balance is paid at the destination.
+                                        </span>
+                                    </p>
+                                </div>
+
                                 <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl text-xs text-yellow-800">
-                                    <p><strong>Note:</strong> Payment is collected at the destination.</p>
+                                    <p><strong>Note:</strong> Remaining balance is collected at the destination.</p>
                                 </div>
                             </div>
                         )}
@@ -337,7 +549,9 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
                             {estimatedPrice && (
                                 <div className="md:hidden flex flex-col items-center">
                                     <span className="text-[10px] uppercase tracking-wider text-safari-400 font-bold">Estimated</span>
-                                    <span className="text-lg font-bold text-secondary-600 leading-none">Rs. {estimatedPrice.total.toLocaleString()}</span>
+                                    <span className="text-lg font-bold text-secondary-600 leading-none">
+                                        Rs. {(discount ? Math.max(0, estimatedPrice.total - discount.amount) : estimatedPrice.total).toLocaleString()}
+                                    </span>
                                 </div>
                             )}
 
@@ -371,12 +585,30 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
                                         <span className="font-medium">Rs. {estimatedPrice.breakdown.extraCost.toLocaleString()}</span>
                                     </div>
                                 )}
+                                {discount && (
+                                    <div className="flex justify-between text-sm text-green-600">
+                                        <span className="text-safari-500">Promo ({discount.code})</span>
+                                        <span className="font-medium">- Rs. {discount.amount.toLocaleString()}</span>
+                                    </div>
+                                )}
                                 <div className="border-t border-safari-100 pt-3 mt-3">
                                     <div className="flex justify-between items-end">
                                         <span className="text-safari-900 font-bold">Total</span>
-                                        <span className="text-2xl font-bold text-secondary-600">Rs. {estimatedPrice.total.toLocaleString()}</span>
+                                        <span className="text-2xl font-bold text-secondary-600">
+                                            Rs. {(discount ? Math.max(0, estimatedPrice.total - discount.amount) : estimatedPrice.total).toLocaleString()}
+                                        </span>
                                     </div>
+                                    {discount && (
+                                        <span className="text-sm text-safari-400 line-through">Rs. {estimatedPrice.total.toLocaleString()}</span>
+                                    )}
                                     <p className="text-xs text-right text-safari-400 mt-1">Approximate Cost</p>
+                                </div>
+                                <div className="border-t border-safari-100 pt-3 mt-3">
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-safari-700 font-semibold">Advance Payment</span>
+                                        <span className="font-bold text-secondary-600">USD 8</span>
+                                    </div>
+                                    <p className="text-xs text-red-500 font-semibold mt-1">Non-refundable</p>
                                 </div>
                             </div>
                         ) : (
