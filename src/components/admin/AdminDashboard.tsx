@@ -13,8 +13,12 @@ import {
     Calendar,
     X,
     ArrowRight,
-    TrendingUp,
     CalendarDays,
+    AlertCircle,
+    Users,
+    TrendingUp,
+    TrendingDown,
+    Clock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -37,6 +41,7 @@ interface AdminDashboardProps {
     nextWeekBookings: Booking[];
     lastWeekRange: { start: string; end: string };
     nextWeekRange: { start: string; end: string };
+    fetchError?: string | null;
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -61,14 +66,11 @@ function categorizeBookings(bookings: Booking[]) {
 
 type ActivityType = 'safari' | 'cooking-class' | 'bicycle-rent' | 'village-tour';
 
-const activityConfig: Record<
-    ActivityType,
-    { label: string; icon: React.ElementType; color: string; bg: string }
-> = {
-    safari: { label: 'Safaris', icon: TreePine, color: 'text-amber-700', bg: 'bg-amber-50 border-amber-200' },
-    'cooking-class': { label: 'Cooking Classes', icon: ChefHat, color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200' },
-    'bicycle-rent': { label: 'Bicycles Rented', icon: Bike, color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
-    'village-tour': { label: 'Village Tours', icon: MapPin, color: 'text-teal-700', bg: 'bg-teal-50 border-teal-200' },
+const activityConfig: Record<ActivityType, { label: string; short: string; icon: React.ElementType; color: string; bg: string }> = {
+    safari: { label: 'Safaris', short: 'Safari', icon: TreePine, color: 'text-amber-700', bg: 'bg-amber-50 border-amber-200' },
+    'cooking-class': { label: 'Cooking Classes', short: 'Cooking', icon: ChefHat, color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200' },
+    'bicycle-rent': { label: 'Bicycles Rented', short: 'Bike', icon: Bike, color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
+    'village-tour': { label: 'Village Tours', short: 'Village', icon: MapPin, color: 'text-teal-700', bg: 'bg-teal-50 border-teal-200' },
 };
 
 function getActivityBookings(bookings: Booking[], type: ActivityType): Booking[] {
@@ -89,80 +91,59 @@ function DailySection({
 }) {
     const Icon = config.icon;
     return (
-        <div className={cn(
-            'rounded-2xl border-2 p-5 shadow-sm hover:shadow-md transition-all duration-300',
-            config.bg,
-            'hover:-translate-y-0.5'
-        )}>
-            <div className="flex items-center gap-3 mb-4">
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-white/70 border border-safari-200/50 shadow-sm">
-                    <Icon className={cn('w-5 h-5', config.color)} />
+        <div className={cn('rounded-xl border p-3.5 shadow-sm', config.bg)}>
+            <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/80 border border-safari-200/50">
+                    <Icon className={cn('w-4 h-4', config.color)} />
                 </div>
                 <div className="flex-1 min-w-0">
-                    <h3 className={cn('font-bold text-base', config.color)}>{title}</h3>
-                    <span className="text-2xl font-extrabold text-safari-900 tabular-nums">{count}</span>
+                    <h3 className={cn('font-semibold text-base', config.color)}>{title}</h3>
+                    <span className="text-xl font-bold text-safari-900 tabular-nums">{count}</span>
                 </div>
             </div>
             {bookings.length === 0 ? (
-                <p className="text-sm text-safari-500 italic py-2">None scheduled</p>
+                <p className="text-base text-safari-500 italic py-1">None</p>
             ) : (
-                <ul className="space-y-2">
-                    {bookings.map((b) => (
-                        <li
-                            key={b.id}
-                            className="flex items-center justify-between text-sm bg-white/80 backdrop-blur rounded-xl px-4 py-2.5 border border-safari-100/80 shadow-sm"
-                        >
-                            <span className="font-semibold text-safari-900 truncate">{b.customer_name}</span>
-                            <span className="text-safari-600 font-bold bg-safari-100/50 px-2 py-0.5 rounded-lg flex-shrink-0 ml-2">{b.time}</span>
+                <ul className="space-y-1.5">
+                    {bookings.slice(0, 5).map((b) => (
+                        <li key={b.id} className="flex items-center justify-between text-base bg-white/80 rounded-lg px-3 py-1.5 border border-safari-100/80">
+                            <span className="font-medium text-safari-900 truncate">{b.customer_name}</span>
+                            <span className="text-safari-600 font-semibold px-1.5 py-0.5 rounded flex-shrink-0 ml-1">{b.time}</span>
                         </li>
                     ))}
+                    {bookings.length > 5 && (
+                        <li className="text-base text-safari-500 italic pl-3">+{bookings.length - 5} more</li>
+                    )}
                 </ul>
             )}
         </div>
     );
 }
 
-function ItineraryModal({
-    title,
-    bookings,
-    onClose,
-}: {
-    title: string;
-    bookings: Booking[];
-    onClose: () => void;
-}) {
+function ItineraryModal({ title, bookings, onClose }: { title: string; bookings: Booking[]; onClose: () => void }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-            <div
-                className="relative bg-white rounded-2xl shadow-2xl border-2 border-safari-100 max-w-lg w-full max-h-[80vh] overflow-hidden"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="sticky top-0 bg-white border-b border-safari-100 px-6 py-4 flex items-center justify-between shadow-sm">
-                    <h3 className="text-lg font-bold text-safari-900">{title}</h3>
-                    <button
-                        onClick={onClose}
-                        className="p-2 rounded-xl hover:bg-safari-100 text-safari-500 transition-colors"
-                    >
-                        <X size={20} />
+            <div className="relative bg-white rounded-xl shadow-2xl border border-safari-100 max-w-lg w-full max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+                <div className="sticky top-0 bg-white border-b border-safari-100 px-4 py-3 flex items-center justify-between">
+                    <h3 className="font-bold text-safari-900">{title}</h3>
+                    <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-safari-100 text-safari-500">
+                        <X size={18} />
                     </button>
                 </div>
-                <div className="p-6 overflow-y-auto max-h-[60vh] space-y-3">
+                <div className="p-4 overflow-y-auto max-h-[60vh] space-y-2">
                     {bookings.length === 0 ? (
-                        <p className="text-safari-500 italic py-4">No bookings</p>
+                        <p className="text-safari-500 italic py-3 text-base">No bookings</p>
                     ) : (
                         bookings.map((b) => (
-                            <div
-                                key={b.id}
-                                className="flex items-center justify-between p-4 rounded-xl bg-safari-50 border border-safari-100 hover:bg-safari-100/50 transition-colors"
-                            >
+                            <div key={b.id} className="flex items-center justify-between p-3 rounded-lg bg-safari-50 border border-safari-100 text-base">
                                 <div>
                                     <p className="font-semibold text-safari-900">{b.customer_name}</p>
-                                    <p className="text-xs text-safari-500 mt-0.5">
+                                    <p className="text-base text-safari-500">
                                         {formatDate(b.date)} at {b.time} · {b.group_size} guest{b.group_size > 1 ? 's' : ''}
                                     </p>
                                     {!b.package_type && b.destinations?.name && (
-                                        <p className="text-xs text-safari-600 mt-0.5">{b.destinations.name}</p>
+                                        <p className="text-base text-safari-600 mt-0.5">{b.destinations.name}</p>
                                     )}
                                 </div>
                             </div>
@@ -181,6 +162,7 @@ export default function AdminDashboard({
     nextWeekBookings,
     lastWeekRange,
     nextWeekRange,
+    fetchError = null,
 }: AdminDashboardProps) {
     const router = useRouter();
     const [modal, setModal] = useState<{ type: ActivityType; period: 'last' | 'next' } | null>(null);
@@ -203,6 +185,14 @@ export default function AdminDashboard({
         'village-tour': nextWeek.villageTours.length,
     };
 
+    const lastWeekTotal = Object.values(lastWeekTotals).reduce((a, b) => a + b, 0);
+    const nextWeekTotal = Object.values(nextWeekTotals).reduce((a, b) => a + b, 0);
+    const dailyTotal = daily.safaris.length + daily.cookingClasses.length + daily.bicycles.length + daily.villageTours.length;
+    const totalGuests = dailyBookings.reduce((sum, b) => sum + (b.group_size || 0), 0);
+    const pendingCount = dailyBookings.filter((b) => b.status === 'new').length;
+
+    const weekChange = lastWeekTotal > 0 ? Math.round(((nextWeekTotal - lastWeekTotal) / lastWeekTotal) * 100) : (nextWeekTotal > 0 ? 100 : 0);
+
     const changeDate = (delta: number) => {
         const d = new Date(selectedDate + 'T12:00:00');
         d.setDate(d.getDate() + delta);
@@ -212,10 +202,6 @@ export default function AdminDashboard({
         router.push(`/admin?date=${y}-${m}-${day}`);
     };
 
-    const lastWeekTotal = lastWeekTotals.safari + lastWeekTotals['cooking-class'] + lastWeekTotals['bicycle-rent'] + lastWeekTotals['village-tour'];
-    const nextWeekTotal = nextWeekTotals.safari + nextWeekTotals['cooking-class'] + nextWeekTotals['bicycle-rent'] + nextWeekTotals['village-tour'];
-    const dailyTotal = daily.safaris.length + daily.cookingClasses.length + daily.bicycles.length + daily.villageTours.length;
-
     const isToday = () => {
         const t = new Date();
         const s = new Date(selectedDate);
@@ -223,159 +209,156 @@ export default function AdminDashboard({
     };
 
     return (
-        <div className="space-y-8">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="space-y-5">
+            {/* Error banner */}
+            {fetchError && (
+                <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-800">
+                    <AlertCircle size={20} className="flex-shrink-0" />
+                    <p className="text-base font-medium">{fetchError}</p>
+                </div>
+            )}
+
+            {/* Compact header row */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                    <h1 className="text-3xl font-bold text-safari-900 tracking-tight">Dashboard</h1>
-                    <p className="text-safari-600 text-sm mt-1">Daily activities and weekly summary</p>
+                    <h1 className="text-xl font-bold text-safari-900">Dashboard</h1>
+                    <p className="text-safari-600 text-base mt-0.5">Daily activities & weekly summary</p>
                 </div>
                 <Link
                     href="/admin/calendar"
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-secondary-600 hover:bg-secondary-500 text-white font-semibold text-sm transition-colors shadow-md hover:shadow-lg"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary-600 hover:bg-secondary-500 text-white font-semibold text-base"
                 >
-                    <CalendarDays size={18} />
+                    <CalendarDays size={16} />
                     View Calendar
-                    <ArrowRight size={16} />
+                    <ArrowRight size={14} />
                 </Link>
             </div>
 
-            {/* Date selector + today's total */}
-            <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex items-center gap-3 bg-white rounded-2xl border-2 border-safari-100 p-4 shadow-md hover:shadow-lg transition-shadow">
-                    <button
-                        onClick={() => changeDate(-1)}
-                        className="p-2.5 rounded-xl bg-safari-50 hover:bg-safari-100 text-safari-600 transition-all hover:scale-105 active:scale-95"
-                    >
-                        <ChevronLeft size={20} />
+            {/* Compact date + stats row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="flex items-center gap-2 bg-white rounded-xl border border-safari-100 p-3">
+                    <button onClick={() => changeDate(-1)} className="p-2 rounded-lg bg-safari-50 hover:bg-safari-100 text-safari-600">
+                        <ChevronLeft size={18} />
                     </button>
-                    <div className="flex-1 flex items-center justify-center gap-3 min-w-0">
-                        <Calendar className="w-6 h-6 text-secondary-500 flex-shrink-0" />
-                        <div className="text-center">
-                            <span className="font-bold text-safari-900 text-lg block">{formatDate(selectedDate)}</span>
-                            {isToday() && (
-                                <span className="text-xs font-semibold text-secondary-600 bg-secondary-100 px-2 py-0.5 rounded-full mt-1 inline-block">Today</span>
-                            )}
-                        </div>
+                    <div className="flex-1 min-w-0 text-center">
+                        <span className="font-bold text-safari-900 text-base block">{formatDate(selectedDate)}</span>
+                        {isToday() && <span className="text-sm font-semibold text-secondary-600 bg-secondary-100 px-1.5 py-0.5 rounded">Today</span>}
                     </div>
-                    <button
-                        onClick={() => changeDate(1)}
-                        className="p-2.5 rounded-xl bg-safari-50 hover:bg-safari-100 text-safari-600 transition-all hover:scale-105 active:scale-95"
-                    >
-                        <ChevronRight size={20} />
+                    <button onClick={() => changeDate(1)} className="p-2 rounded-lg bg-safari-50 hover:bg-safari-100 text-safari-600">
+                        <ChevronRight size={18} />
                     </button>
                 </div>
-                <div className="flex items-center gap-4 sm:gap-6 bg-gradient-to-br from-secondary-600 to-secondary-700 rounded-2xl px-6 py-4 text-white shadow-lg flex-1">
-                    <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                            <TrendingUp size={24} />
-                        </div>
-                        <div>
-                            <p className="text-white/80 text-xs font-semibold uppercase tracking-wider">Today&apos;s Total</p>
-                            <p className="text-3xl font-extrabold tabular-nums">{dailyTotal}</p>
-                            <p className="text-white/70 text-xs">activities</p>
-                        </div>
+
+                <div className="bg-gradient-to-br from-secondary-600 to-secondary-700 rounded-xl px-4 py-3 text-white flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
+                        <Calendar size={20} />
+                    </div>
+                    <div>
+                        <p className="text-white/80 text-sm font-semibold uppercase tracking-wider">Today</p>
+                        <p className="text-2xl font-bold tabular-nums">{dailyTotal}</p>
+                        <p className="text-white/70 text-sm">activities</p>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl border border-safari-100 px-4 py-3 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-safari-100 flex items-center justify-center">
+                        <Users size={18} className="text-safari-700" />
+                    </div>
+                    <div>
+                        <p className="text-safari-500 text-sm font-semibold uppercase">Guests</p>
+                        <p className="text-xl font-bold text-safari-900 tabular-nums">{totalGuests}</p>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl border border-safari-100 px-4 py-3 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                        <Clock size={18} className="text-amber-700" />
+                    </div>
+                    <div>
+                        <p className="text-safari-500 text-sm font-semibold uppercase">Pending</p>
+                        <p className="text-xl font-bold text-safari-900 tabular-nums">{pendingCount}</p>
+                        <p className="text-sm text-safari-500">to confirm</p>
                     </div>
                 </div>
             </div>
 
-            {/* Daily list */}
+            {/* Daily activities - compact grid */}
             <section>
-                <h2 className="text-lg font-bold text-safari-800 mb-4 flex items-center gap-2">
-                    <span className="w-1 h-6 bg-secondary-500 rounded-full" />
-                    Activities for {formatDate(selectedDate)}
+                <h2 className="text-base font-bold text-safari-800 mb-2 flex items-center gap-1.5">
+                    <span className="w-1 h-4 bg-secondary-500 rounded-full" />
+                    {formatDate(selectedDate)}
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <DailySection
-                        title="Safaris"
-                        count={daily.safaris.length}
-                        bookings={daily.safaris}
-                        config={activityConfig.safari}
-                    />
-                    <DailySection
-                        title="Cooking Classes"
-                        count={daily.cookingClasses.length}
-                        bookings={daily.cookingClasses}
-                        config={activityConfig['cooking-class']}
-                    />
-                    <DailySection
-                        title="Bicycles Rented"
-                        count={daily.bicycles.length}
-                        bookings={daily.bicycles}
-                        config={activityConfig['bicycle-rent']}
-                    />
-                    <DailySection
-                        title="Village Tours"
-                        count={daily.villageTours.length}
-                        bookings={daily.villageTours}
-                        config={activityConfig['village-tour']}
-                    />
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <DailySection title="Safaris" count={daily.safaris.length} bookings={daily.safaris} config={activityConfig.safari} />
+                    <DailySection title="Cooking" count={daily.cookingClasses.length} bookings={daily.cookingClasses} config={activityConfig['cooking-class']} />
+                    <DailySection title="Bikes" count={daily.bicycles.length} bookings={daily.bicycles} config={activityConfig['bicycle-rent']} />
+                    <DailySection title="Village" count={daily.villageTours.length} bookings={daily.villageTours} config={activityConfig['village-tour']} />
                 </div>
             </section>
 
-            {/* Weekly summary */}
+            {/* Weekly summary - compact side by side */}
             <section>
-                <h2 className="text-lg font-bold text-safari-800 mb-4 flex items-center gap-2">
-                    <span className="w-1 h-6 bg-secondary-500 rounded-full" />
+                <h2 className="text-base font-bold text-safari-800 mb-2 flex items-center gap-1.5">
+                    <span className="w-1 h-4 bg-secondary-500 rounded-full" />
                     Weekly Summary
                 </h2>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Last week */}
-                    <div className="bg-white rounded-2xl border-2 border-safari-100 shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                        <div className="px-6 py-4 bg-gradient-to-r from-safari-50 to-safari-100/50 border-b border-safari-100">
-                            <h3 className="font-bold text-safari-800 text-lg">
-                                Last Week
-                            </h3>
-                            <p className="text-sm text-safari-600 mt-0.5">
-                                {formatShortDate(lastWeekRange.start)} – {formatShortDate(lastWeekRange.end)}
-                            </p>
-                            <p className="text-xs font-semibold text-safari-500 mt-2 bg-white/60 px-2 py-1 rounded-lg w-fit">
-                                {lastWeekTotal} activities completed
-                            </p>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div className="bg-white rounded-xl border border-safari-100 overflow-hidden">
+                        <div className="px-4 py-2.5 bg-safari-50 border-b border-safari-100 flex items-center justify-between">
+                            <div>
+                                <h3 className="font-semibold text-safari-800 text-base">Last Week</h3>
+                                <p className="text-base text-safari-600">{formatShortDate(lastWeekRange.start)} – {formatShortDate(lastWeekRange.end)}</p>
+                            </div>
+                            <span className="text-base font-bold text-safari-700 bg-white px-2 py-0.5 rounded">{lastWeekTotal} done</span>
                         </div>
-                        <div className="p-5 space-y-3">
+                        <div className="p-3 space-y-2">
                             {(Object.keys(activityConfig) as ActivityType[]).map((type) => {
                                 const config = activityConfig[type];
-                                const count = lastWeekTotals[type as keyof typeof lastWeekTotals];
+                                const count = lastWeekTotals[type];
                                 const Icon = config.icon;
+                                const isClickable = count > 0;
                                 return (
-                                    <div
+                                    <button
                                         key={type}
+                                        onClick={() => isClickable && setModal({ type, period: 'last' })}
                                         className={cn(
-                                            'flex items-center justify-between p-4 rounded-xl border-2 transition-all',
-                                            config.bg
+                                            'w-full flex items-center justify-between p-2.5 rounded-lg border text-left text-base transition-all',
+                                            config.bg,
+                                            isClickable && 'hover:ring-1 hover:ring-safari-300 cursor-pointer',
+                                            !isClickable && 'opacity-60 cursor-default'
                                         )}
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-lg bg-white/70 flex items-center justify-center border border-safari-100">
-                                                <Icon className={cn('w-4 h-4', config.color)} />
-                                            </div>
-                                            <span className={cn('font-semibold', config.color)}>{config.label}</span>
+                                        <div className="flex items-center gap-2">
+                                            <Icon className={cn('w-3.5 h-3.5', config.color)} />
+                                            <span className={cn('font-medium', config.color)}>{config.short}</span>
                                         </div>
-                                        <span className="font-extrabold text-safari-900 text-lg tabular-nums">{count}</span>
-                                    </div>
+                                        <span className="font-bold text-safari-900 tabular-nums">{count}</span>
+                                    </button>
                                 );
                             })}
                         </div>
                     </div>
 
-                    {/* Next week - clickable */}
-                    <div className="bg-white rounded-2xl border-2 border-secondary-200 shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                        <div className="px-6 py-4 bg-gradient-to-r from-secondary-50 to-secondary-100/30 border-b border-secondary-100">
-                            <h3 className="font-bold text-safari-800 text-lg">
-                                Coming Week
-                            </h3>
-                            <p className="text-sm text-safari-600 mt-0.5">
-                                {formatShortDate(nextWeekRange.start)} – {formatShortDate(nextWeekRange.end)}
-                            </p>
-                            <p className="text-xs font-semibold text-secondary-600 mt-2 bg-secondary-100/50 px-2 py-1 rounded-lg w-fit">
-                                {nextWeekTotal} upcoming · Click to view itineraries
-                            </p>
+                    <div className="bg-white rounded-xl border border-secondary-200 overflow-hidden">
+                        <div className="px-4 py-2.5 bg-secondary-50 border-b border-secondary-100 flex items-center justify-between">
+                            <div>
+                                <h3 className="font-semibold text-safari-800 text-base">Coming Week</h3>
+                                <p className="text-base text-safari-600">{formatShortDate(nextWeekRange.start)} – {formatShortDate(nextWeekRange.end)}</p>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                {weekChange !== 0 && (
+                                    <span className={cn('text-base font-semibold flex items-center gap-0.5', weekChange >= 0 ? 'text-green-600' : 'text-red-600')}>
+                                        {weekChange >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                                        {Math.abs(weekChange)}%
+                                    </span>
+                                )}
+                                <span className="text-base font-bold text-secondary-600 bg-white px-2 py-0.5 rounded">{nextWeekTotal} upcoming</span>
+                            </div>
                         </div>
-                        <div className="p-5 space-y-3">
+                        <div className="p-3 space-y-2">
                             {(Object.keys(activityConfig) as ActivityType[]).map((type) => {
                                 const config = activityConfig[type];
-                                const count = nextWeekTotals[type as keyof typeof nextWeekTotals];
+                                const count = nextWeekTotals[type];
                                 const Icon = config.icon;
                                 const isClickable = count > 0;
                                 return (
@@ -383,23 +366,19 @@ export default function AdminDashboard({
                                         key={type}
                                         onClick={() => isClickable && setModal({ type, period: 'next' })}
                                         className={cn(
-                                            'w-full flex items-center justify-between p-4 rounded-xl border-2 text-left transition-all',
+                                            'w-full flex items-center justify-between p-2.5 rounded-lg border text-left text-base transition-all',
                                             config.bg,
-                                            isClickable && 'hover:ring-2 hover:ring-secondary-400 hover:scale-[1.02] cursor-pointer active:scale-[0.99]',
-                                            !isClickable && 'opacity-75 cursor-default'
+                                            isClickable && 'hover:ring-2 hover:ring-secondary-400 cursor-pointer',
+                                            !isClickable && 'opacity-60 cursor-default'
                                         )}
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-lg bg-white/70 flex items-center justify-center border border-safari-100">
-                                                <Icon className={cn('w-4 h-4', config.color)} />
-                                            </div>
-                                            <span className={cn('font-semibold', config.color)}>{config.label}</span>
-                                        </div>
                                         <div className="flex items-center gap-2">
-                                            <span className="font-extrabold text-safari-900 text-lg tabular-nums">{count}</span>
-                                            {isClickable && (
-                                                <ChevronRight className="w-5 h-5 text-safari-500" />
-                                            )}
+                                            <Icon className={cn('w-3.5 h-3.5', config.color)} />
+                                            <span className={cn('font-medium', config.color)}>{config.short}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <span className="font-bold text-safari-900 tabular-nums">{count}</span>
+                                            {isClickable && <ChevronRight className="w-4 h-4 text-safari-500" />}
                                         </div>
                                     </button>
                                 );
@@ -409,15 +388,10 @@ export default function AdminDashboard({
                 </div>
             </section>
 
-            {/* Itinerary modal */}
             {modal && (
                 <ItineraryModal
-                    title={`${activityConfig[modal.type].label} – Coming Week`}
-                    bookings={
-                        modal.period === 'next'
-                            ? getActivityBookings(nextWeekBookings, modal.type)
-                            : getActivityBookings(lastWeekBookings, modal.type)
-                    }
+                    title={`${activityConfig[modal.type].label} – ${modal.period === 'next' ? 'Coming Week' : 'Last Week'}`}
+                    bookings={modal.period === 'next' ? getActivityBookings(nextWeekBookings, modal.type) : getActivityBookings(lastWeekBookings, modal.type)}
                     onClose={() => setModal(null)}
                 />
             )}

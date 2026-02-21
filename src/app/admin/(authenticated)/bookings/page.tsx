@@ -56,14 +56,14 @@ export default async function AdminBookingsPage({ searchParams }: PageProps) {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-safari-900">Bookings</h1>
-                    <p className="text-safari-600 text-sm">Manage and track your safari reservations</p>
+                    <p className="text-safari-600 text-base">Manage and track your safari reservations</p>
                 </div>
                 <BookingSearch />
             </div>
 
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <BookingFilterTabs />
-                <div className="bg-white px-4 py-2 rounded-2xl shadow-sm text-sm font-bold text-safari-600 border border-safari-100 italic">
+                <div className="bg-white px-4 py-2 rounded-2xl shadow-sm text-base font-bold text-safari-600 border border-safari-100 italic">
                     {count || 0} Results Found
                 </div>
             </div>

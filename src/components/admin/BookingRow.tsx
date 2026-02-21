@@ -32,15 +32,15 @@ export default function BookingRow({ booking, onSelect }: { booking: any; onSele
             className={cn("hover:bg-safari-50/50 transition-colors", onSelect && "cursor-pointer")}
             onClick={onSelect}
         >
-            <td className="p-4 font-mono text-xs text-safari-400">{booking.id.slice(0, 8)}</td>
+            <td className="p-4 font-mono text-sm text-safari-400">{booking.id.slice(0, 8)}</td>
             <td className="p-4">
                 <div className="font-semibold text-safari-900">{booking.customer_name}</div>
-                <div className="text-xs text-safari-500">{booking.email}</div>
-                <div className="text-xs text-safari-500">{booking.phone}</div>
+                <div className="text-sm text-safari-500">{booking.email}</div>
+                <div className="text-sm text-safari-500">{booking.phone}</div>
             </td>
             <td className="p-4 text-safari-800">
                 {booking.package_type ? (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-sm font-medium bg-purple-100 text-purple-800">
                         {formatPackageName(booking.package_type)}
                     </span>
                 ) : (
@@ -55,11 +55,11 @@ export default function BookingRow({ booking, onSelect }: { booking: any; onSele
                         year: 'numeric'
                     })}
                 </div>
-                <div className="text-xs text-safari-500">{booking.time}</div>
+                <div className="text-sm text-safari-500">{booking.time}</div>
             </td>
             <td className="p-4 text-safari-800">{booking.group_size}</td>
             <td className="p-4">
-                <span className={cn("px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wider", statusColors[booking.status as keyof typeof statusColors])}>
+                <span className={cn("px-2 py-1 rounded-full text-sm font-bold uppercase tracking-wider", statusColors[booking.status as keyof typeof statusColors])}>
                     {booking.status}
                 </span>
             </td>
@@ -86,7 +86,7 @@ export default function BookingRow({ booking, onSelect }: { booking: any; onSele
                         </>
                     )}
                     {booking.status === 'confirmed' && (
-                        <button onClick={() => handleUpdate('cancelled')} className="text-xs text-red-500 hover:underline">Cancel</button>
+                        <button onClick={() => handleUpdate('cancelled')} className="text-sm text-red-500 hover:underline">Cancel</button>
                     )}
                 </div>
             </td>

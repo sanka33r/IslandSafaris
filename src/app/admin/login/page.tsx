@@ -51,7 +51,7 @@ export default function AdminLoginPage() {
 
                 <form onSubmit={handleLogin} className="space-y-6">
                     <div className="space-y-2">
-                        <label className="block text-sm font-semibold text-safari-100 ml-1">Username</label>
+                        <label className="block text-base font-semibold text-safari-100 ml-1">Username</label>
                         <input
                             type="text"
                             value={username}
@@ -63,7 +63,7 @@ export default function AdminLoginPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="block text-sm font-semibold text-safari-100 ml-1">Password</label>
+                        <label className="block text-base font-semibold text-safari-100 ml-1">Password</label>
                         <input
                             type="password"
                             value={password}
@@ -78,7 +78,7 @@ export default function AdminLoginPage() {
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-red-500/10 border border-red-500/50 text-red-400 p-3 rounded-xl text-sm text-center"
+                            className="bg-red-500/10 border border-red-500/50 text-red-400 p-3 rounded-xl text-base text-center"
                         >
                             {error}
                         </motion.div>

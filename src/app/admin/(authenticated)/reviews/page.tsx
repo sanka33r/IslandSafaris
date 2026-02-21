@@ -30,7 +30,7 @@ export default async function AdminReviewsPage() {
             <div className="space-y-6">
                 <h2 className="text-xl font-bold text-yellow-700 flex items-center gap-2">
                     Pending Approval
-                    <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">{pendingReviews.length}</span>
+                    <span className="bg-yellow-100 text-yellow-800 text-base px-2 py-1 rounded-full">{pendingReviews.length}</span>
                 </h2>
 
                 {/* Mobile View */}
@@ -48,7 +48,7 @@ export default async function AdminReviewsPage() {
                 {/* Desktop View */}
                 <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-safari-100 overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm">
+                        <table className="w-full text-left text-base">
                             <thead className="bg-safari-50 text-safari-700">
                                 <tr>
                                     <th className="p-4">Reviewer</th>
@@ -91,7 +91,7 @@ export default async function AdminReviewsPage() {
                 {/* Desktop View */}
                 <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-safari-100 overflow-hidden opacity-75">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm">
+                        <table className="w-full text-left text-base">
                             <tbody className="divide-y divide-safari-100">
                                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                 {approvedReviews.slice(0, 5).map((review: any) => ( // Show last 5

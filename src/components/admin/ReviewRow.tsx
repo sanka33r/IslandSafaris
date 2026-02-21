@@ -20,7 +20,7 @@ export default function ReviewRow({ review, readOnly = false }: { review: any, r
         <tr className="hover:bg-safari-50/50 transition-colors">
             <td className="p-4">
                 <div className="font-semibold text-safari-900">{review.name}</div>
-                <div className="text-xs text-safari-400">{new Date(review.created_at).toLocaleDateString()}</div>
+                <div className="text-base text-safari-400">{new Date(review.created_at).toLocaleDateString()}</div>
             </td>
             <td className="p-4 text-safari-800">{review.destinations?.name || 'General'}</td>
             <td className="p-4">
@@ -39,7 +39,7 @@ export default function ReviewRow({ review, readOnly = false }: { review: any, r
                         <button
                             onClick={() => handleModerate(true)}
                             disabled={loading}
-                            className="px-3 py-1 rounded bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 text-xs font-semibold flex items-center gap-1"
+                            className="px-3 py-1 rounded bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 text-base font-semibold flex items-center gap-1"
                         >
                             {loading ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
                             Approve
@@ -54,7 +54,7 @@ export default function ReviewRow({ review, readOnly = false }: { review: any, r
                         </button>
                     </div>
                 )}
-                {readOnly && <span className="text-green-600 text-xs font-bold px-2 py-1 bg-green-50 rounded-full">Approved</span>}
+                {readOnly && <span className="text-green-600 text-base font-bold px-2 py-1 bg-green-50 rounded-full">Approved</span>}
             </td>
         </tr>
     );

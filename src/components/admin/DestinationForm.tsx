@@ -159,13 +159,13 @@ export default function DestinationForm({ destination, images }: DestinationForm
                             </div>
                             <div>
                                 <h2 className="text-2xl font-bold text-safari-900">Destination Details</h2>
-                                <p className="text-safari-500 text-sm">Update the park name, description, and settings</p>
+                                <p className="text-safari-500 text-base">Update the park name, description, and settings</p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                             <div className="space-y-2">
-                                <label className="block text-sm font-bold text-safari-700 ml-1">Destination Name</label>
+                                <label className="block text-base font-bold text-safari-700 ml-1">Destination Name</label>
                                 <input
                                     type="text"
                                     value={formData.name}
@@ -175,7 +175,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="block text-sm font-bold text-safari-700 ml-1">URL Slug</label>
+                                <label className="block text-base font-bold text-safari-700 ml-1">URL Slug</label>
                                 <input
                                     type="text"
                                     value={formData.slug}
@@ -185,7 +185,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                 />
                             </div>
                             <div className="md:col-span-2 space-y-2">
-                                <label className="block text-sm font-bold text-safari-700 ml-1">Full Description</label>
+                                <label className="block text-base font-bold text-safari-700 ml-1">Full Description</label>
                                 <textarea
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -194,7 +194,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                 />
                             </div>
                             <div className="md:col-span-2 space-y-6">
-                                <label className="block text-sm font-bold text-safari-700 ml-1">Structured Sections</label>
+                                <label className="block text-base font-bold text-safari-700 ml-1">Structured Sections</label>
 
                                 <div className="rounded-2xl border border-safari-100 bg-white p-5 space-y-4">
                                     <h4 className="font-bold text-safari-900">Intro</h4>
@@ -285,7 +285,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                                 migrationCycle: [...descriptionSections.migrationCycle, '']
                                             })
                                         }
-                                        className="inline-flex items-center gap-2 text-secondary-600 font-semibold text-sm"
+                                        className="inline-flex items-center gap-2 text-secondary-600 font-semibold text-base"
                                     >
                                         <Plus size={14} />
                                         Add item
@@ -329,7 +329,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                                 whyChooseHurulu: [...descriptionSections.whyChooseHurulu, '']
                                             })
                                         }
-                                        className="inline-flex items-center gap-2 text-secondary-600 font-semibold text-sm"
+                                        className="inline-flex items-center gap-2 text-secondary-600 font-semibold text-base"
                                     >
                                         <Plus size={14} />
                                         Add item
@@ -346,7 +346,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                 </div>
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="block text-xs font-bold text-safari-500 uppercase tracking-wider ml-1">Ticket Price (Rs.)</label>
+                                        <label className="block text-base font-bold text-safari-500 uppercase tracking-wider ml-1">Ticket Price (Rs.)</label>
                                         <input
                                             type="number"
                                             value={formData.ticket_price}
@@ -355,7 +355,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-xs font-bold text-safari-500 uppercase tracking-wider ml-1">Pricing Type</label>
+                                        <label className="block text-base font-bold text-safari-500 uppercase tracking-wider ml-1">Pricing Type</label>
                                         <select
                                             value={formData.ticket_pricing_type}
                                             onChange={(e) => setFormData({ ...formData, ticket_pricing_type: e.target.value as any })}
@@ -375,7 +375,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                 </div>
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="block text-xs font-bold text-safari-500 uppercase tracking-wider ml-1">Jeep Price (up to 3 pax)</label>
+                                        <label className="block text-base font-bold text-safari-500 uppercase tracking-wider ml-1">Jeep Price (up to 3 pax)</label>
                                         <input
                                             type="number"
                                             value={formData.vehicle_price_up_to_3}
@@ -384,7 +384,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-xs font-bold text-safari-500 uppercase tracking-wider ml-1">Duration (Hours)</label>
+                                        <label className="block text-base font-bold text-safari-500 uppercase tracking-wider ml-1">Duration (Hours)</label>
                                         <input
                                             type="number"
                                             value={formData.standard_duration_hours}
@@ -437,7 +437,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                 <ImageIcon size={48} className="text-safari-200" />
                             </div>
                             <h3 className="text-xl font-bold text-safari-900 mb-2">Gallery Management</h3>
-                            <p className="text-safari-500 text-sm leading-relaxed">
+                            <p className="text-safari-500 text-base leading-relaxed">
                                 You can add and manage destination images after saving the initial details.
                             </p>
                         </div>
@@ -471,7 +471,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                     </div>
                                 ))}
                                 {images.length === 0 && (
-                                    <div className="col-span-2 py-8 text-center border-2 border-dashed border-safari-100 rounded-2xl text-safari-400 text-sm">
+                                    <div className="col-span-2 py-8 text-center border-2 border-dashed border-safari-100 rounded-2xl text-safari-400 text-base">
                                         No images yet
                                     </div>
                                 )}
@@ -479,26 +479,26 @@ export default function DestinationForm({ destination, images }: DestinationForm
 
                             {/* Add New Image Form */}
                             <div className="space-y-4 pt-6 border-t border-safari-50">
-                                <h4 className="font-bold text-safari-900 text-sm italic">Add New Image URL</h4>
+                                <h4 className="font-bold text-safari-900 text-base italic">Add New Image URL</h4>
                                 <div className="space-y-3">
                                     <input
                                         type="url"
                                         placeholder="https://..."
                                         value={newImageUrl}
                                         onChange={(e) => setNewImageUrl(e.target.value)}
-                                        className="w-full p-3 bg-safari-50 rounded-xl border border-safari-100 text-sm outline-none focus:border-secondary-500"
+                                        className="w-full p-3 bg-safari-50 rounded-xl border border-safari-100 text-base outline-none focus:border-secondary-500"
                                     />
                                     <input
                                         type="text"
                                         placeholder="Alt text (e.g. Birds eye view)"
                                         value={newImageAlt}
                                         onChange={(e) => setNewImageAlt(e.target.value)}
-                                        className="w-full p-3 bg-safari-50 rounded-xl border border-safari-100 text-sm outline-none focus:border-secondary-500"
+                                        className="w-full p-3 bg-safari-50 rounded-xl border border-safari-100 text-base outline-none focus:border-secondary-500"
                                     />
                                     <button
                                         onClick={handleAddImage}
                                         disabled={!newImageUrl || imageLoading === 'new'}
-                                        className="w-full flex items-center justify-center gap-2 bg-safari-900 hover:bg-safari-800 text-white py-3 rounded-xl font-bold text-sm transition-all active:scale-95 disabled:opacity-50"
+                                        className="w-full flex items-center justify-center gap-2 bg-safari-900 hover:bg-safari-800 text-white py-3 rounded-xl font-bold text-base transition-all active:scale-95 disabled:opacity-50"
                                     >
                                         {imageLoading === 'new' ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
                                         Add Image

@@ -133,7 +133,7 @@ function BookingPill({ booking, onCancel, onViewDetails }: { booking: Booking; o
 
     return (
         <div
-            className={cn('flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border transition-all group', config.bg, config.text, config.border, onViewDetails && 'cursor-pointer')}
+            className={cn('flex items-center gap-1 px-2 py-1 rounded-md text-base font-semibold border transition-all group', config.bg, config.text, config.border, onViewDetails && 'cursor-pointer')}
             title={`${booking.customer_name} — ${name} — ${booking.time} — ${booking.group_size} pax — ${config.label}. Click to view details.`}
             onClick={onViewDetails ? (e) => { e.stopPropagation(); onViewDetails(booking); } : undefined}
         >
@@ -173,20 +173,20 @@ function DetailRow({ booking, onCancel, onViewDetails }: { booking: Booking; onC
                 <div className="flex items-center gap-2 mb-1">
                     <span className={cn('w-2 h-2 rounded-full flex-shrink-0', config.dot)} />
                     <span className={cn('text-base font-bold', config.text)}>{booking.customer_name}</span>
-                    <span className={cn('text-xs font-bold uppercase px-2 py-0.5 rounded-full border', config.bg, config.text, config.border)}>
+                    <span className={cn('text-base font-bold uppercase px-2 py-0.5 rounded-full border', config.bg, config.text, config.border)}>
                         {config.label}
                     </span>
                 </div>
-                <div className="text-sm text-safari-500 space-y-0.5 ml-4">
+                <div className="text-base text-safari-500 space-y-0.5 ml-4">
                     <p><strong>{name}</strong> — {booking.time}</p>
                     <p>{booking.group_size} person{booking.group_size > 1 ? 's' : ''}</p>
                 </div>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                <span className="text-xs font-medium text-safari-500">View details</span>
+                <span className="text-base font-medium text-safari-500">View details</span>
                 {status !== 'cancelled' && (
                     <button onClick={handleCancel} disabled={isPending}
-                        className="flex items-center gap-1 px-2 py-1 text-xs font-bold rounded-lg bg-red-100 text-red-600 hover:bg-red-200 border border-red-200 transition-all disabled:opacity-50">
+                        className="flex items-center gap-1 px-2 py-1 text-base font-bold rounded-lg bg-red-100 text-red-600 hover:bg-red-200 border border-red-200 transition-all disabled:opacity-50">
                         {isPending ? <Loader2 size={12} className="animate-spin" /> : <X size={12} />}
                         Cancel
                     </button>
@@ -221,31 +221,31 @@ function BookingDetailModal({ booking, onClose, onCancel }: { booking: Booking; 
                 <div className="p-6 space-y-4">
                     <div className="flex justify-between items-start">
                         <div>
-                            <p className="text-xs font-mono text-safari-400">Ref: {booking.id.slice(0, 8)}</p>
+                            <p className="text-base font-mono text-safari-400">Ref: {booking.id.slice(0, 8)}</p>
                             <p className="text-xl font-bold text-safari-900">{booking.customer_name}</p>
                         </div>
-                        <span className={cn('px-2 py-1 rounded-full text-xs font-bold uppercase', config.bg, config.text, config.border)}>{config.label}</span>
+                        <span className={cn('px-2 py-1 rounded-full text-base font-bold uppercase', config.bg, config.text, config.border)}>{config.label}</span>
                     </div>
 
-                    <div className="grid gap-3 text-sm">
+                    <div className="grid gap-3 text-base">
                         <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
                             <MapPin size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
                             <div>
-                                <p className="text-xs font-bold text-safari-500 uppercase">{booking.package_type ? 'Package' : 'Destination'}</p>
+                                <p className="text-base font-bold text-safari-500 uppercase">{booking.package_type ? 'Package' : 'Destination'}</p>
                                 <p className="font-semibold text-safari-900">{name}</p>
                             </div>
                         </div>
                         <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
                             <Calendar size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
                             <div>
-                                <p className="text-xs font-bold text-safari-500 uppercase">Date & Time</p>
+                                <p className="text-base font-bold text-safari-500 uppercase">Date & Time</p>
                                 <p className="font-semibold text-safari-900">{new Date(booking.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })} at {booking.time}</p>
                             </div>
                         </div>
                         <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
                             <Users size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
                             <div>
-                                <p className="text-xs font-bold text-safari-500 uppercase">Group Size</p>
+                                <p className="text-base font-bold text-safari-500 uppercase">Group Size</p>
                                 <p className="font-semibold text-safari-900">{booking.group_size} person{booking.group_size > 1 ? 's' : ''}</p>
                             </div>
                         </div>
@@ -253,7 +253,7 @@ function BookingDetailModal({ booking, onClose, onCancel }: { booking: Booking; 
                             <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
                                 <Mail size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
                                 <div>
-                                    <p className="text-xs font-bold text-safari-500 uppercase">Email</p>
+                                    <p className="text-base font-bold text-safari-500 uppercase">Email</p>
                                     <p className="font-medium text-safari-900 break-all">{booking.email}</p>
                                 </div>
                             </div>
@@ -262,7 +262,7 @@ function BookingDetailModal({ booking, onClose, onCancel }: { booking: Booking; 
                             <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
                                 <Phone size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
                                 <div>
-                                    <p className="text-xs font-bold text-safari-500 uppercase">Phone</p>
+                                    <p className="text-base font-bold text-safari-500 uppercase">Phone</p>
                                     <p className="font-medium text-safari-900">{booking.phone}</p>
                                 </div>
                             </div>
@@ -271,7 +271,7 @@ function BookingDetailModal({ booking, onClose, onCancel }: { booking: Booking; 
                             <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
                                 <User size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
                                 <div>
-                                    <p className="text-xs font-bold text-safari-500 uppercase">Country</p>
+                                    <p className="text-base font-bold text-safari-500 uppercase">Country</p>
                                     <p className="font-medium text-safari-900">{booking.country}</p>
                                 </div>
                             </div>
@@ -280,7 +280,7 @@ function BookingDetailModal({ booking, onClose, onCancel }: { booking: Booking; 
                             <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
                                 <MapPin size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
                                 <div>
-                                    <p className="text-xs font-bold text-safari-500 uppercase">Pickup</p>
+                                    <p className="text-base font-bold text-safari-500 uppercase">Pickup</p>
                                     <p className="font-medium text-safari-900">{booking.hotel_name || booking.pickup_location}</p>
                                 </div>
                             </div>
@@ -289,14 +289,14 @@ function BookingDetailModal({ booking, onClose, onCancel }: { booking: Booking; 
                             <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
                                 <MessageSquare size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
                                 <div>
-                                    <p className="text-xs font-bold text-safari-500 uppercase">Notes</p>
+                                    <p className="text-base font-bold text-safari-500 uppercase">Notes</p>
                                     <p className="font-medium text-safari-900">{booking.special_requests || booking.message}</p>
                                 </div>
                             </div>
                         )}
                         {booking.promo_code && (
                             <div className="flex items-center gap-2 p-3 rounded-xl bg-green-50 border border-green-100">
-                                <span className="text-xs font-bold text-green-700">Promo:</span>
+                                <span className="text-base font-bold text-green-700">Promo:</span>
                                 <span className="font-semibold text-green-800">{booking.promo_code}</span>
                                 {booking.discount_amount ? <span className="text-green-600">(-${booking.discount_amount})</span> : null}
                             </div>
@@ -329,19 +329,19 @@ function DayDetail({ date, safariBookings, packageBookings, onCancel, onClose, o
                 </div>
                 <div className="p-6 space-y-6">
                     <div>
-                        <h4 className="text-sm font-bold uppercase tracking-wider text-safari-400 mb-3 flex items-center gap-2">
+                        <h4 className="text-base font-bold uppercase tracking-wider text-safari-400 mb-3 flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-safari-700" /> Safari Bookings ({safariBookings.length})
                         </h4>
                         {safariBookings.length === 0
-                            ? <p className="text-sm text-safari-300 italic">No safari bookings</p>
+                            ? <p className="text-base text-safari-300 italic">No safari bookings</p>
                             : <div className="space-y-2">{safariBookings.map(b => <DetailRow key={b.id} booking={b} onCancel={onCancel} onViewDetails={onViewDetails} />)}</div>}
                     </div>
                     <div>
-                        <h4 className="text-sm font-bold uppercase tracking-wider text-purple-500 mb-3 flex items-center gap-2">
+                        <h4 className="text-base font-bold uppercase tracking-wider text-purple-500 mb-3 flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-purple-500" /> Package Bookings ({packageBookings.length})
                         </h4>
                         {packageBookings.length === 0
-                            ? <p className="text-sm text-safari-300 italic">No package bookings</p>
+                            ? <p className="text-base text-safari-300 italic">No package bookings</p>
                             : <div className="space-y-2">{packageBookings.map(b => <DetailRow key={b.id} booking={b} onCancel={onCancel} onViewDetails={onViewDetails} />)}</div>}
                     </div>
                 </div>
@@ -393,7 +393,7 @@ export default function BookingCalendar({ bookings, currentMonth }: BookingCalen
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-safari-900">Booking Calendar</h1>
-                    <p className="text-safari-600 text-sm">Visual overview of all bookings by date</p>
+                    <p className="text-safari-600 text-base">Visual overview of all bookings by date</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button onClick={() => navigateMonth('prev')} className="p-2 rounded-xl bg-white border border-safari-200 hover:bg-safari-50 text-safari-600 shadow-sm transition-all">
@@ -412,13 +412,13 @@ export default function BookingCalendar({ bookings, currentMonth }: BookingCalen
             <div className="flex flex-wrap gap-3">
                 <div className="flex items-center gap-5 bg-white px-4 py-2.5 rounded-2xl shadow-sm border border-safari-100">
                     {Object.entries(statusConfig).map(([key, cfg]) => (
-                        <div key={key} className="flex items-center gap-1.5 text-sm font-semibold">
+                        <div key={key} className="flex items-center gap-1.5 text-base font-semibold">
                             <span className={cn('w-2.5 h-2.5 rounded-full', cfg.dot)} />
                             <span className={cfg.text}>{cfg.label}</span>
                         </div>
                     ))}
                 </div>
-                <div className="flex items-center gap-4 bg-white px-4 py-2.5 rounded-2xl shadow-sm border border-safari-100 text-sm font-bold text-safari-600">
+                <div className="flex items-center gap-4 bg-white px-4 py-2.5 rounded-2xl shadow-sm border border-safari-100 text-base font-bold text-safari-600">
                     <span>🦒 Safari: {totalSafari}</span>
                     <span>📦 Package: {totalPackage}</span>
                     <span className="text-green-600">↑ {upcoming}</span>
@@ -431,7 +431,7 @@ export default function BookingCalendar({ bookings, currentMonth }: BookingCalen
             <div className="bg-white rounded-2xl shadow-sm border border-safari-100 overflow-hidden">
                 <div className="grid grid-cols-7 border-b border-safari-100">
                     {DAYS_SHORT.map(d => (
-                        <div key={d} className="p-3 text-center text-sm font-bold text-safari-500 uppercase tracking-wider bg-safari-50/50">{d}</div>
+                        <div key={d} className="p-3 text-center text-base font-bold text-safari-500 uppercase tracking-wider bg-safari-50/50">{d}</div>
                     ))}
                 </div>
                 <div className="grid grid-cols-7">
@@ -455,7 +455,7 @@ export default function BookingCalendar({ bookings, currentMonth }: BookingCalen
                             >
                                 <div className="flex items-center justify-between mb-1">
                                     <span className={cn(
-                                        'text-sm font-bold w-7 h-7 flex items-center justify-center rounded-full',
+                                        'text-base font-bold w-7 h-7 flex items-center justify-center rounded-full',
                                         !inMonth && 'text-safari-300',
                                         inMonth && 'text-safari-700',
                                         isToday(day) && 'bg-secondary-500 text-white'
@@ -463,7 +463,7 @@ export default function BookingCalendar({ bookings, currentMonth }: BookingCalen
                                         {day.getDate()}
                                     </span>
                                     {total > 0 && (
-                                        <span className="text-xs font-bold text-safari-400 bg-safari-100 px-2 py-0.5 rounded-full">{total}</span>
+                                        <span className="text-base font-bold text-safari-400 bg-safari-100 px-2 py-0.5 rounded-full">{total}</span>
                                     )}
                                 </div>
                                 {inMonth && db && (
@@ -471,7 +471,7 @@ export default function BookingCalendar({ bookings, currentMonth }: BookingCalen
                                         {[...db.safari, ...db.packages].slice(0, 3).map(b => (
                                             <BookingPill key={b.id} booking={b} onCancel={handleCancel} onViewDetails={(b) => setSelectedBooking(b)} />
                                         ))}
-                                        {total > 3 && <div className="text-xs font-bold text-safari-400 text-center py-0.5">+{total - 3} more</div>}
+                                        {total > 3 && <div className="text-base font-bold text-safari-400 text-center py-0.5">+{total - 3} more</div>}
                                     </div>
                                 )}
                             </div>
@@ -490,18 +490,18 @@ export default function BookingCalendar({ bookings, currentMonth }: BookingCalen
                         <div key={dk} className="bg-white rounded-xl border border-safari-100 shadow-sm overflow-hidden">
                             <div className="px-4 py-2.5 bg-safari-50/60 border-b border-safari-100 flex items-center justify-between">
                                 <span className="text-base font-bold text-safari-900">{shortDate(d)}</span>
-                                <span className="text-sm text-safari-400 font-bold">{dd.safari.length + dd.packages.length} bookings</span>
+                                <span className="text-base text-safari-400 font-bold">{dd.safari.length + dd.packages.length} bookings</span>
                             </div>
                             <div className="p-3 space-y-3">
                                 {dd.safari.length > 0 && (
                                     <div>
-                                        <p className="text-xs font-bold uppercase text-safari-400 mb-1.5">🦒 Safari</p>
+                                        <p className="text-base font-bold uppercase text-safari-400 mb-1.5">🦒 Safari</p>
                                         <div className="space-y-1.5">{dd.safari.map(b => <DetailRow key={b.id} booking={b} onCancel={handleCancel} onViewDetails={setSelectedBooking} />)}</div>
                                     </div>
                                 )}
                                 {dd.packages.length > 0 && (
                                     <div>
-                                        <p className="text-xs font-bold uppercase text-purple-500 mb-1.5">📦 Package</p>
+                                        <p className="text-base font-bold uppercase text-purple-500 mb-1.5">📦 Package</p>
                                         <div className="space-y-1.5">{dd.packages.map(b => <DetailRow key={b.id} booking={b} onCancel={handleCancel} onViewDetails={setSelectedBooking} />)}</div>
                                     </div>
                                 )}

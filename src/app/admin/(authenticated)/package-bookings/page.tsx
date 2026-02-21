@@ -57,14 +57,14 @@ export default async function AdminPackageBookingsPage({ searchParams }: PagePro
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-safari-900">Package Bookings</h1>
-                    <p className="text-safari-600 text-sm">Manage reviews and reservations for special packages</p>
+                    <p className="text-safari-600 text-base">Manage reviews and reservations for special packages</p>
                 </div>
                 <BookingSearch />
             </div>
 
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <BookingFilterTabs />
-                <div className="bg-white px-4 py-2 rounded-2xl shadow-sm text-sm font-bold text-safari-600 border border-safari-100 italic">
+                <div className="bg-white px-4 py-2 rounded-2xl shadow-sm text-base font-bold text-safari-600 border border-safari-100 italic">
                     {count || 0} Results Found
                 </div>
             </div>

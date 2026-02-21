@@ -37,13 +37,13 @@ export default function ReviewCard({ review, readOnly = false }: { review: any, 
                     </div>
                 </div>
                 {readOnly && (
-                    <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-full uppercase tracking-wider">
+                    <span className="px-2 py-1 bg-green-100 text-green-700 text-sm font-bold rounded-full uppercase tracking-wider">
                         Approved
                     </span>
                 )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4 text-xs py-3 border-y border-safari-50">
+            <div className="grid grid-cols-2 gap-4 text-base py-3 border-y border-safari-50">
                 <div className="flex items-center gap-1.5 text-safari-600">
                     <MapPin size={14} className="text-secondary-500" />
                     <span className="font-medium truncate">{review.destinations?.name || 'General'}</span>
@@ -56,7 +56,7 @@ export default function ReviewCard({ review, readOnly = false }: { review: any, 
 
             <div className="relative">
                 <Quote size={16} className="text-safari-100 absolute -left-1 -top-1" />
-                <p className="text-sm text-safari-600 pl-4 leading-relaxed line-clamp-4">
+                <p className="text-base text-safari-600 pl-4 leading-relaxed line-clamp-4">
                     {review.comment}
                 </p>
             </div>

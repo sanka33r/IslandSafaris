@@ -38,34 +38,34 @@ export default async function AdminDestinationsPage() {
                                     </div>
                                     <div>
                                         <div className="font-bold text-safari-900 leading-tight">{dest.name}</div>
-                                        <div className="text-xs text-safari-500">/{dest.slug}</div>
+                                        <div className="text-base text-safari-500">/{dest.slug}</div>
                                     </div>
                                 </div>
                                 <span className={cn(
-                                    "px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
+                                    "px-2 py-1 rounded-full text-sm font-bold uppercase tracking-widest",
                                     dest.active ? "bg-green-100 text-green-700" : "bg-safari-100 text-safari-400"
                                 )}>
                                     {dest.active ? 'Active' : 'Hidden'}
                                 </span>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-safari-50 text-sm">
+                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-safari-50 text-base">
                                 <div>
-                                    <p className="text-xs text-safari-400 font-bold uppercase mb-1">Pricing</p>
+                                    <p className="text-base text-safari-400 font-bold uppercase mb-1">Pricing</p>
                                     <p className="font-semibold text-safari-900">Rs. {dest.ticket_price.toLocaleString()}</p>
-                                    <p className="text-xs text-safari-500">
+                                    <p className="text-base text-safari-500">
                                         {dest.ticket_pricing_type === 'per_person' ? 'Per Person' : 'Flat'}
                                     </p>
                                 </div>
                                 <div>
-                                    <p className="text-xs text-safari-400 font-bold uppercase mb-1">Duration</p>
+                                    <p className="text-base text-safari-400 font-bold uppercase mb-1">Duration</p>
                                     <p className="font-semibold text-safari-900">{dest.standard_duration_hours} Hours</p>
                                 </div>
                             </div>
 
                             <Link
                                 href={`/admin/destinations/${dest.id}`}
-                                className="flex items-center justify-center gap-2 w-full text-secondary-600 hover:text-secondary-700 font-bold text-sm bg-secondary-50 hover:bg-secondary-100 py-3 rounded-xl transition-all"
+                                className="flex items-center justify-center gap-2 w-full text-secondary-600 hover:text-secondary-700 font-bold text-base bg-secondary-50 hover:bg-secondary-100 py-3 rounded-xl transition-all"
                             >
                                 <Edit2 size={16} />
                                 Edit Destination
@@ -81,11 +81,11 @@ export default async function AdminDestinationsPage() {
                     <table className="w-full text-left min-w-[700px]">
                         <thead>
                             <tr className="bg-safari-50/50 border-b border-safari-100">
-                                <th className="p-6 text-sm font-bold text-safari-400 uppercase tracking-wider">Destination</th>
-                                <th className="p-6 text-sm font-bold text-safari-400 uppercase tracking-wider">Pricing</th>
-                                <th className="p-6 text-sm font-bold text-safari-400 uppercase tracking-wider">Duration</th>
-                                <th className="p-6 text-sm font-bold text-safari-400 uppercase tracking-wider">Status</th>
-                                <th className="p-6 text-sm font-bold text-safari-400 uppercase tracking-wider text-right">Actions</th>
+                                <th className="p-6 text-base font-bold text-safari-400 uppercase tracking-wider">Destination</th>
+                                <th className="p-6 text-base font-bold text-safari-400 uppercase tracking-wider">Pricing</th>
+                                <th className="p-6 text-base font-bold text-safari-400 uppercase tracking-wider">Duration</th>
+                                <th className="p-6 text-base font-bold text-safari-400 uppercase tracking-wider">Status</th>
+                                <th className="p-6 text-base font-bold text-safari-400 uppercase tracking-wider text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-safari-50">
@@ -98,29 +98,29 @@ export default async function AdminDestinationsPage() {
                                             </div>
                                             <div>
                                                 <div className="font-bold text-safari-900">{dest.name}</div>
-                                                <div className="text-xs text-safari-500">/{dest.slug}</div>
+                                                <div className="text-base text-safari-500">/{dest.slug}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="p-6">
-                                        <div className="text-sm">
+                                        <div className="text-base">
                                             <div className="font-semibold text-safari-900">
                                                 Rs. {dest.ticket_price.toLocaleString()}
-                                                <span className="text-xs font-normal text-safari-500 ml-1">
+                                                <span className="text-base font-normal text-safari-500 ml-1">
                                                     ({dest.ticket_pricing_type === 'per_person' ? 'Per Person' : 'Flat'})
                                                 </span>
                                             </div>
-                                            <div className="text-xs text-safari-500">
+                                            <div className="text-base text-safari-500">
                                                 Jeep: Rs. {dest.vehicle_price_up_to_3.toLocaleString()}
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="p-6 text-sm text-safari-800 font-medium">
+                                    <td className="p-6 text-base text-safari-800 font-medium">
                                         {dest.standard_duration_hours} Hours
                                     </td>
                                     <td className="p-6">
                                         <span className={cn(
-                                            "inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
+                                            "inline-flex px-3 py-1 rounded-full text-sm font-bold uppercase tracking-widest",
                                             dest.active ? "bg-green-100 text-green-700" : "bg-safari-100 text-safari-400"
                                         )}>
                                             {dest.active ? 'Active' : 'Hidden'}
@@ -129,7 +129,7 @@ export default async function AdminDestinationsPage() {
                                     <td className="p-6 text-right">
                                         <Link
                                             href={`/admin/destinations/${dest.id}`}
-                                            className="inline-flex items-center gap-2 text-secondary-600 hover:text-secondary-700 font-bold text-sm bg-secondary-50 hover:bg-secondary-100 px-4 py-2 rounded-xl transition-all"
+                                            className="inline-flex items-center gap-2 text-secondary-600 hover:text-secondary-700 font-bold text-base bg-secondary-50 hover:bg-secondary-100 px-4 py-2 rounded-xl transition-all"
                                         >
                                             <Edit2 size={16} />
                                             Edit

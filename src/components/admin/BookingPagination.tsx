@@ -29,21 +29,21 @@ export default function BookingPagination({ totalPages }: PaginationProps) {
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-safari-700 bg-white border border-safari-300 rounded-md hover:bg-safari-50 disabled:opacity-50"
+                    className="relative inline-flex items-center px-4 py-2 text-base font-medium text-safari-700 bg-white border border-safari-300 rounded-md hover:bg-safari-50 disabled:opacity-50"
                 >
                     Previous
                 </button>
                 <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="relative ml-3 inline-flex items-center px-4 py-2 text-sm font-medium text-safari-700 bg-white border border-safari-300 rounded-md hover:bg-safari-50 disabled:opacity-50"
+                    className="relative ml-3 inline-flex items-center px-4 py-2 text-base font-medium text-safari-700 bg-white border border-safari-300 rounded-md hover:bg-safari-50 disabled:opacity-50"
                 >
                     Next
                 </button>
             </div>
             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                 <div>
-                    <p className="text-sm text-safari-700">
+                    <p className="text-base text-safari-700">
                         Page <span className="font-medium">{currentPage}</span> of{' '}
                         <span className="font-medium">{totalPages}</span>
                     </p>
@@ -71,7 +71,7 @@ export default function BookingPagination({ totalPages }: PaginationProps) {
                                         key={page}
                                         onClick={() => handlePageChange(page)}
                                         className={cn(
-                                            "relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:z-20 border transition-all",
+                                            "relative inline-flex items-center px-4 py-2 text-base font-semibold focus:z-20 border transition-all",
                                             currentPage === page
                                                 ? "z-10 bg-secondary-600 text-white border-secondary-600"
                                                 : "text-safari-900 border-safari-300 bg-white hover:bg-safari-50"
@@ -85,7 +85,7 @@ export default function BookingPagination({ totalPages }: PaginationProps) {
                                 page === currentPage + 2
                             ) {
                                 return (
-                                    <span key={page} className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-safari-700 border border-safari-300 bg-white">
+                                    <span key={page} className="relative inline-flex items-center px-4 py-2 text-base font-semibold text-safari-700 border border-safari-300 bg-white">
                                         ...
                                     </span>
                                 );

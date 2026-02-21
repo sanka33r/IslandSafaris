@@ -101,7 +101,7 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
 
             <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-6">
                 {error && (
-                    <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-center gap-3 text-sm font-medium">
+                    <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-center gap-3 text-base font-medium">
                         <AlertCircle size={18} />
                         {error}
                     </div>
@@ -109,7 +109,7 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-safari-700">Code</label>
+                        <label className="text-base font-bold text-safari-700">Code</label>
                         <input
                             type="text"
                             value={formData.code}
@@ -121,7 +121,7 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-safari-700">Status</label>
+                        <label className="text-base font-bold text-safari-700">Status</label>
                         <select
                             value={formData.status}
                             onChange={e => setFormData({ ...formData, status: e.target.value as any })}
@@ -133,12 +133,12 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-safari-700">Discount Type</label>
+                        <label className="text-base font-bold text-safari-700">Discount Type</label>
                         <div className="flex bg-safari-50 p-1 rounded-xl border border-safari-200">
                             <button
                                 type="button"
                                 onClick={() => setFormData({ ...formData, type: 'fixed' })}
-                                className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${formData.type === 'fixed'
+                                className={`flex-1 py-2 rounded-lg text-base font-bold transition-all ${formData.type === 'fixed'
                                         ? 'bg-white shadow text-secondary-600'
                                         : 'text-safari-500 hover:text-safari-700'
                                     }`}
@@ -148,7 +148,7 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
                             <button
                                 type="button"
                                 onClick={() => setFormData({ ...formData, type: 'percentage' })}
-                                className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${formData.type === 'percentage'
+                                className={`flex-1 py-2 rounded-lg text-base font-bold transition-all ${formData.type === 'percentage'
                                         ? 'bg-white shadow text-secondary-600'
                                         : 'text-safari-500 hover:text-safari-700'
                                     }`}
@@ -159,7 +159,7 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-safari-700">
+                        <label className="text-base font-bold text-safari-700">
                             {formData.type === 'fixed' ? 'Discount Amount ($)' : 'Discount Percentage (%)'}
                         </label>
                         <input
@@ -176,7 +176,7 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
 
                     {formData.type === 'percentage' && (
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-safari-700">Max Discount Limit ($)</label>
+                            <label className="text-base font-bold text-safari-700">Max Discount Limit ($)</label>
                             <input
                                 type="number"
                                 min="0"
@@ -190,7 +190,7 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
                     )}
 
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-safari-700">Min Order Value ($)</label>
+                        <label className="text-base font-bold text-safari-700">Min Order Value ($)</label>
                         <input
                             type="number"
                             min="0"
@@ -201,7 +201,7 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-safari-700">Usage Limit</label>
+                        <label className="text-base font-bold text-safari-700">Usage Limit</label>
                         <input
                             type="number"
                             min="1"
@@ -213,7 +213,7 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-safari-700">Start Date</label>
+                        <label className="text-base font-bold text-safari-700">Start Date</label>
                         <input
                             type="datetime-local"
                             value={formData.start_date}
@@ -224,7 +224,7 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-safari-700">End Date</label>
+                        <label className="text-base font-bold text-safari-700">End Date</label>
                         <input
                             type="datetime-local"
                             value={formData.end_date}
@@ -236,7 +236,7 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
                 </div>
 
                 <div className="space-y-3">
-                    <label className="text-sm font-bold text-safari-700 block">Applicable Scope</label>
+                    <label className="text-base font-bold text-safari-700 block">Applicable Scope</label>
                     <div className="flex flex-wrap gap-2">
                         {SCOPES.map(scope => {
                             const isSelected = formData.applicable_scope?.includes(scope.value);
@@ -245,7 +245,7 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
                                     key={scope.value}
                                     type="button"
                                     onClick={() => toggleScope(scope.value)}
-                                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all border ${isSelected
+                                    className={`px-4 py-2 rounded-lg text-base font-semibold transition-all border ${isSelected
                                             ? 'bg-secondary-600 border-secondary-600 text-white shadow-md'
                                             : 'bg-white border-safari-200 text-safari-600 hover:bg-safari-50'
                                         }`}
@@ -255,7 +255,7 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
                             );
                         })}
                     </div>
-                    <p className="text-xs text-safari-500">
+                    <p className="text-base text-safari-500">
                         Select which bookings this code applies to. Selecting "All Bookings" will override specific selections.
                     </p>
                 </div>

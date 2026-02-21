@@ -34,7 +34,7 @@ export default function BookingFilterTabs() {
                     key={tab.id}
                     onClick={() => handleTabChange(tab.id)}
                     className={cn(
-                        "px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap",
+                        "px-4 py-2 rounded-xl text-base font-bold transition-all whitespace-nowrap",
                         currentStatus === tab.id || (tab.id === 'all' && !searchParams.get('status'))
                             ? "bg-white text-safari-900 shadow-sm"
                             : "text-safari-400 hover:text-safari-600"

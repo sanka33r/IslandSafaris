@@ -55,8 +55,8 @@ export default function BookingDetailModal({ booking, onClose }: { booking: any;
             <div className="flex items-start gap-2 p-2.5 rounded-lg bg-safari-50">
                 {Icon && <Icon size={16} className="text-safari-500 mt-0.5 flex-shrink-0" />}
                 <div className="min-w-0">
-                    <p className="text-[10px] font-bold text-safari-500 uppercase">{label}</p>
-                    <p className="text-sm font-medium text-safari-900 break-words">{String(value)}</p>
+                    <p className="text-sm font-bold text-safari-500 uppercase">{label}</p>
+                    <p className="text-base font-medium text-safari-900 break-words">{String(value)}</p>
                 </div>
             </div>
         ) : null;
@@ -77,15 +77,15 @@ export default function BookingDetailModal({ booking, onClose }: { booking: any;
                 <div className="p-6">
                     <div className="flex justify-between items-start mb-6">
                         <div>
-                            <p className="text-xs font-mono text-safari-400">Ref: {booking.id.slice(0, 8)}</p>
+                            <p className="text-base font-mono text-safari-400">Ref: {booking.id.slice(0, 8)}</p>
                             <p className="text-xl font-bold text-safari-900">{booking.customer_name}</p>
                         </div>
-                        <span className={cn('px-2 py-1 rounded-full text-xs font-bold uppercase', config.bg, config.text, config.border)}>
+                        <span className={cn('px-2 py-1 rounded-full text-base font-bold uppercase', config.bg, config.text, config.border)}>
                             {booking.status}
                         </span>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-base">
                         <DetailItem label={booking.package_type ? 'Package' : 'Destination'} value={name} icon={MapPin} />
                         <DetailItem label="Date & Time" value={`${new Date(booking.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })} at ${booking.time}`} icon={Calendar} />
                         <DetailItem label="Group Size" value={`${booking.group_size} person${booking.group_size > 1 ? 's' : ''}`} icon={Users} />
@@ -106,8 +106,8 @@ export default function BookingDetailModal({ booking, onClose }: { booking: any;
                         <div className="mt-4 flex items-start gap-2 p-3 rounded-xl bg-safari-50">
                             <MessageSquare size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
                             <div>
-                                <p className="text-xs font-bold text-safari-500 uppercase">Notes / Special Requests</p>
-                                <p className="text-sm font-medium text-safari-900">{booking.special_requests || booking.message}</p>
+                                <p className="text-base font-bold text-safari-500 uppercase">Notes / Special Requests</p>
+                                <p className="text-base font-medium text-safari-900">{booking.special_requests || booking.message}</p>
                             </div>
                         </div>
                     )}
@@ -116,33 +116,33 @@ export default function BookingDetailModal({ booking, onClose }: { booking: any;
                         {booking.promo_code && (
                             <div className="flex items-center gap-2 p-3 rounded-xl bg-green-50 border border-green-100">
                                 <Tag size={16} className="text-green-600" />
-                                <span className="text-xs font-bold text-green-700">Promo:</span>
+                                <span className="text-base font-bold text-green-700">Promo:</span>
                                 <span className="font-semibold text-green-800">{booking.promo_code}</span>
                                 {discount > 0 && <span className="text-green-600">(-${discount})</span>}
                             </div>
                         )}
                         <div className="p-3 rounded-xl bg-safari-50 border border-safari-100 space-y-2">
-                            <p className="text-xs font-bold text-safari-500 uppercase">Payment</p>
-                            <div className="flex justify-between text-sm">
+                            <p className="text-base font-bold text-safari-500 uppercase">Payment</p>
+                            <div className="flex justify-between text-base">
                                 <span className="text-safari-600">Total</span>
                                 <span className="font-semibold">${totalPrice}</span>
                             </div>
                             {discount > 0 && (
-                                <div className="flex justify-between text-sm text-green-600">
+                                <div className="flex justify-between text-base text-green-600">
                                     <span>Discount</span>
                                     <span>-${discount}</span>
                                 </div>
                             )}
-                            <div className="flex justify-between text-sm">
+                            <div className="flex justify-between text-base">
                                 <span className="text-safari-600">Advance Paid</span>
                                 <span className="font-semibold">${advance}</span>
                             </div>
-                            <div className="flex justify-between text-sm pt-2 border-t border-safari-200">
+                            <div className="flex justify-between text-base pt-2 border-t border-safari-200">
                                 <span className="font-bold text-secondary-700">Balance Due</span>
                                 <span className="font-bold text-secondary-700">${balanceDue}</span>
                             </div>
                             {booking.advance_payment_status && (
-                                <p className="text-xs text-safari-500 mt-1">Status: {booking.advance_payment_status}</p>
+                                <p className="text-base text-safari-500 mt-1">Status: {booking.advance_payment_status}</p>
                             )}
                         </div>
                     </div>

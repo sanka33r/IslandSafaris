@@ -27,7 +27,7 @@ export default function BookingsList({ bookings, totalPages }: { bookings: any[]
             {/* Desktop View: Table */}
             <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-safari-100 overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
+                    <table className="w-full text-left text-base">
                         <thead className="bg-safari-50 border-b border-safari-100/50">
                             <tr>
                                 <th className="p-4 font-semibold text-safari-700">Ref</th>

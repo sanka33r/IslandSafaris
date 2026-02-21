@@ -35,7 +35,7 @@ export default function BookingCard({ booking, onViewDetails }: { booking: any; 
         >
             <div className="flex justify-between items-start">
                 <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-safari-400 font-mono text-xs">
+                    <div className="flex items-center gap-2 text-safari-400 font-mono text-base">
                         <span>Ref: {booking.id.slice(0, 8)}</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -43,16 +43,16 @@ export default function BookingCard({ booking, onViewDetails }: { booking: any; 
                         <span className="font-bold text-safari-900">{booking.customer_name}</span>
                     </div>
                 </div>
-                <span className={cn("px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider", statusColors[booking.status as keyof typeof statusColors])}>
+                <span className={cn("px-2 py-1 rounded-full text-sm font-bold uppercase tracking-wider", statusColors[booking.status as keyof typeof statusColors])}>
                     {booking.status}
                 </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-y-4 gap-x-2 pt-2 text-sm border-t border-safari-50">
+            <div className="grid grid-cols-2 gap-y-4 gap-x-2 pt-2 text-base border-t border-safari-50">
                 <div className="flex items-start gap-2">
                     <MapPin size={16} className="text-safari-400 mt-0.5" />
                     <div>
-                        <p className="text-[10px] font-bold text-safari-400 uppercase">
+                        <p className="text-sm font-bold text-safari-400 uppercase">
                             {booking.package_type ? 'Package' : 'Destination'}
                         </p>
                         <p className="text-safari-800 font-medium leading-tight">
@@ -68,7 +68,7 @@ export default function BookingCard({ booking, onViewDetails }: { booking: any; 
                 <div className="flex items-start gap-2">
                     <Calendar size={16} className="text-safari-400 mt-0.5" />
                     <div>
-                        <p className="text-[10px] font-bold text-safari-400 uppercase">Date & Time</p>
+                        <p className="text-sm font-bold text-safari-400 uppercase">Date & Time</p>
                         <p className="text-safari-800 font-medium truncate">
                             {new Date(booking.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} @ {booking.time}
                         </p>
@@ -78,7 +78,7 @@ export default function BookingCard({ booking, onViewDetails }: { booking: any; 
                 <div className="flex items-start gap-2">
                     <Users size={16} className="text-safari-400 mt-0.5" />
                     <div>
-                        <p className="text-[10px] font-bold text-safari-400 uppercase">Group</p>
+                        <p className="text-sm font-bold text-safari-400 uppercase">Group</p>
                         <p className="text-safari-800 font-medium">{booking.group_size} Persons</p>
                     </div>
                 </div>
@@ -86,21 +86,21 @@ export default function BookingCard({ booking, onViewDetails }: { booking: any; 
                 <div className="flex items-start gap-2">
                     <Phone size={16} className="text-safari-400 mt-0.5" />
                     <div>
-                        <p className="text-[10px] font-bold text-safari-400 uppercase">Contact</p>
-                        <p className="text-safari-800 font-medium truncate text-xs">{booking.phone}</p>
+                        <p className="text-sm font-bold text-safari-400 uppercase">Contact</p>
+                        <p className="text-safari-800 font-medium truncate text-base">{booking.phone}</p>
                     </div>
                 </div>
 
                 {/* Price Breakdown */}
                 <div className="col-span-2 mt-2 pt-2 border-t border-dashed border-safari-100">
-                    <div className="flex justify-between items-center text-xs">
+                    <div className="flex justify-between items-center text-base">
                         <span className="text-safari-500">Total Price:</span>
                         <span className="font-bold text-safari-900">
                             ${booking.package_type ? (PACKAGE_INFO[booking.package_type as keyof typeof PACKAGE_INFO]?.price * booking.group_size) : booking.ticket_price}
                         </span>
                     </div>
                     {booking.discount_amount > 0 && (
-                        <div className="flex justify-between items-center text-xs text-green-600 font-medium">
+                        <div className="flex justify-between items-center text-base text-green-600 font-medium">
                             <span className="flex items-center gap-1">
                                 <Tag size={10} />
                                 Promo ({booking.promo_code}):
@@ -108,11 +108,11 @@ export default function BookingCard({ booking, onViewDetails }: { booking: any; 
                             <span>-${booking.discount_amount}</span>
                         </div>
                     )}
-                    <div className="flex justify-between items-center text-xs">
+                    <div className="flex justify-between items-center text-base">
                         <span className="text-safari-500">Advance Paid:</span>
                         <span className="font-bold text-safari-900">${booking.advance_payment_amount || 0}</span>
                     </div>
-                    <div className="flex justify-between items-center text-xs mt-1 pt-1 border-t border-safari-100">
+                    <div className="flex justify-between items-center text-base mt-1 pt-1 border-t border-safari-100">
                         <span className="font-bold text-secondary-700">Balance Due:</span>
                         <span className="font-bold text-secondary-700">
                             ${Math.max(0, (booking.package_type ? (PACKAGE_INFO[booking.package_type as keyof typeof PACKAGE_INFO]?.price * booking.group_size) : booking.ticket_price) - (booking.discount_amount || 0) - (booking.advance_payment_amount || 0))}
@@ -145,13 +145,13 @@ export default function BookingCard({ booking, onViewDetails }: { booking: any; 
                 {booking.status === 'confirmed' && (
                     <button
                         onClick={() => handleUpdate('cancelled')}
-                        className="w-full py-2.5 text-xs text-red-500 hover:text-red-600 font-bold bg-red-50 rounded-xl transition-all"
+                        className="w-full py-2.5 text-base text-red-500 hover:text-red-600 font-bold bg-red-50 rounded-xl transition-all"
                     >
                         Cancel Booking
                     </button>
                 )}
                 {booking.status === 'cancelled' && (
-                    <div className="w-full text-center py-2.5 text-xs text-safari-400 font-medium bg-safari-50 rounded-xl">
+                    <div className="w-full text-center py-2.5 text-base text-safari-400 font-medium bg-safari-50 rounded-xl">
                         Cancelled
                     </div>
                 )}

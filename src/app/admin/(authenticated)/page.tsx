@@ -37,38 +37,52 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
     const lastWeek = getWeekRange(lastWeekStart);
     const nextWeek = getWeekRange(nextWeekStart);
 
-    const [dailyRes, lastWeekRes, nextWeekRes] = await Promise.all([
-        supabaseAdmin
-            .from('bookings')
-            .select('*, destinations(name)')
-            .eq('date', dateParam)
-            .neq('status', 'cancelled')
-            .order('time', { ascending: true }),
-        supabaseAdmin
-            .from('bookings')
-            .select('*, destinations(name)')
-            .gte('date', lastWeek.start)
-            .lte('date', lastWeek.end)
-            .neq('status', 'cancelled')
-            .order('date', { ascending: true })
-            .order('time', { ascending: true }),
-        supabaseAdmin
-            .from('bookings')
-            .select('*, destinations(name)')
-            .gte('date', nextWeek.start)
-            .lte('date', nextWeek.end)
-            .neq('status', 'cancelled')
-            .order('date', { ascending: true })
-            .order('time', { ascending: true }),
-    ]);
+    let dailyBookings: any[] = [];
+    let lastWeekBookings: any[] = [];
+    let nextWeekBookings: any[] = [];
+    let fetchError: string | null = null;
 
-    const dailyBookings = (dailyRes.data || []) as any[];
-    const lastWeekBookings = (lastWeekRes.data || []) as any[];
-    const nextWeekBookings = (nextWeekRes.data || []) as any[];
+    try {
+        const [dailyRes, lastWeekRes, nextWeekRes] = await Promise.all([
+            supabaseAdmin
+                .from('bookings')
+                .select('*, destinations(name)')
+                .eq('date', dateParam)
+                .neq('status', 'cancelled')
+                .order('time', { ascending: true }),
+            supabaseAdmin
+                .from('bookings')
+                .select('*, destinations(name)')
+                .gte('date', lastWeek.start)
+                .lte('date', lastWeek.end)
+                .neq('status', 'cancelled')
+                .order('date', { ascending: true })
+                .order('time', { ascending: true }),
+            supabaseAdmin
+                .from('bookings')
+                .select('*, destinations(name)')
+                .gte('date', nextWeek.start)
+                .lte('date', nextWeek.end)
+                .neq('status', 'cancelled')
+                .order('date', { ascending: true })
+                .order('time', { ascending: true }),
+        ]);
+
+        dailyBookings = dailyRes.data ?? [];
+        lastWeekBookings = lastWeekRes.data ?? [];
+        nextWeekBookings = nextWeekRes.data ?? [];
+
+        if (dailyRes.error || lastWeekRes.error || nextWeekRes.error) {
+            fetchError = dailyRes.error?.message || lastWeekRes.error?.message || nextWeekRes.error?.message || 'Failed to load data';
+        }
+    } catch (err) {
+        fetchError = err instanceof Error ? err.message : 'Failed to load dashboard data';
+    }
 
     return (
         <AdminDashboard
             selectedDate={dateParam}
+            fetchError={fetchError}
             dailyBookings={dailyBookings}
             lastWeekBookings={lastWeekBookings}
             nextWeekBookings={nextWeekBookings}

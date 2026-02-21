@@ -94,7 +94,7 @@ export default function PromoCodesPage() {
 
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-safari-50 text-safari-700 text-sm font-bold uppercase tracking-wider">
+                        <thead className="bg-safari-50 text-safari-700 text-base font-bold uppercase tracking-wider">
                             <tr>
                                 <th className="p-4 rounded-tl-xl text-center">Status</th>
                                 <th className="p-4">Code</th>
@@ -122,14 +122,14 @@ export default function PromoCodesPage() {
                                 filteredCodes.map((code) => (
                                     <tr key={code.id} className="hover:bg-safari-50/50 transition-colors">
                                         <td className="p-4 text-center">
-                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border ${getStatusColor(code.status, code.end_date)}`}>
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-base font-bold border ${getStatusColor(code.status, code.end_date)}`}>
                                                 {getStatusText(code.status, code.end_date) === 'Active' ? <CheckCircle size={12} /> :
                                                     getStatusText(code.status, code.end_date) === 'Expired' ? <Clock size={12} /> : <XCircle size={12} />}
                                                 {getStatusText(code.status, code.end_date)}
                                             </span>
                                         </td>
                                         <td className="p-4">
-                                            <div className="font-mono font-bold text-safari-900 bg-safari-100 inline-block px-2 py-1 rounded text-sm">
+                                            <div className="font-mono font-bold text-safari-900 bg-safari-100 inline-block px-2 py-1 rounded text-base">
                                                 {code.code}
                                             </div>
                                         </td>
@@ -138,10 +138,10 @@ export default function PromoCodesPage() {
                                                 {code.type === 'percentage' ? `${code.value}%` : `$${code.value}`}
                                             </span>
                                             {code.type === 'percentage' && code.max_discount && (
-                                                <div className="text-xs text-safari-500">Max ${code.max_discount}</div>
+                                                <div className="text-base text-safari-500">Max ${code.max_discount}</div>
                                             )}
                                         </td>
-                                        <td className="p-4 text-sm text-safari-600">
+                                        <td className="p-4 text-base text-safari-600">
                                             <span className="font-bold">{code.usage_count}</span>
                                             <span className="text-safari-400"> / </span>
                                             <span>{code.usage_limit || '∞'}</span>
@@ -149,18 +149,18 @@ export default function PromoCodesPage() {
                                         <td className="p-4">
                                             <div className="flex flex-wrap gap-1">
                                                 {code.applicable_scope.slice(0, 2).map(s => (
-                                                    <span key={s} className="text-[10px] uppercase font-bold bg-safari-100 text-safari-600 px-1.5 py-0.5 rounded">
+                                                    <span key={s} className="text-sm uppercase font-bold bg-safari-100 text-safari-600 px-1.5 py-0.5 rounded">
                                                         {s}
                                                     </span>
                                                 ))}
                                                 {code.applicable_scope.length > 2 && (
-                                                    <span className="text-[10px] uppercase font-bold bg-safari-100 text-safari-600 px-1.5 py-0.5 rounded">
+                                                    <span className="text-sm uppercase font-bold bg-safari-100 text-safari-600 px-1.5 py-0.5 rounded">
                                                         +{code.applicable_scope.length - 2}
                                                     </span>
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="p-4 text-xs text-safari-600">
+                                        <td className="p-4 text-base text-safari-600">
                                             <div>{new Date(code.start_date).toLocaleDateString()}</div>
                                             <div className="text-safari-400">to</div>
                                             <div className={new Date(code.end_date) < new Date() ? 'text-red-500 font-bold' : ''}>
