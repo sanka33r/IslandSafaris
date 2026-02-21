@@ -10,7 +10,7 @@ interface StickyPriceBarProps {
 
 export default function StickyPriceBar({ packageName, price, advancePrice, bookHref }: StickyPriceBarProps) {
     return (
-        <section className="sticky top-0 z-50 container mx-auto px-4 sm:px-6 -mt-6 sm:-mt-8 md:-mt-10 relative mb-10 sm:mb-16">
+        <section className="sticky top-20 z-40 container mx-auto px-4 sm:px-6 -mt-6 sm:-mt-8 md:-mt-10 relative mb-10 sm:mb-16">
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl border border-safari-100 p-4 sm:p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 sm:gap-6 md:gap-8 w-full md:w-auto">
                     <div className="text-center md:text-left">
