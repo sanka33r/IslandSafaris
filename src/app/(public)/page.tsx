@@ -12,59 +12,43 @@ export default async function HomePage() {
     <>
       <HeroSection />
 
-      {/* About Section */}
-      <section className="py-20 md:py-28 bg-secondary-50">
+      {/* About Section - The Rhythm of the Wild */}
+      <section className="py-12 md:py-16 bg-secondary-50">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Image Stack */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Image Stack - The Rhythm of the Wild (Cloudinary) */}
             <div className="relative order-2 lg:order-1">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <div className="aspect-[3/4] rounded-3xl overflow-hidden shadow-xl border border-safari-100 bg-safari-200">
-                    {destinations[0]?.images[0] ? (
-                      <img
-                        src={destinations[0].images[0].secure_url}
-                        alt={destinations[0].images[0].alt_text || 'Safari'}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-safari-400 to-safari-600" />
-                    )}
+                    <img
+                      src="https://res.cloudinary.com/dxau42ovy/image/upload/v1772045462/IMG_6163.JPG_tewuwz.jpg"
+                      alt="Safari wildlife - The Rhythm of the Wild"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="aspect-square rounded-3xl overflow-hidden shadow-xl border border-safari-100 bg-secondary-200">
-                    {destinations[1]?.images[0] ? (
-                      <img
-                        src={destinations[1].images[0].secure_url}
-                        alt={destinations[1].images[0].alt_text || 'Safari'}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-secondary-300 to-secondary-500" />
-                    )}
+                    <img
+                      src="https://res.cloudinary.com/dxau42ovy/image/upload/v1772045450/IMG_6181_xxilcs.avif"
+                      alt="Elephant corridor - The Rhythm of the Wild"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 </div>
                 <div className="space-y-4 pt-8">
                   <div className="aspect-square rounded-3xl overflow-hidden shadow-xl border border-safari-100 bg-safari-200">
-                    {destinations[2]?.images[0] ? (
-                      <img
-                        src={destinations[2].images[0].secure_url}
-                        alt={destinations[2].images[0].alt_text || 'Safari'}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-safari-300 to-safari-500" />
-                    )}
+                    <img
+                      src="https://res.cloudinary.com/dxau42ovy/image/upload/v1772045443/IMG_6164_klnyzg.webp"
+                      alt="Safari experience - The Rhythm of the Wild"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="aspect-[3/4] rounded-3xl overflow-hidden shadow-xl border border-safari-100 bg-secondary-200">
-                    {destinations[0]?.images[1] ? (
-                      <img
-                        src={destinations[0].images[1].secure_url}
-                        alt={destinations[0].images[1].alt_text || 'Safari'}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-secondary-400 to-secondary-600" />
-                    )}
+                    <img
+                      src="https://res.cloudinary.com/dxau42ovy/image/upload/v1772045344/IMG_6203.JPG_nh8v7m.jpg"
+                      alt="Wildlife in the wild - The Rhythm of the Wild"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 </div>
               </div>
@@ -76,20 +60,20 @@ export default async function HomePage() {
 
             {/* Content */}
             <div className="order-1 lg:order-2">
-              <span className="inline-block text-secondary-600 font-bold uppercase tracking-widest text-xs mb-4 bg-secondary-100 px-4 py-2 rounded-full">
+              <span className="inline-block text-secondary-600 font-bold uppercase tracking-widest text-xs mb-3 bg-secondary-100 px-4 py-2 rounded-full">
                 The Migration Story
               </span>
-              <h2 className="text-4xl md:text-5xl font-bold text-safari-900 mb-6 leading-tight">
+              <h2 className="text-4xl md:text-5xl font-bold text-safari-900 mb-4 leading-tight">
                 The Rhythm of the Wild
               </h2>
-              <p className="text-lg text-safari-600 leading-relaxed mb-6">
+              <p className="text-lg text-safari-600 leading-relaxed mb-4">
                 Welcome to the heart of the Cultural Triangle, where the ancient pulse of nature dictates the journey.
                 Unlike ordinary safari operators, we specialize in the <strong>Minneriya-Kaudulla-Hurulu Corridor</strong>—a
                 vast, interconnected wilderness where hundreds of Asian elephants roam freely.
               </p>
-              <div className="rounded-3xl bg-white border border-safari-100 p-6 md:p-8 shadow-sm">
-                <h3 className="text-2xl font-bold text-safari-900 mb-3">Why Book With Us?</h3>
-                <p className="text-safari-600 leading-relaxed mb-6">
+              <div className="rounded-3xl bg-white border border-safari-100 p-5 md:p-6 shadow-sm">
+                <h3 className="text-2xl font-bold text-safari-900 mb-2">Why Book With Us?</h3>
+                <p className="text-safari-600 leading-relaxed mb-4">
                   Nature doesn&apos;t stay in one place, and neither do we. The Great Elephant Gathering is a seasonal masterpiece,
                   and we ensure you&apos;re always in the front row. Our expert guides track the migration daily to bring you
                   exactly where the magic is happening.
@@ -107,7 +91,7 @@ export default async function HomePage() {
       </section>
 
       {/* Destinations Preview */}
-      <section className="py-20 md:py-32 bg-white relative">
+      <section className="pt-12 pb-20 md:pt-16 md:pb-24 bg-white relative">
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-16 gap-4">
             <div>
@@ -258,14 +242,14 @@ export default async function HomePage() {
                 title: 'Organic Cooking',
                 tagline: 'Farm to Table',
                 price: '22',
-                image: 'https://images.unsplash.com/',
+                image: 'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045142/WhatsApp_Image_2026-02-15_at_12.06.43_PM_bxpezn.jpg',
                 href: '/packages/cooking-class',
               },
               {
                 title: 'Village Tour',
                 tagline: 'Cultural Immersion',
                 price: '22',
-                image: 'https://images.unsplash.com/photo-1588828195511-584568433682?w=600&q=80',
+                image: 'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045164/WhatsApp_Image_2026-02-15_at_12.06.47_PM_aknrgc.jpg',
                 href: '/packages/village-tour',
               },
               {

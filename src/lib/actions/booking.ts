@@ -39,11 +39,14 @@ async function calculatePrice(data: BookingFormData) {
 
     const extraHoursCost = data.extra_hours * extraHourPrice * vehicleCount; // Extra hours per jeep? Usually yes.
 
+    // We only charge for the safari jeep (+ extra hours). Entrance tickets are paid at the park gate.
+    const ourCharge = vehicleCost + extraHoursCost;
+
     return {
         tickets: ticketCost,
         vehicle: vehicleCost,
         extra_hours: extraHoursCost,
-        total: ticketCost + vehicleCost + extraHoursCost,
+        total: ourCharge, // Jeep + extra only; tickets paid at gate
         vehicle_count: vehicleCount,
         currency: 'LKR'
     };

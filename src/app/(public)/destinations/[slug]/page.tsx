@@ -4,6 +4,7 @@ import { useGlobalData } from '@/providers/GlobalDataProvider';
 import { notFound, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { lkrToUsd } from '@/lib/constants';
 import {
     Clock, Ticket, Car, Camera, DollarSign,
     MapPin, Star, Repeat, Compass, Sparkles, Sun,
@@ -363,7 +364,7 @@ export default function DestinationDetailPage() {
                                 <span className="text-sm font-bold uppercase tracking-wider text-secondary-600 mb-2 block">Starting from</span>
                                 <div className="flex items-baseline gap-1">
                                     <span className="text-4xl font-bold text-safari-900">
-                                        Rs. {destination.vehicle_price_up_to_3.toLocaleString()}
+                                        USD {lkrToUsd(destination.vehicle_price_up_to_3)}
                                     </span>
                                     <span className="text-safari-500 font-medium">/ jeep</span>
                                 </div>
@@ -390,7 +391,7 @@ export default function DestinationDetailPage() {
                                     <div>
                                         <p className="text-xs text-safari-500 font-bold uppercase tracking-wider mb-0.5">Entrance Ticket</p>
                                         <p className="text-safari-900 font-bold">
-                                            Rs. {destination.ticket_price.toLocaleString()}
+                                            USD {lkrToUsd(destination.ticket_price)}
                                             <span className="text-sm font-normal text-safari-500">
                                                 {destination.ticket_pricing_type === 'per_person' ? ' / person' : ' flat rate'}
                                             </span>
@@ -406,7 +407,7 @@ export default function DestinationDetailPage() {
                                     <div>
                                         <p className="text-xs text-safari-500 font-bold uppercase tracking-wider mb-0.5">Jeep Fee</p>
                                         <p className="text-safari-900 font-bold">
-                                            Rs. {destination.vehicle_price_up_to_3.toLocaleString()}
+                                            USD {lkrToUsd(destination.vehicle_price_up_to_3)}
                                             <span className="text-sm font-normal text-safari-500"> (up to 3 pax)</span>
                                         </p>
                                     </div>
@@ -415,7 +416,7 @@ export default function DestinationDetailPage() {
 
                             <Link
                                 href={`/booking?destination=${destination.slug}`}
-                                className="w-full block text-center bg-gradient-to-r from-secondary-600 to-secondary-500 hover:from-secondary-700 hover:to-secondary-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-secondary-200 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 text-lg"
+                                className="w-full block text-center bg-gradient-to-r from-secondary-600 to-secondary-500 hover:from-secondary-700 hover:to-secondary-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-black/20 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 text-lg"
                             >
                                 Book This Safari
                             </Link>

@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import StickyPriceBar from '@/components/packages/StickyPriceBar';
+import PackageGallery from '@/components/packages/PackageGallery';
+import { packages } from '../page';
 import {
     ArrowRight,
     ChefHat,
@@ -89,15 +91,26 @@ const additionalReasons = [
 ];
 
 export default function CookingClassPage() {
+    const pkg = packages.find((p) => p.slug === 'cooking-class');
+    const galleryImages = pkg && 'images' in pkg ? pkg.images : undefined;
+
     return (
         <div className="bg-secondary-50 min-h-screen">
             {/* ═══════ HERO ═══════ */}
             <section className="relative py-16 sm:py-20 md:py-28 lg:py-36 overflow-hidden">
                 {/* Layered background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-safari-900 via-safari-800 to-safari-950" />
-                <div className="absolute inset-0 opacity-[0.03]" style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                }} />
+                {pkg?.image && (
+                    <>
+                        <div
+                            className="absolute inset-0 bg-cover bg-center"
+                            style={{ backgroundImage: `url(${pkg.image})` }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-safari-900/90 via-safari-800/85 to-safari-950/95" />
+                    </>
+                )}
+                {!pkg?.image && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-safari-900 via-safari-800 to-safari-950" />
+                )}
                 <div className="absolute top-0 right-0 w-64 sm:w-80 md:w-[500px] h-64 sm:h-80 md:h-[500px] bg-secondary-600/10 rounded-full blur-[80px] md:blur-[100px]" />
                 <div className="absolute bottom-0 left-0 w-48 sm:w-64 md:w-[400px] h-48 sm:h-64 md:h-[400px] bg-secondary-400/8 rounded-full blur-[60px] md:blur-[80px]" />
 
@@ -246,6 +259,16 @@ export default function CookingClassPage() {
                 </div>
             </div>
 
+
+            {/* ═══════ GALLERY ═══════ */}
+            {galleryImages && (
+                <PackageGallery
+                    images={galleryImages}
+                    title="Cooking experience in photos"
+                    altPrefix="Cooking experience"
+                />
+            )}
+            
             {/* ═══════ WHY CHOOSE — EDITORIAL LAYOUT ═══════ */}
             <section className="py-12 sm:py-16 md:py-20">
                 <div className="container mx-auto px-4 sm:px-6">
@@ -377,12 +400,10 @@ export default function CookingClassPage() {
                 </div>
             </section>
 
+
             {/* ═══════ CTA ═══════ */}
             <section className="py-14 sm:py-20 md:py-28 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-safari-900 via-safari-800 to-safari-900" />
-                <div className="absolute inset-0 opacity-[0.03]" style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                }} />
                 <div className="absolute top-0 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-secondary-500/10 rounded-full blur-[80px] sm:blur-[100px]" />
 
                 <div className="container mx-auto px-4 sm:px-6 relative text-center">

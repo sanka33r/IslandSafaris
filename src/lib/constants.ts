@@ -19,6 +19,14 @@ export const PACKAGE_INFO = {
     },
 };
 
+/** LKR to USD - used to display safari jeep/ticket prices in USD. Update as needed. */
+export const LKR_TO_USD_RATE = 310;
+
+/** Convert LKR amount to USD display string (2 decimals). */
+export function lkrToUsd(lkr: number): string {
+    return (lkr / LKR_TO_USD_RATE).toFixed(2);
+}
+
 export const TIME_SLOTS = [
     { value: '06:00', label: '6:00 AM - Early Morning' },
     { value: '09:00', label: '9:00 AM - Morning' },

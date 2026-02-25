@@ -22,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={cn(outfit.variable, "font-sans min-h-screen bg-safari-50 text-safari-900")}>
+      <body className={cn(outfit.variable, "font-sans min-h-screen bg-safari-950 text-secondary-50")}>
         <GlobalDataProvider>
           {children}
         </GlobalDataProvider>

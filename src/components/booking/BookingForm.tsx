@@ -317,7 +317,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                             onChange={(e) => handleChange('date', e.target.value)}
                             onBlur={handleBlur}
                             min={getTomorrowDate()}
-                            className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border focus:bg-white outline-none transition-all ${errors.date ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
+                            className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border text-safari-900 placeholder:text-safari-500 focus:bg-white outline-none transition-all [color-scheme:light] ${errors.date ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
                         />
                         {errors.date && <p className="text-red-500 text-xs ml-1">{errors.date}</p>}
                     </div>
@@ -329,7 +329,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                             value={formData.time}
                             onChange={(e) => handleChange('time', e.target.value)}
                             onBlur={handleBlur}
-                            className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border focus:bg-white outline-none transition-all ${errors.time ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
+                            className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border text-safari-900 focus:bg-white outline-none transition-all [color-scheme:light] ${errors.time ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
                         >
                             {TIME_SLOTS.map((slot) => (
                                 <option key={slot.value} value={slot.value}>{slot.label}</option>
@@ -359,7 +359,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                                 }}
                                 min="1"
                                 max="20"
-                                className="flex-1 p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border border-safari-100 focus:border-secondary-500 focus:bg-white outline-none transition-all text-center font-bold text-lg"
+                                className="flex-1 p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border border-safari-100 text-safari-900 focus:border-secondary-500 focus:bg-white outline-none transition-all text-center font-bold text-lg"
                             />
                             <button
                                 type="button"
@@ -406,7 +406,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                                     onChange={(e) => handleChange('hotel_name', e.target.value)}
                                     onBlur={handleBlur}
                                     placeholder="Enter your hotel name"
-                                    className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border focus:bg-white outline-none transition-all ${errors.hotel_name ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
+                                    className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border text-safari-900 placeholder:text-safari-500 focus:bg-white outline-none transition-all ${errors.hotel_name ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
                                 />
                                 {errors.hotel_name && <p className="text-red-500 text-xs ml-1">{errors.hotel_name}</p>}
                             </div>
@@ -421,7 +421,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                                         onChange={(e) => handleChange('pickup_location', e.target.value)}
                                         onBlur={handleBlur}
                                         placeholder="Paste Google Maps link or type location"
-                                        className={`w-full p-3 sm:p-4 pr-10 bg-safari-50/50 rounded-xl sm:rounded-2xl border focus:bg-white outline-none transition-all text-sm ${errors.pickup_location ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
+                                        className={`w-full p-3 sm:p-4 pr-10 bg-safari-50/50 rounded-xl sm:rounded-2xl border text-safari-900 placeholder:text-safari-500 focus:bg-white outline-none transition-all text-sm ${errors.pickup_location ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
                                     />
                                     <MapPin size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-safari-400" />
                                 </div>
@@ -488,7 +488,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                             onChange={(e) => handleChange('customer_name', e.target.value)}
                             onBlur={handleBlur}
                             placeholder="John Doe"
-                            className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border focus:bg-white outline-none transition-all ${errors.customer_name ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
+                            className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border text-safari-900 placeholder:text-safari-500 focus:bg-white outline-none transition-all ${errors.customer_name ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
                         />
                         {errors.customer_name && <p className="text-red-500 text-xs ml-1">{errors.customer_name}</p>}
                     </div>
@@ -502,7 +502,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                             onChange={(e) => handleChange('email', e.target.value)}
                             onBlur={handleBlur}
                             placeholder="john@example.com"
-                            className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border focus:bg-white outline-none transition-all ${errors.email ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
+                            className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border text-safari-900 placeholder:text-safari-500 focus:bg-white outline-none transition-all ${errors.email ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
                         />
                         {errors.email && <p className="text-red-500 text-xs ml-1">{errors.email}</p>}
                     </div>
@@ -511,16 +511,16 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                         <label className="block text-sm font-bold text-safari-700 ml-1">Contact Number</label>
                         <div className="flex gap-2">
                             <div className="relative w-[100px] sm:w-[110px]">
-                                <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm font-semibold text-safari-800">
+                                <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm font-semibold text-safari-900">
                                     {COUNTRY_CODES.find(cc => cc.code === formData.country_code)?.flag} {formData.country_code}
                                 </div>
                                 <select
                                     value={formData.country_code}
                                     onChange={(e) => handleChange('country_code', e.target.value)}
-                                    className="w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border border-safari-100 focus:border-secondary-500 focus:bg-white outline-none transition-all text-sm text-transparent cursor-pointer appearance-none"
+                                    className="w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border border-safari-100 focus:border-secondary-500 focus:bg-white outline-none transition-all text-sm text-transparent cursor-pointer appearance-none [color-scheme:light]"
                                 >
                                     {COUNTRY_CODES.map((cc) => (
-                                        <option key={cc.code} value={cc.code} className="text-safari-800">
+                                        <option key={cc.code} value={cc.code} className="text-safari-900 bg-white">
                                             {cc.flag} {cc.code} {cc.country}
                                         </option>
                                     ))}
@@ -534,7 +534,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                                     onChange={(e) => handleChange('phone', e.target.value)}
                                     onBlur={handleBlur}
                                     placeholder="771 234 567"
-                                    className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border focus:bg-white outline-none transition-all ${errors.phone ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
+                                    className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border text-safari-900 placeholder:text-safari-500 focus:bg-white outline-none transition-all ${errors.phone ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
                                 />
                                 {errors.phone && <p className="text-red-500 text-xs ml-1">{errors.phone}</p>}
                             </div>
@@ -550,7 +550,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                             onChange={(e) => handleChange('country', e.target.value)}
                             onBlur={handleBlur}
                             placeholder="United States"
-                            className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border focus:bg-white outline-none transition-all ${errors.country ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
+                            className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border text-safari-900 placeholder:text-safari-500 focus:bg-white outline-none transition-all ${errors.country ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
                         />
                         {errors.country && <p className="text-red-500 text-xs ml-1">{errors.country}</p>}
                     </div>
@@ -562,7 +562,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                             value={formData.passport_number}
                             onChange={(e) => setFormData({ ...formData, passport_number: e.target.value })}
                             placeholder="e.g. N1234567"
-                            className="w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border border-safari-100 focus:border-secondary-500 focus:bg-white outline-none transition-all"
+                            className="w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border border-safari-100 text-safari-900 placeholder:text-safari-500 focus:border-secondary-500 focus:bg-white outline-none transition-all"
                         />
                     </div>
 
@@ -573,7 +573,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                             onChange={(e) => setFormData({ ...formData, special_requests: e.target.value })}
                             placeholder="Any dietary restrictions, accessibility needs, or special requests..."
                             rows={4}
-                            className="w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border border-safari-100 focus:border-secondary-500 focus:bg-white outline-none transition-all resize-none"
+                            className="w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border border-safari-100 text-safari-900 placeholder:text-safari-500 focus:border-secondary-500 focus:bg-white outline-none transition-all resize-none"
                         />
                     </div>
                 </div>
@@ -607,7 +607,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                                     }
                                 }}
                                 placeholder="Enter promo code"
-                                className="flex-1 p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border border-safari-100 focus:border-secondary-500 focus:bg-white outline-none transition-all uppercase tracking-wider font-semibold"
+                                className="flex-1 p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border border-safari-100 text-safari-900 placeholder:text-safari-500 focus:border-secondary-500 focus:bg-white outline-none transition-all uppercase tracking-wider font-semibold"
                             />
                             <button
                                 type="button"

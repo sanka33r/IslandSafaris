@@ -81,7 +81,7 @@ export async function addDestinationImage(destinationId: string, imageData: any)
             secure_url: imageData.secure_url,
             cloudinary_public_id: imageData.cloudinary_public_id || 'manual_upload',
             alt_text: imageData.alt_text,
-            sort_order: imageData.sort_order || 0
+            sort_order: imageData.sort_order ?? 0
         });
 
     if (error) {
@@ -90,6 +90,40 @@ export async function addDestinationImage(destinationId: string, imageData: any)
     }
 
     revalidatePath('/admin/destinations');
+    revalidatePath('/');
+    return { success: true };
+}
+
+export async function setDestinationImageAsHero(imageId: string) {
+    const { data: image, error: fetchError } = await supabaseAdmin
+        .from('images')
+        .select('id, destination_id, sort_order')
+        .eq('id', imageId)
+        .single();
+
+    if (fetchError || !image?.destination_id) {
+        console.error('Error fetching image:', fetchError);
+        return { success: false, message: fetchError?.message ?? 'Image not found' };
+    }
+
+    const currentOrder = image.sort_order ?? 0;
+    if (currentOrder === 0) return { success: true };
+
+    await supabaseAdmin.from('images').update({ sort_order: 0 }).eq('id', imageId);
+
+    const { data: others } = await supabaseAdmin
+        .from('images')
+        .select('id')
+        .eq('destination_id', image.destination_id)
+        .neq('id', imageId)
+        .order('sort_order');
+
+    for (let i = 0; others && i < others.length; i++) {
+        await supabaseAdmin.from('images').update({ sort_order: i + 1 }).eq('id', others[i].id);
+    }
+
+    revalidatePath('/admin/destinations');
+    revalidatePath('/');
     return { success: true };
 }
 
@@ -132,5 +166,6 @@ export async function deleteDestinationImage(id: string) {
     }
 
     revalidatePath('/admin/destinations');
+    revalidatePath('/');
     return { success: true };
 }

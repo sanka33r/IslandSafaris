@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Destination, Image } from '@/types/db';
-import { updateDestination, createDestination, addDestinationImage, deleteDestinationImage } from '@/lib/actions/admin';
+import { updateDestination, createDestination, addDestinationImage, deleteDestinationImage, setDestinationImageAsHero } from '@/lib/actions/admin';
 import { cn } from '@/lib/utils';
-import { Loader2, Save, Trash2, Plus, Globe, ImageIcon, Clock, Ticket, Car, ArrowLeft } from 'lucide-react';
+import { Loader2, Save, Trash2, Plus, Globe, ImageIcon, Clock, Ticket, Car, ArrowLeft, Star, Upload } from 'lucide-react';
 import Link from 'next/link';
 
 interface DestinationFormProps {
@@ -137,6 +137,13 @@ export default function DestinationForm({ destination, images }: DestinationForm
         if (result.success) {
             router.refresh();
         }
+    };
+
+    const handleSetAsHero = async (imageId: string) => {
+        setImageLoading(imageId);
+        const result = await setDestinationImageAsHero(imageId);
+        setImageLoading(null);
+        if (result.success) router.refresh();
     };
 
     return (
@@ -443,54 +450,76 @@ export default function DestinationForm({ destination, images }: DestinationForm
                         </div>
                     ) : (
                         <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-safari-100">
-                            <div className="flex items-center gap-3 mb-6">
+                            <div className="flex items-center gap-3 mb-2">
                                 <div className="bg-secondary-100/50 p-3 rounded-xl text-secondary-600">
                                     <ImageIcon size={20} />
                                 </div>
-                                <h3 className="text-xl font-bold text-safari-900">Gallery</h3>
+                                <h3 className="text-xl font-bold text-safari-900">Photo gallery</h3>
                             </div>
+                            <p className="text-safari-500 text-sm mb-6">First image is the backdrop on the destination page. Delete or add photos below; use &quot;Set as hero&quot; to change the backdrop.</p>
 
                             {/* Existing Images */}
                             <div className="grid grid-cols-2 gap-4 mb-8">
-                                {images.map((image) => (
+                                {images.map((image, index) => (
                                     <div key={image.id} className="group relative aspect-square rounded-2xl overflow-hidden bg-safari-50 border border-safari-100">
                                         <img
                                             src={image.secure_url}
                                             alt={image.alt_text || ''}
                                             className="w-full h-full object-cover transition-transform group-hover:scale-110"
                                         />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        {index === 0 && (
+                                            <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary-600 text-white text-xs font-bold shadow">
+                                                <Star size={12} />
+                                                Hero
+                                            </span>
+                                        )}
+                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
+                                            {index !== 0 && (
+                                                <button
+                                                    onClick={() => handleSetAsHero(image.id)}
+                                                    disabled={imageLoading === image.id}
+                                                    className="w-full flex items-center justify-center gap-1.5 bg-secondary-600 hover:bg-secondary-700 text-white py-2 px-3 rounded-xl text-sm font-medium transition-all active:scale-95 disabled:opacity-50"
+                                                >
+                                                    {imageLoading === image.id ? <Loader2 size={14} className="animate-spin" /> : <Star size={14} />}
+                                                    Set as hero
+                                                </button>
+                                            )}
                                             <button
                                                 onClick={() => handleDeleteImage(image.id)}
                                                 disabled={imageLoading === image.id}
-                                                className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-xl transition-all active:scale-90 shadow-xl"
+                                                className="w-full flex items-center justify-center gap-1.5 bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded-xl text-sm font-medium transition-all active:scale-95 disabled:opacity-50"
                                             >
-                                                {imageLoading === image.id ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
+                                                {imageLoading === image.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                                                Delete
                                             </button>
                                         </div>
                                     </div>
                                 ))}
                                 {images.length === 0 && (
                                     <div className="col-span-2 py-8 text-center border-2 border-dashed border-safari-100 rounded-2xl text-safari-400 text-base">
-                                        No images yet
+                                        No photos yet. Add one below.
                                     </div>
                                 )}
                             </div>
 
-                            {/* Add New Image Form */}
-                            <div className="space-y-4 pt-6 border-t border-safari-50">
-                                <h4 className="font-bold text-safari-900 text-base italic">Add New Image URL</h4>
+                            {/* Add New Photo */}
+                            <div className="space-y-4 pt-6 border-t border-safari-100">
+                                <h4 className="font-bold text-safari-900 text-base flex items-center gap-2">
+                                    <Upload size={18} />
+                                    Upload new photo
+                                </h4>
+                                <p className="text-safari-500 text-sm">Paste an image URL (e.g. from Cloudinary or your CDN). The image will be added to the gallery.</p>
                                 <div className="space-y-3">
                                     <input
                                         type="url"
-                                        placeholder="https://..."
+                                        placeholder="https://res.cloudinary.com/... or any image URL"
                                         value={newImageUrl}
                                         onChange={(e) => setNewImageUrl(e.target.value)}
                                         className="w-full p-3 bg-safari-50 rounded-xl border border-safari-100 text-base outline-none focus:border-secondary-500"
                                     />
                                     <input
                                         type="text"
-                                        placeholder="Alt text (e.g. Birds eye view)"
+                                        placeholder="Alt text (optional, e.g. Elephant at waterhole)"
                                         value={newImageAlt}
                                         onChange={(e) => setNewImageAlt(e.target.value)}
                                         className="w-full p-3 bg-safari-50 rounded-xl border border-safari-100 text-base outline-none focus:border-secondary-500"
@@ -501,7 +530,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                         className="w-full flex items-center justify-center gap-2 bg-safari-900 hover:bg-safari-800 text-white py-3 rounded-xl font-bold text-base transition-all active:scale-95 disabled:opacity-50"
                                     >
                                         {imageLoading === 'new' ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
-                                        Add Image
+                                        Add photo
                                     </button>
                                 </div>
                             </div>

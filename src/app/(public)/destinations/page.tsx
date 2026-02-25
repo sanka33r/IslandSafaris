@@ -2,18 +2,55 @@
 
 import Link from 'next/link';
 import { useGlobalData } from '@/providers/GlobalDataProvider';
-import { ArrowRight, MapPin, Clock, Calendar, Camera, Car } from 'lucide-react';
+import { ArrowRight, MapPin, Clock, Calendar, Camera, Car, ChevronDown } from 'lucide-react';
+import { lkrToUsd } from '@/lib/constants';
 
 // export const revalidate = 3600; // Not needed for client component
 
-const seasonInfo: Record<string, { months: string; color: string; bgColor: string }> = {
-    'minneriya-national-park': { months: 'Jul - Sep', color: 'text-green-600', bgColor: 'bg-green-100' },
-    'kaudulla-national-park': { months: 'Oct - Nov', color: 'text-yellow-600', bgColor: 'bg-yellow-100' },
-    'hurulu-eco-park': { months: 'Dec - Jan', color: 'text-blue-600', bgColor: 'bg-blue-100' },
+const seasonInfo: Record<string, { months: string; color: string; bgColor: string; label: string }> = {
+    'minneriya-national-park': { months: 'Jul - Sep', color: 'text-green-600', bgColor: 'bg-green-100', label: 'Minneriya' },
+    'kaudulla-national-park': { months: 'Oct - Nov', color: 'text-yellow-600', bgColor: 'bg-yellow-100', label: 'Kaudulla' },
+    'hurulu-eco-park': { months: 'Dec - Jan', color: 'text-blue-600', bgColor: 'bg-blue-100', label: 'Hurulu' },
 };
+
+const MIGRATION_PARK_SLUGS = ['minneriya-national-park', 'kaudulla-national-park', 'hurulu-eco-park'] as const;
+
+/** Park slug that matches the current month (peak season). Jul–Sep Minneriya, Oct–Nov Kaudulla, Dec–Jan Hurulu. Feb–Jun: next up is Minneriya. */
+function getCurrentSeasonParkSlug(month: number): string {
+    if (month >= 7 && month <= 9) return 'minneriya-national-park';
+    if (month >= 10 && month <= 11) return 'kaudulla-national-park';
+    if (month === 12 || month === 1) return 'hurulu-eco-park';
+    return 'minneriya-national-park'; // Feb–Jun: next peak is Minneriya
+}
+
+/** Order migration parks so the time-matching one is first, then the other two in calendar order. */
+function orderedMigrationPills(currentSlug: string): readonly string[] {
+    const idx = MIGRATION_PARK_SLUGS.indexOf(currentSlug as (typeof MIGRATION_PARK_SLUGS)[number]);
+    if (idx <= 0) return MIGRATION_PARK_SLUGS;
+    return [currentSlug, ...MIGRATION_PARK_SLUGS.filter((s) => s !== currentSlug)];
+}
+
+/** Sort destinations so the park matching the current month is first (featured), then other migration parks, then the rest. */
+function sortDestinationsByCurrentSeason<T extends { slug: string }>(destinations: T[], currentSlug: string): T[] {
+    const bySlug = new Map(destinations.map((d) => [d.slug, d]));
+    const ordered: T[] = [];
+    const migrationOrder = orderedMigrationPills(currentSlug);
+    for (const slug of migrationOrder) {
+        const d = bySlug.get(slug);
+        if (d) ordered.push(d);
+    }
+    for (const d of destinations) {
+        if (!MIGRATION_PARK_SLUGS.includes(d.slug as (typeof MIGRATION_PARK_SLUGS)[number])) ordered.push(d);
+    }
+    return ordered;
+}
 
 export default function DestinationsPage() {
     const { destinations, isLoading } = useGlobalData();
+    const currentMonth = new Date().getMonth() + 1; // 1–12
+    const currentSeasonSlug = getCurrentSeasonParkSlug(currentMonth);
+    const sortedDestinations = sortDestinationsByCurrentSeason(destinations, currentSeasonSlug);
+    const migrationPillOrder = orderedMigrationPills(currentSeasonSlug);
 
     if (isLoading) {
         return (
@@ -26,33 +63,55 @@ export default function DestinationsPage() {
     return (
         <div className="min-h-screen bg-secondary-50">
             {/* Hero Header */}
-            <div className="relative h-[70vh] bg-safari-900 overflow-hidden flex items-center justify-center">
-                {/* Background Pattern/Gradient */}
-                <div className="absolute inset-0 bg-[url('https://res.cloudinary.com/dtsuvx8dz/image/upload/v1706679901/cld-sample-2.jpg')] bg-cover bg-center opacity-30 mix-blend-overlay" />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-safari-900/50 to-secondary-50" />
-                <div className="absolute inset-0 bg-gradient-to-r from-safari-900/90 to-transparent" />
+            <div className="relative min-h-[75vh] bg-safari-900 overflow-hidden flex items-end">
+                {/* Full-bleed background image */}
+                <div
+                    className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                    style={{ backgroundImage: `url('https://res.cloudinary.com/dxau42ovy/image/upload/v1772045435/IMG_6160.JPG_gxx9vc.jpg')` }}
+                />
+                {/* Overlay: darken from top (image visible) to bottom (readable text) */}
+                <div className="absolute inset-0 bg-gradient-to-b from-safari-900/30 via-safari-900/70 to-safari-900/95" />
+                <div className="absolute inset-0 bg-gradient-to-r from-safari-900/80 via-transparent to-transparent" />
+                {/* Depth: soft blur orbs */}
+                <div className="absolute top-0 right-0 w-[min(80vw,500px)] h-[min(80vw,500px)] bg-secondary-500/20 rounded-full blur-[100px] pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-72 h-72 bg-safari-600/20 rounded-full blur-[80px] pointer-events-none" />
 
-                <div className="container mx-auto px-6 relative z-10">
+                <div className="container mx-auto px-6 relative z-10 pb-16 md:pb-24 pt-24 md:pt-32">
                     <div className="max-w-4xl">
                         <div className="animate-fade-in-up">
-                            <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-5 py-2 mb-8 text-white/90">
-                                <MapPin size={16} className="text-secondary-400" />
-                                <span className="text-sm font-bold tracking-widest uppercase">The Wild Awaits</span>
-                            </span>
-                            <h1 className="text-6xl md:text-8xl font-bold mb-8 font-display text-white leading-tight">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="h-px w-12 bg-secondary-400" />
+                                <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 text-white/95">
+                                    <MapPin size={14} className="text-secondary-400" />
+                                    <span className="text-xs font-semibold tracking-[0.2em] uppercase">The Wild Awaits</span>
+                                </span>
+                            </div>
+                            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 font-display text-white leading-[1.05] drop-shadow-sm">
                                 Safari <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary-300 to-secondary-500">Destinations</span>
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary-300 via-secondary-400 to-secondary-500 drop-shadow-sm">
+                                    Destinations
+                                </span>
                             </h1>
-                            <p className="text-xl md:text-2xl text-safari-100/80 leading-relaxed max-w-2xl font-light">
-                                Journey through the heart of Sri Lanka's wilderness. Witness the gathering of giants in their natural habitat.
+                            <p className="text-lg md:text-xl lg:text-2xl text-safari-100/90 leading-relaxed max-w-2xl font-light max-w-xl">
+                                Journey through the heart of Sri Lanka&apos;s wilderness. Witness the gathering of giants in their natural habitat.
                             </p>
+                            <a
+                                href="#migration-overview"
+                                className="mt-10 inline-flex items-center gap-2 text-white/70 hover:text-white text-sm font-medium tracking-wide transition-colors"
+                            >
+                                <span>Explore destinations</span>
+                                <ChevronDown size={18} className="animate-bounce" />
+                            </a>
                         </div>
                     </div>
                 </div>
+
+                {/* Bottom edge fade into page */}
+                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-secondary-50 to-transparent pointer-events-none" />
             </div>
 
             {/* Migration Overview */}
-            <div className="container mx-auto px-6 -mt-20 relative z-20 mb-20">
+            <div id="migration-overview" className="container mx-auto px-6 -mt-20 relative z-20 mb-20 scroll-mt-24">
                 <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8 md:p-10">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
                         <div className="flex items-start gap-6">
@@ -69,21 +128,27 @@ export default function DestinationsPage() {
                         </div>
 
                         <div className="flex flex-wrap justify-center gap-4">
-                            <div className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-safari-50 border border-safari-100 min-w-[140px]">
-                                <span className="w-3 h-3 bg-green-500 rounded-full shadow-lg shadow-green-200" />
-                                <span className="text-xs font-bold uppercase tracking-wider text-safari-400">Jul - Sep</span>
-                                <span className="text-safari-900 font-bold">Minneriya</span>
-                            </div>
-                            <div className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-safari-50 border border-safari-100 min-w-[140px]">
-                                <span className="w-3 h-3 bg-yellow-500 rounded-full shadow-lg shadow-yellow-200" />
-                                <span className="text-xs font-bold uppercase tracking-wider text-safari-400">Oct - Nov</span>
-                                <span className="text-safari-900 font-bold">Kaudulla</span>
-                            </div>
-                            <div className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-secondary-50 border border-secondary-100 min-w-[140px] shadow-sm transform scale-105 ring-2 ring-secondary-200">
-                                <span className="w-3 h-3 bg-blue-500 rounded-full shadow-lg shadow-blue-200" />
-                                <span className="text-xs font-bold uppercase tracking-wider text-secondary-600">Dec - Jan</span>
-                                <span className="text-safari-900 font-bold">Hurulu</span>
-                            </div>
+                            {migrationPillOrder.map((slug, i) => {
+                                const info = seasonInfo[slug];
+                                if (!info) return null;
+                                const isNow = slug === currentSeasonSlug;
+                                return (
+                                    <div
+                                        key={slug}
+                                        className={`flex flex-col items-center gap-2 p-4 rounded-2xl min-w-[140px] border ${
+                                            isNow
+                                                ? 'bg-secondary-50 border-secondary-200 shadow-sm transform scale-105 ring-2 ring-secondary-200'
+                                                : 'bg-safari-50 border-safari-100'
+                                        }`}
+                                    >
+                                        <span className={`w-3 h-3 rounded-full shadow-lg ${slug === 'minneriya-national-park' ? 'bg-green-500 shadow-green-200' : slug === 'kaudulla-national-park' ? 'bg-yellow-500 shadow-yellow-200' : 'bg-blue-500 shadow-blue-200'}`} />
+                                        <span className={`text-xs font-bold uppercase tracking-wider ${isNow ? 'text-secondary-600' : 'text-safari-400'}`}>
+                                            {info.months}
+                                        </span>
+                                        <span className="text-safari-900 font-bold">{info.label}</span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
@@ -92,7 +157,7 @@ export default function DestinationsPage() {
             {/* Destinations Grid */}
             <div className="container mx-auto px-6 pb-32">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                    {destinations.map((destination, index) => {
+                    {sortedDestinations.map((destination, index) => {
                         const season = seasonInfo[destination.slug] || { months: 'Year-round', color: 'text-safari-600', bgColor: 'bg-safari-100' };
                         const isFeature = index === 0;
 
@@ -171,7 +236,7 @@ export default function DestinationsPage() {
                                                         <span className="font-medium text-sm">Private Jeep</span>
                                                     </div>
                                                     <span className="font-bold text-safari-900">
-                                                        Rs. {destination.vehicle_price_up_to_3.toLocaleString()}
+                                                        USD {lkrToUsd(destination.vehicle_price_up_to_3)}
                                                     </span>
                                                 </div>
                                             </div>
@@ -217,7 +282,7 @@ export default function DestinationsPage() {
                     })}
                 </div>
 
-                {destinations.length === 0 && (
+                {sortedDestinations.length === 0 && (
                     <div className="text-center py-32 opacity-60">
                         <div className="w-24 h-24 bg-safari-100 rounded-full flex items-center justify-center mx-auto mb-6">
                             <MapPin size={40} className="text-safari-400" />

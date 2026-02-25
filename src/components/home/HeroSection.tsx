@@ -224,11 +224,11 @@ export default function HeroSection() {
                 </div>
             </div>
 
-            {/* ── Bottom Terrain Silhouette (foreground parallax) ── */}
+            {/* ── Bottom Terrain Silhouette (fixed to bottom, no scroll lift) ── */}
             <div
                 className="absolute bottom-0 left-0 right-0 pointer-events-none z-30"
                 style={{
-                    transform: `translate3d(${mousePos.x * 20}px, ${-parallaxFg * 0.3}px, 80px)`,
+                    transform: `translate3d(${mousePos.x * 20}px, 0, 80px)`,
                     transition: 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
                 }}
             >

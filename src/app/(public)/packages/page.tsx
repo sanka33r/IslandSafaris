@@ -16,7 +16,7 @@ export const metadata = {
         'Explore our curated experience packages — organic cooking classes, authentic village tours, and scenic bicycle rentals in Sri Lanka.',
 };
 
-const packages = [
+export const packages = [
     {
         slug: 'cooking-class',
         icon: ChefHat,
@@ -33,7 +33,15 @@ const packages = [
         accentText: 'text-orange-600',
         accentBorder: 'border-orange-200',
         image:
-            'https://images.unsplash.com/',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045142/WhatsApp_Image_2026-02-15_at_12.06.43_PM_bxpezn.jpg',
+        images: [
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045142/WhatsApp_Image_2026-02-15_at_12.06.43_PM_bxpezn.jpg',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045142/WhatsApp_Image_2026-02-15_at_12.06.44_PM_lc1rkx.jpg',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045142/WhatsApp_Image_2026-02-15_at_12.06.42_PM_qqz6qf.jpg',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045142/WhatsApp_Image_2026-02-15_at_12.06.44_PM_1_vfcznz.jpg',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045141/WhatsApp_Image_2026-02-15_at_12.06.45_PM_nx8h5a.jpg',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045143/WhatsApp_Image_2026-02-15_at_12.06.45_PM_1_icz8ge.jpg',
+        ],
     },
     {
         slug: 'village-tour',
@@ -51,7 +59,17 @@ const packages = [
         accentText: 'text-emerald-600',
         accentBorder: 'border-emerald-200',
         image:
-            'https://images.unsplash.com/photo-1588828195511-584568433682?w=900&q=80',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045164/WhatsApp_Image_2026-02-15_at_12.06.47_PM_aknrgc.jpg',
+        images: [
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045164/WhatsApp_Image_2026-02-15_at_12.06.47_PM_aknrgc.jpg',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045168/WhatsApp_Image_2026-02-15_at_12.06.50_PM_rkm6et.jpg',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045167/WhatsApp_Image_2026-02-15_at_12.06.49_PM_qfmjwa.jpg',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045165/WhatsApp_Image_2026-02-15_at_12.06.49_PM_1_oox3hc.jpg',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045165/WhatsApp_Image_2026-02-15_at_12.06.46_PM_nycn67.jpg',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045165/WhatsApp_Image_2026-02-15_at_12.06.48_PM_ro3ulg.jpg',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045164/WhatsApp_Image_2026-02-15_at_12.06.48_PM_1_bqpavw.jpg',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045163/WhatsApp_Image_2026-02-15_at_12.06.46_PM_1_fi57kd.jpg',
+        ],
     },
     {
         slug: 'bicycle-rent',

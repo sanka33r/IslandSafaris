@@ -19,6 +19,7 @@ import {
     TrendingUp,
     TrendingDown,
     Clock,
+    DollarSign,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -34,6 +35,13 @@ interface Booking {
     destinations?: { name: string } | null;
 }
 
+export type IncomeByCategory = {
+    safari: number;
+    'cooking-class': number;
+    'bicycle-rent': number;
+    'village-tour': number;
+};
+
 interface AdminDashboardProps {
     selectedDate: string;
     dailyBookings: Booking[];
@@ -41,6 +49,10 @@ interface AdminDashboardProps {
     nextWeekBookings: Booking[];
     lastWeekRange: { start: string; end: string };
     nextWeekRange: { start: string; end: string };
+    thisWeekRange: { start: string; end: string };
+    incomeDaily: IncomeByCategory;
+    incomeWeekly: IncomeByCategory;
+    incomeMonthly: IncomeByCategory;
     fetchError?: string | null;
 }
 
@@ -162,6 +174,10 @@ export default function AdminDashboard({
     nextWeekBookings,
     lastWeekRange,
     nextWeekRange,
+    thisWeekRange,
+    incomeDaily,
+    incomeWeekly,
+    incomeMonthly,
     fetchError = null,
 }: AdminDashboardProps) {
     const router = useRouter();
@@ -281,6 +297,99 @@ export default function AdminDashboard({
                     </div>
                 </div>
             </div>
+
+            {/* Total Income - Daily, Weekly, Monthly by category */}
+            <section>
+                <h2 className="text-base font-bold text-safari-800 mb-2 flex items-center gap-1.5">
+                    <span className="w-1 h-4 bg-secondary-500 rounded-full" />
+                    Total Income
+                </h2>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div className="bg-white rounded-xl border border-safari-100 overflow-hidden">
+                        <div className="px-4 py-2.5 bg-green-50 border-b border-green-100 flex items-center gap-2">
+                            <DollarSign size={18} className="text-green-600" />
+                            <h3 className="font-semibold text-safari-800 text-base">Daily</h3>
+                            <span className="text-base text-safari-600 ml-auto">{formatShortDate(selectedDate)}</span>
+                        </div>
+                        <div className="p-3 space-y-2">
+                            {(Object.keys(activityConfig) as ActivityType[]).map((type) => {
+                                const config = activityConfig[type];
+                                const amount = incomeDaily[type];
+                                const Icon = config.icon;
+                                return (
+                                    <div key={type} className={cn('flex items-center justify-between p-2.5 rounded-lg border', config.bg)}>
+                                        <div className="flex items-center gap-2">
+                                            <Icon className={cn('w-3.5 h-3.5', config.color)} />
+                                            <span className={cn('font-medium', config.color)}>{config.label}</span>
+                                        </div>
+                                        <span className="font-bold text-safari-900 tabular-nums">USD {amount}</span>
+                                    </div>
+                                );
+                            })}
+                            <div className="flex items-center justify-between p-2.5 rounded-lg bg-safari-100 border border-safari-200 font-bold">
+                                <span className="text-safari-800">Total</span>
+                                <span className="text-safari-900">USD {incomeDaily.safari + incomeDaily['cooking-class'] + incomeDaily['bicycle-rent'] + incomeDaily['village-tour']}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl border border-safari-100 overflow-hidden">
+                        <div className="px-4 py-2.5 bg-green-50 border-b border-green-100 flex items-center gap-2">
+                            <DollarSign size={18} className="text-green-600" />
+                            <h3 className="font-semibold text-safari-800 text-base">Weekly</h3>
+                            <span className="text-base text-safari-600 ml-auto">{formatShortDate(thisWeekRange.start)} – {formatShortDate(thisWeekRange.end)}</span>
+                        </div>
+                        <div className="p-3 space-y-2">
+                            {(Object.keys(activityConfig) as ActivityType[]).map((type) => {
+                                const config = activityConfig[type];
+                                const amount = incomeWeekly[type];
+                                const Icon = config.icon;
+                                return (
+                                    <div key={type} className={cn('flex items-center justify-between p-2.5 rounded-lg border', config.bg)}>
+                                        <div className="flex items-center gap-2">
+                                            <Icon className={cn('w-3.5 h-3.5', config.color)} />
+                                            <span className={cn('font-medium', config.color)}>{config.label}</span>
+                                        </div>
+                                        <span className="font-bold text-safari-900 tabular-nums">USD {amount}</span>
+                                    </div>
+                                );
+                            })}
+                            <div className="flex items-center justify-between p-2.5 rounded-lg bg-safari-100 border border-safari-200 font-bold">
+                                <span className="text-safari-800">Total</span>
+                                <span className="text-safari-900">USD {incomeWeekly.safari + incomeWeekly['cooking-class'] + incomeWeekly['bicycle-rent'] + incomeWeekly['village-tour']}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl border border-safari-100 overflow-hidden">
+                        <div className="px-4 py-2.5 bg-green-50 border-b border-green-100 flex items-center gap-2">
+                            <DollarSign size={18} className="text-green-600" />
+                            <h3 className="font-semibold text-safari-800 text-base">Monthly</h3>
+                            <span className="text-base text-safari-600 ml-auto">{MONTHS[new Date(selectedDate).getMonth()]} {new Date(selectedDate).getFullYear()}</span>
+                        </div>
+                        <div className="p-3 space-y-2">
+                            {(Object.keys(activityConfig) as ActivityType[]).map((type) => {
+                                const config = activityConfig[type];
+                                const amount = incomeMonthly[type];
+                                const Icon = config.icon;
+                                return (
+                                    <div key={type} className={cn('flex items-center justify-between p-2.5 rounded-lg border', config.bg)}>
+                                        <div className="flex items-center gap-2">
+                                            <Icon className={cn('w-3.5 h-3.5', config.color)} />
+                                            <span className={cn('font-medium', config.color)}>{config.label}</span>
+                                        </div>
+                                        <span className="font-bold text-safari-900 tabular-nums">USD {amount}</span>
+                                    </div>
+                                );
+                            })}
+                            <div className="flex items-center justify-between p-2.5 rounded-lg bg-safari-100 border border-safari-200 font-bold">
+                                <span className="text-safari-800">Total</span>
+                                <span className="text-safari-900">USD {incomeMonthly.safari + incomeMonthly['cooking-class'] + incomeMonthly['bicycle-rent'] + incomeMonthly['village-tour']}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             {/* Daily activities - compact grid */}
             <section>

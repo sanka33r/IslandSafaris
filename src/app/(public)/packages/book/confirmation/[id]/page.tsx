@@ -2,6 +2,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { notFound } from 'next/navigation';
 import { CheckCircle, Calendar, Clock, Users, MapPin, Mail, Phone, Globe, Download, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import PaymentSection from '@/components/payments/PaymentSection';
 
 export const metadata = {
     title: 'Booking Confirmation | Island Safaris Sri Lanka',
@@ -181,34 +182,11 @@ export default async function BookingConfirmationPage(props: ConfirmationPagePro
                 </div>
 
                 {/* Payment Information */}
-                <div className="bg-secondary-50 rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-secondary-100 mb-6 sm:mb-8">
-                    <h3 className="text-xl font-bold text-safari-900 mb-4">Payment Information</h3>
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center pb-4 border-b border-secondary-200">
-                            <span className="text-safari-700">Advance Payment Required</span>
-                            <span className="text-2xl font-bold text-secondary-600">
-                                USD {booking.advance_payment_amount || 5}
-                            </span>
-                        </div>
-                        <div className="bg-white rounded-xl p-4 border border-secondary-200">
-                            <div className="font-semibold text-safari-900 mb-3">Payment Instructions</div>
-                            <ul className="space-y-2 text-sm text-safari-700">
-                                <li className="flex items-start gap-2">
-                                    <span className="text-secondary-600 mt-1">•</span>
-                                    <span>We will send payment instructions to your email within 24 hours</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <span className="text-secondary-600 mt-1">•</span>
-                                    <span>Payment gateway integration coming soon for instant booking</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <span className="text-secondary-600 mt-1">•</span>
-                                    <span>Remaining balance to be paid on the day of your experience</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                <PaymentSection
+                    bookingId={booking.id}
+                    amount={Number(booking.advance_payment_amount) || 5}
+                    alreadyPaid={booking.advance_payment_status === 'paid'}
+                />
 
                 {/* Next Steps */}
                 <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-safari-100 shadow-sm mb-8">
