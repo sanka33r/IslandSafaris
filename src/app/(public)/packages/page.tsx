@@ -102,7 +102,7 @@ export default function PackagesPage() {
                 <div className="container mx-auto px-6 relative text-white text-center">
                     <div className="flex items-center justify-center gap-2 mb-4">
                         <Compass size={16} className="text-secondary-400" />
-                        <span className="text-secondary-300 text-xs tracking-[0.25em] uppercase font-medium">
+                        <span className="text-secondary-300 text-sm tracking-[0.25em] uppercase font-medium">
                             Curated Experiences
                         </span>
                     </div>
@@ -160,7 +160,7 @@ export default function PackagesPage() {
                                         >
                                             <span className="text-white/60 text-xs block">From</span>
                                             <span className="text-2xl font-bold">${pkg.price}</span>
-                                            <span className="text-white/60 text-xs"> /person</span>
+                                            <span className="text-white/60 text-sm"> /person</span>
                                         </div>
 
                                         {/* Decorative accent dot */}
@@ -177,7 +177,7 @@ export default function PackagesPage() {
                                     >
                                         {/* Tagline pill */}
                                         <div
-                                            className={`inline-flex items-center gap-2 ${pkg.accentLight} ${pkg.accentText} px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase mb-5 border ${pkg.accentBorder}`}
+                                            className={`inline-flex items-center gap-2 ${pkg.accentLight} ${pkg.accentText} px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide uppercase mb-5 border ${pkg.accentBorder}`}
                                         >
                                             <Sparkles size={12} />
                                             {pkg.tagline}

@@ -90,11 +90,11 @@ export default function PackageBookingPage({ searchParams }: BookingPageProps) {
                             </p>
                             <div className="space-y-3 text-sm">
                                 <div>
-                                    <div className="text-safari-400 text-xs mb-1">WhatsApp / Phone</div>
+                                    <div className="text-safari-400 text-sm mb-1">WhatsApp / Phone</div>
                                     <div className="font-semibold">+94 77 000 0000</div>
                                 </div>
                                 <div>
-                                    <div className="text-safari-400 text-xs mb-1">Email</div>
+                                    <div className="text-safari-400 text-sm mb-1">Email</div>
                                     <div className="font-semibold">info@islandsafaris.com</div>
                                 </div>
                             </div>

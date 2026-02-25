@@ -55,7 +55,7 @@ export default function VillageTourPage() {
                     <div className="max-w-4xl">
                         <div className="flex items-center gap-3 mb-4 sm:mb-6">
                             <div className="h-px w-8 sm:w-12 bg-secondary-400" />
-                            <span className="text-secondary-400 text-xs sm:text-sm font-medium uppercase tracking-[0.15em] sm:tracking-[0.2em]">Experience Package</span>
+                            <span className="text-secondary-400 text-sm font-medium uppercase tracking-[0.15em] sm:tracking-[0.2em]">Experience Package</span>
                         </div>
                         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-4 sm:mb-6 leading-[1.1]">
                             Sigiriya Village<br />
@@ -66,7 +66,7 @@ export default function VillageTourPage() {
                         </p>
                         <div className="flex flex-wrap gap-2 sm:gap-3">
                             {[{ icon: Clock, label: '4-5 Hours' }, { icon: MapPin, label: 'Sigiriya Village' }, { icon: Users, label: 'Small Groups' }].map((pill) => (
-                                <div key={pill.label} className="flex items-center gap-1.5 sm:gap-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-safari-100">
+                                <div key={pill.label} className="flex items-center gap-1.5 sm:gap-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-sm text-safari-100">
                                     <pill.icon size={14} className="text-secondary-400" />{pill.label}
                                 </div>
                             ))}
@@ -89,7 +89,7 @@ export default function VillageTourPage() {
                             <div className="w-8 h-8 sm:w-10 sm:h-10 bg-safari-100 rounded-full flex items-center justify-center">
                                 <TreePalm size={18} className="text-safari-600" />
                             </div>
-                            <span className="text-safari-600 text-xs sm:text-sm font-semibold uppercase tracking-wider">The Experience</span>
+                            <span className="text-safari-600 text-sm font-semibold uppercase tracking-wider">The Experience</span>
                         </div>
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-safari-900 mb-4 sm:mb-6 leading-snug">
                             Journey Into the Heart of<br className="hidden sm:block" />
@@ -104,8 +104,8 @@ export default function VillageTourPage() {
                         <div className="bg-safari-800 rounded-xl sm:rounded-2xl p-5 sm:p-6 relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-secondary-500/10 rounded-full blur-2xl" />
                             <Quote size={20} className="text-secondary-400/40 mb-2 sm:mb-3" />
-                            <p className="text-safari-100 text-xs sm:text-sm leading-relaxed italic relative">&ldquo;The village is where the true spirit of Sri Lanka lives — in the rhythm of the paddy fields, the warmth of the people, and the flavors of home-cooked meals.&rdquo;</p>
-                            <div className="mt-2 sm:mt-3 flex items-center gap-2"><div className="w-6 h-px bg-secondary-400" /><span className="text-secondary-400 text-xs font-medium">Local Wisdom</span></div>
+                            <p className="text-safari-100 text-sm leading-relaxed italic relative">&ldquo;The village is where the true spirit of Sri Lanka lives — in the rhythm of the paddy fields, the warmth of the people, and the flavors of home-cooked meals.&rdquo;</p>
+                            <div className="mt-2 sm:mt-3 flex items-center gap-2"><div className="w-6 h-px bg-secondary-400" /><span className="text-secondary-400 text-sm font-medium">Local Wisdom</span></div>
                         </div>
                         <div className="grid grid-cols-2 gap-2 sm:gap-3">
                             {tourHighlights.map((h) => {
@@ -114,8 +114,8 @@ export default function VillageTourPage() {
                                         <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-secondary-50 to-safari-50 rounded-lg flex items-center justify-center mb-2 sm:mb-3 border border-safari-100 group-hover:scale-110 transition-transform">
                                             <Icon size={16} className="text-secondary-600" />
                                         </div>
-                                        <div className="text-xs sm:text-sm font-bold text-safari-900 mb-1">{h.title}</div>
-                                        <p className="text-safari-600 text-[10px] sm:text-xs leading-relaxed">{h.text}</p>
+                                        <div className="text-sm font-bold text-safari-900 mb-1">{h.title}</div>
+                                        <p className="text-safari-600 text-sm leading-relaxed">{h.text}</p>
                                     </div>
                                 );
                             })}
@@ -145,7 +145,7 @@ export default function VillageTourPage() {
                     <div className="max-w-2xl mb-8 sm:mb-10 md:mb-14">
                         <div className="flex items-center gap-3 mb-3 sm:mb-4">
                             <div className="h-px w-8 sm:w-10 bg-secondary-400" />
-                            <span className="text-secondary-600 text-xs sm:text-sm font-semibold uppercase tracking-[0.15em]">Step by Step</span>
+                            <span className="text-secondary-600 text-sm font-semibold uppercase tracking-[0.15em]">Step by Step</span>
                         </div>
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-safari-900 leading-snug">Your <span className="text-secondary-600">Journey</span></h2>
                     </div>
@@ -160,11 +160,11 @@ export default function VillageTourPage() {
                                                 <div className="relative z-10 w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-white rounded-xl sm:rounded-2xl border-2 border-safari-200 group-hover:border-secondary-400 flex items-center justify-center shadow-sm transition-colors duration-300 flex-shrink-0">
                                                     <Icon size={20} className="text-secondary-600" />
                                                 </div>
-                                                <div className="lg:hidden"><span className="text-xs font-bold text-secondary-600 bg-secondary-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Step {item.step}</span></div>
+                                                <div className="lg:hidden"><span className="text-sm font-bold text-secondary-600 bg-secondary-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Step {item.step}</span></div>
                                             </div>
                                             <div className="lg:col-span-11 bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border border-safari-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
                                                 <div className="hidden lg:flex items-center gap-3 mb-3">
-                                                    <span className="text-xs font-bold text-secondary-600 bg-secondary-50 px-2.5 py-1 rounded-full uppercase tracking-wider">Step {item.step}</span>
+                                                    <span className="text-sm font-bold text-secondary-600 bg-secondary-50 px-2.5 py-1 rounded-full uppercase tracking-wider">Step {item.step}</span>
                                                     <h3 className="text-xl font-bold text-safari-900 group-hover:text-secondary-600 transition-colors">{item.title}</h3>
                                                 </div>
                                                 <h3 className="lg:hidden text-base sm:text-lg font-bold text-safari-900 mb-2 group-hover:text-secondary-600 transition-colors">{item.title}</h3>
@@ -190,7 +190,7 @@ export default function VillageTourPage() {
                             {['Pickup and drop-off', 'Bullock cart ride', 'Catamaran boat ride', 'Village walk through paddy fields', 'Cooking demonstration', 'Traditional rice & curry lunch', 'Tuk-tuk return ride'].map((item) => (
                                 <div key={item} className="flex items-center gap-2.5 sm:gap-3 bg-safari-50 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3">
                                     <CheckCircle size={16} className="text-safari-400 flex-shrink-0" />
-                                    <span className="text-safari-700 text-xs sm:text-sm">{item}</span>
+                                    <span className="text-safari-700 text-sm">{item}</span>
                                 </div>
                             ))}
                         </div>
@@ -199,12 +199,12 @@ export default function VillageTourPage() {
                         <div className="absolute -right-8 -bottom-8 w-32 sm:w-40 h-32 sm:h-40 bg-white/5 rounded-full" />
                         <div className="absolute -left-4 -top-4 w-16 sm:w-20 h-16 sm:h-20 bg-white/5 rounded-full" />
                         <div className="relative">
-                            <span className="inline-block bg-white/20 text-xs font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 sm:mb-4">Cultural Immersion</span>
+                            <span className="inline-block bg-white/20 text-sm font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 sm:mb-4">Cultural Immersion</span>
                             <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">A True Village Experience</h3>
-                            <p className="text-secondary-100 leading-relaxed mb-3 sm:mb-4 text-xs sm:text-sm">Every moment is designed to connect you with the land and its people — from scenic cart rides to serene lake crossings.</p>
-                            <div className="flex items-center gap-2 mb-4 sm:mb-6"><Car size={16} className="text-secondary-200" /><span className="text-secondary-100 text-xs">Return ride included</span></div>
+                            <p className="text-secondary-100 leading-relaxed mb-3 sm:mb-4 text-sm">Every moment is designed to connect you with the land and its people — from scenic cart rides to serene lake crossings.</p>
+                            <div className="flex items-center gap-2 mb-4 sm:mb-6"><Car size={16} className="text-secondary-200" /><span className="text-secondary-100 text-sm">Return ride included</span></div>
                         </div>
-                        <Link href="/contact" className="relative inline-flex items-center justify-center gap-2 bg-white text-secondary-700 font-bold py-2.5 sm:py-3 px-5 sm:px-6 rounded-full hover:bg-secondary-50 transition-all shadow-lg hover:scale-105 active:scale-95 text-xs sm:text-sm">
+                        <Link href="/contact" className="relative inline-flex items-center justify-center gap-2 bg-white text-secondary-700 font-bold py-2.5 sm:py-3 px-5 sm:px-6 rounded-full hover:bg-secondary-50 transition-all shadow-lg hover:scale-105 active:scale-95 text-sm">
                             Book This Experience <ArrowRight size={16} />
                         </Link>
                     </div>
@@ -224,12 +224,12 @@ export default function VillageTourPage() {
                         Ready for a Village{' '}<span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary-300 to-secondary-400">Adventure?</span>
                     </h2>
                     <p className="text-safari-300 text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-3 sm:mb-4">Secure your spot with just a USD 5 advance payment. The remaining balance is paid on the day of the tour.</p>
-                    <p className="text-safari-500 text-xs sm:text-sm mb-6 sm:mb-8 md:mb-10">Free cancellation up to 24 hours before the tour.</p>
-                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-                        <Link href="/packages/village-tour/book" className="group bg-secondary-600 hover:bg-secondary-500 text-white font-bold py-3 sm:py-4 px-6 sm:px-10 rounded-full transition-all transform hover:scale-105 shadow-2xl active:scale-95 inline-flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base">
-                            Book Now — USD 5 Advance <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                    <p className="text-safari-500 text-sm mb-6 sm:mb-8 md:mb-10">Free cancellation up to 24 hours before the tour.</p>
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center">
+                        <Link href="/packages/village-tour/book" className="group bg-secondary-600 hover:bg-secondary-500 text-white font-bold py-2 px-4 sm:py-4 sm:px-10 rounded-full transition-all transform hover:scale-105 shadow-2xl active:scale-95 inline-flex items-center justify-center gap-1.5 sm:gap-3 text-sm sm:text-base">
+                            Book Now — USD 5 Advance <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform shrink-0" />
                         </Link>
-                        <Link href="/packages" className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-full transition-all border border-white/20 hover:border-white/40 text-sm sm:text-base">
+                        <Link href="/packages" className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold py-2 px-4 sm:py-4 sm:px-8 rounded-full transition-all border border-white/20 hover:border-white/40 text-sm sm:text-base">
                             View Other Packages
                         </Link>
                     </div>

@@ -33,7 +33,7 @@ export default function BicycleRentPage() {
                     <div className="max-w-4xl">
                         <div className="flex items-center gap-3 mb-4 sm:mb-6">
                             <div className="h-px w-8 sm:w-12 bg-secondary-400" />
-                            <span className="text-secondary-400 text-xs sm:text-sm font-medium uppercase tracking-[0.15em] sm:tracking-[0.2em]">Experience Package</span>
+                            <span className="text-secondary-400 text-sm font-medium uppercase tracking-[0.15em] sm:tracking-[0.2em]">Experience Package</span>
                         </div>
                         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-4 sm:mb-6 leading-[1.1]">
                             Bicycle<br />
@@ -44,7 +44,7 @@ export default function BicycleRentPage() {
                         </p>
                         <div className="flex flex-wrap gap-2 sm:gap-3">
                             {[{ icon: Clock, label: 'Flexible Duration' }, { icon: MapPin, label: 'Sigiriya & Surroundings' }, { icon: Wind, label: 'Self-Paced' }].map((pill) => (
-                                <div key={pill.label} className="flex items-center gap-1.5 sm:gap-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-safari-100">
+                                <div key={pill.label} className="flex items-center gap-1.5 sm:gap-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-sm text-safari-100">
                                     <pill.icon size={14} className="text-secondary-400" />{pill.label}
                                 </div>
                             ))}
@@ -67,7 +67,7 @@ export default function BicycleRentPage() {
                             <div className="w-8 h-8 sm:w-10 sm:h-10 bg-safari-100 rounded-full flex items-center justify-center">
                                 <Bike size={18} className="text-safari-600" />
                             </div>
-                            <span className="text-safari-600 text-xs sm:text-sm font-semibold uppercase tracking-wider">The Adventure</span>
+                            <span className="text-safari-600 text-sm font-semibold uppercase tracking-wider">The Adventure</span>
                         </div>
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-safari-900 mb-4 sm:mb-6 leading-snug">
                             Explore the Countryside on<br className="hidden sm:block" />
@@ -87,7 +87,7 @@ export default function BicycleRentPage() {
                                 {['Available daily from 6:00 AM to 6:00 PM', 'Suitable for ages 12 and above', 'Bring sunscreen, hat, and water bottle', 'Comfortable clothing recommended', 'Guided group rides available on request'].map((item) => (
                                     <li key={item} className="flex items-start gap-2.5 sm:gap-3">
                                         <div className="w-1.5 h-1.5 rounded-full bg-secondary-400 mt-2 sm:mt-2.5 flex-shrink-0" />
-                                        <span className="text-safari-700 text-xs sm:text-sm">{item}</span>
+                                        <span className="text-safari-700 text-sm">{item}</span>
                                     </li>
                                 ))}
                             </ul>
@@ -95,8 +95,8 @@ export default function BicycleRentPage() {
                         <div className="bg-safari-800 rounded-xl sm:rounded-2xl p-5 sm:p-6 relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-secondary-500/10 rounded-full blur-2xl" />
                             <Quote size={20} className="text-secondary-400/40 mb-2 sm:mb-3" />
-                            <p className="text-safari-100 text-xs sm:text-sm leading-relaxed italic relative">&ldquo;The best way to discover a place is slowly — on two wheels, with the wind in your hair and the world unfolding around you.&rdquo;</p>
-                            <div className="mt-2 sm:mt-3 flex items-center gap-2"><div className="w-6 h-px bg-secondary-400" /><span className="text-secondary-400 text-xs font-medium">A Traveler&apos;s Wisdom</span></div>
+                            <p className="text-safari-100 text-sm leading-relaxed italic relative">&ldquo;The best way to discover a place is slowly — on two wheels, with the wind in your hair and the world unfolding around you.&rdquo;</p>
+                            <div className="mt-2 sm:mt-3 flex items-center gap-2"><div className="w-6 h-px bg-secondary-400" /><span className="text-secondary-400 text-sm font-medium">A Traveler&apos;s Wisdom</span></div>
                         </div>
                     </div>
                 </div>
@@ -115,7 +115,7 @@ export default function BicycleRentPage() {
                     <div className="max-w-2xl mb-8 sm:mb-10 md:mb-14">
                         <div className="flex items-center gap-3 mb-3 sm:mb-4">
                             <div className="h-px w-8 sm:w-10 bg-secondary-400" />
-                            <span className="text-secondary-600 text-xs sm:text-sm font-semibold uppercase tracking-[0.15em]">Why Ride With Us</span>
+                            <span className="text-secondary-600 text-sm font-semibold uppercase tracking-[0.15em]">Why Ride With Us</span>
                         </div>
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-safari-900 leading-snug">Why Choose This <span className="text-secondary-600">Experience</span></h2>
                     </div>
@@ -129,7 +129,7 @@ export default function BicycleRentPage() {
                                             <Icon size={20} className="text-secondary-600" />
                                         </div>
                                         <h4 className="text-base sm:text-lg font-bold text-safari-900 mb-1.5 sm:mb-2 group-hover:text-secondary-700 transition-colors">{item.title}</h4>
-                                        <p className="text-safari-600 text-xs sm:text-sm leading-relaxed">{item.text}</p>
+                                        <p className="text-safari-600 text-sm leading-relaxed">{item.text}</p>
                                     </div>
                                 </div>
                             );
@@ -148,7 +148,7 @@ export default function BicycleRentPage() {
                         {['Well-maintained bicycle', 'Helmet (on request)', 'Suggested scenic routes & maps', 'Local tips and recommendations', 'Basic repair kit'].map((item) => (
                             <div key={item} className="flex items-center gap-2.5 sm:gap-3 bg-safari-50 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3">
                                 <CheckCircle size={16} className="text-safari-400 flex-shrink-0" />
-                                <span className="text-safari-700 text-xs sm:text-sm">{item}</span>
+                                <span className="text-safari-700 text-sm">{item}</span>
                             </div>
                         ))}
                     </div>
@@ -166,12 +166,12 @@ export default function BicycleRentPage() {
                         Ready to{' '}<span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary-300 to-secondary-400">Ride?</span>
                     </h2>
                     <p className="text-safari-300 text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-3 sm:mb-4">Secure your bicycle with a USD 5 advance payment. Contact us to reserve and get personalized route recommendations.</p>
-                    <p className="text-safari-500 text-xs sm:text-sm mb-6 sm:mb-8 md:mb-10">Free cancellation up to 24 hours in advance.</p>
-                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-                        <Link href="/packages/bicycle-rent/book" className="group bg-secondary-600 hover:bg-secondary-500 text-white font-bold py-3 sm:py-4 px-6 sm:px-10 rounded-full transition-all transform hover:scale-105 shadow-2xl active:scale-95 inline-flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base">
-                            Book Now — USD 5 Advance <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                    <p className="text-safari-500 text-sm mb-6 sm:mb-8 md:mb-10">Free cancellation up to 24 hours in advance.</p>
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center">
+                        <Link href="/packages/bicycle-rent/book" className="group bg-secondary-600 hover:bg-secondary-500 text-white font-bold py-2 px-4 sm:py-4 sm:px-10 rounded-full transition-all transform hover:scale-105 shadow-2xl active:scale-95 inline-flex items-center justify-center gap-1.5 sm:gap-3 text-sm sm:text-base">
+                            Book Now — USD 5 Advance <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform shrink-0" />
                         </Link>
-                        <Link href="/packages" className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-full transition-all border border-white/20 hover:border-white/40 text-sm sm:text-base">
+                        <Link href="/packages" className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold py-2 px-4 sm:py-4 sm:px-8 rounded-full transition-all border border-white/20 hover:border-white/40 text-sm sm:text-base">
                             View Other Packages
                         </Link>
                     </div>
