@@ -19,6 +19,7 @@ declare global {
             Buttons: (config: {
                 createOrder: (data: unknown, actions: unknown) => Promise<string>;
                 onApprove: (data: { orderID: string }, actions: unknown) => Promise<void>;
+                onError?: (err: Error) => void;
                 style?: { color?: string; shape?: string; label?: string };
             }) => { render: (selector: string | HTMLElement) => Promise<void>; isEligible: () => boolean };
         };
