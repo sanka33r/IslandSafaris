@@ -1,13 +1,13 @@
 'use server';
 
 import { bookingSchema, BookingFormData } from '@/lib/schemas/booking';
-import { supabasePublic } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 
 // Helper to calculate price implementation
 async function calculatePrice(data: BookingFormData) {
     // Fetch destination pricing
-    const { data: dest } = await supabasePublic
+    const { data: dest } = await supabaseAdmin
         .from('destinations')
         .select('*')
         .eq('id', data.destination_id)
@@ -18,7 +18,7 @@ async function calculatePrice(data: BookingFormData) {
     // Fetch extra hour price from settings
     // Ideally this should be cached or fetched once
     // For now assuming 5000 or fetching
-    const { data: settings } = await supabasePublic
+    const { data: settings } = await supabaseAdmin
         .from('settings')
         .select('value')
         .eq('key', 'extra_hour_price')
@@ -63,7 +63,7 @@ export async function submitBooking(prevState: any, formData: BookingFormData) {
     const pricing = await calculatePrice(result.data);
 
     // Insert into DB
-    const { data: booking, error } = await supabasePublic
+    const { data: booking, error } = await supabaseAdmin
         .from('bookings')
         .insert({
             destination_id: result.data.destination_id,
