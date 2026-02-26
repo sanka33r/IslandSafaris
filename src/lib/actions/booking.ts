@@ -63,7 +63,7 @@ export async function submitBooking(prevState: any, formData: BookingFormData) {
     const pricing = await calculatePrice(result.data);
 
     // Insert into DB
-    const { error } = await supabasePublic
+    const { data: booking, error } = await supabasePublic
         .from('bookings')
         .insert({
             destination_id: result.data.destination_id,
@@ -82,15 +82,17 @@ export async function submitBooking(prevState: any, formData: BookingFormData) {
             message: result.data.message,
             advance_payment_amount: 8,
             advance_payment_status: 'pending',
-            status: 'new'
-        });
+            status: 'payment_pending',
+        })
+        .select('id')
+        .single();
 
-    if (error) {
+    if (error || !booking) {
         console.error('Booking Error:', error);
         return { success: false, message: 'Failed to submit booking. Please try again.' };
     }
 
     revalidatePath('/admin/bookings');
 
-    return { success: true, pricing };
+    return { success: true, pricing, bookingId: booking.id };
 }

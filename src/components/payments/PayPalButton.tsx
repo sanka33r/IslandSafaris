@@ -38,12 +38,26 @@ export default function PayPalButton({
     const [loading, setLoading] = useState(true);
     const [paid, setPaid] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    // Track whether buttons have been rendered to prevent double-initialization
+    // (React StrictMode fires effects twice in development)
+    const renderedRef = useRef(false);
     const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
     const loadScript = useCallback(() => {
         return new Promise<void>((resolve, reject) => {
             if (window.paypal) {
                 resolve();
+                return;
+            }
+            // Check if script is already being loaded
+            const existing = document.querySelector(
+                `script[src*="paypal.com/sdk/js"]`
+            );
+            if (existing) {
+                existing.addEventListener('load', () => resolve());
+                existing.addEventListener('error', () =>
+                    reject(new Error('Failed to load PayPal SDK'))
+                );
                 return;
             }
             const script = document.createElement('script');
@@ -61,11 +75,21 @@ export default function PayPalButton({
             return;
         }
 
-        let mounted = true;
+        // Prevent double-render from React StrictMode
+        if (renderedRef.current) {
+            setLoading(false);
+            return;
+        }
+
+        let cancelled = false;
 
         loadScript()
             .then(() => {
-                if (!mounted || !window.paypal || !containerRef.current) return;
+                if (cancelled || !window.paypal || !containerRef.current) return;
+
+                // Mark as rendered before calling render() to prevent
+                // a second effect invocation from re-rendering
+                renderedRef.current = true;
 
                 window.paypal
                     .Buttons({
@@ -103,23 +127,34 @@ export default function PayPalButton({
                     })
                     .render(containerRef.current)
                     .catch((err) => {
-                        setError(err?.message || 'Could not load PayPal');
+                        // Swallow "zoid destroyed" errors — they are harmless
+                        // teardown artefacts from StrictMode double-mount
+                        if (!cancelled) {
+                            const msg: string = err?.message ?? '';
+                            if (!msg.toLowerCase().includes('zoid')) {
+                                setError(msg || 'Could not load PayPal');
+                            }
+                        }
                     })
                     .finally(() => {
-                        if (mounted) setLoading(false);
+                        if (!cancelled) setLoading(false);
                     });
             })
             .catch((err) => {
-                if (mounted) {
+                if (!cancelled) {
                     setError(err?.message || 'PayPal not available');
                     setLoading(false);
                 }
             });
 
         return () => {
-            mounted = false;
+            cancelled = true;
+            // Reset rendered flag only if component fully unmounts
+            // (in StrictMode this runs between the two mount cycles)
+            renderedRef.current = false;
         };
-    }, [clientId, bookingId, paid, disabled, loadScript, onSuccess, onError]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [clientId, bookingId, paid, disabled]);
 
     if (!clientId) {
         return (

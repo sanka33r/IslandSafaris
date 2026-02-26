@@ -21,6 +21,7 @@ export async function POST(request: Request) {
             .from('bookings')
             .update({
                 advance_payment_status: 'paid',
+                status: 'new',
             })
             .eq('id', bookingId);
 
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Booking update failed' }, { status: 500 });
         }
 
-        return NextResponse.json({ success: true, captureId: result.captureId });
+        return NextResponse.json({ success: true, captureId: result.captureId, bookingId });
     } catch (err) {
         console.error('PayPal capture-order error:', err);
         const message = err instanceof Error ? err.message : 'Failed to capture payment';

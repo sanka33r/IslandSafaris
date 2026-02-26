@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
                 special_requests: special_requests || null,
                 advance_payment_amount: advance_payment_amount || 5,
                 advance_payment_status: 'pending',
-                status: 'new',
+                status: 'payment_pending',
                 extra_hours: 0,
             })
             .select()

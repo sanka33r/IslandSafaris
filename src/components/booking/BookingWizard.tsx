@@ -6,10 +6,11 @@ import { Destination } from '@/types/db';
 import { submitBooking } from '@/lib/actions/booking';
 import { validatePromoCode } from '@/lib/actions/promo-codes';
 import { BookingFormData } from '@/lib/schemas/booking';
-import { Loader2, CheckCircle, Calendar, Users, Clock, Car, MapPin, ExternalLink, Tag, AlertCircle } from 'lucide-react';
+import { Loader2, CheckCircle, CreditCard, Car, MapPin, ExternalLink, Tag, AlertCircle } from 'lucide-react';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import { lkrToUsd } from '@/lib/constants';
+import PaymentSection from '@/components/payments/PaymentSection';
 
 const COUNTRY_CODES = [
     { code: '+94', country: 'Sri Lanka', flag: '🇱🇰' },
@@ -252,30 +253,58 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
         }
     };
 
-    if (submitResult?.success) {
+    // Payment confirmed state
+    if (submitResult?.paid) {
         return (
             <div className="max-w-xl mx-auto bg-white rounded-3xl p-12 text-center shadow-lg border border-green-100">
                 <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle size={40} />
                 </div>
-                <h2 className="text-3xl font-bold text-safari-900 mb-4">Booking Request Sent!</h2>
+                <h2 className="text-3xl font-bold text-safari-900 mb-4">Booking Confirmed!</h2>
                 <p className="text-safari-600 mb-8">
-                    Thank you, {formData.customer_name}. We have received your request for {formData.date}.
-                    Our team will review your details and confirm via email shortly.
+                    Thank you, {formData.customer_name}! Your advance payment has been received and your safari booking for {formData.date} is confirmed.
                 </p>
                 <div className="bg-safari-50 p-6 rounded-xl text-left mb-6 space-y-3">
-                    <h3 className="font-semibold text-safari-900 mb-2">Safari jeep (pay at destination)</h3>
+                    <h3 className="font-semibold text-safari-900 mb-2">Safari jeep (remaining balance — pay at destination)</h3>
                     <p className="text-2xl font-bold text-secondary-600">USD {lkrToUsd(submitResult.pricing.total)}</p>
                     {submitResult.pricing.tickets != null && submitResult.pricing.tickets > 0 && (
                         <p className="text-sm text-safari-600">
                             Entrance ticket (approx. USD {lkrToUsd(submitResult.pricing.tickets)}) is paid separately at the park gate.
                         </p>
                     )}
-                    <p className="text-xs text-safari-600 border-t border-safari-200 pt-2 mt-2">
-                        We only charge for the safari jeep. Entrance tickets are paid at the entrance gate for all safaris.
-                    </p>
                 </div>
                 <button onClick={() => window.location.href = '/'} className="w-full bg-secondary-600 text-white rounded-lg py-3 font-semibold hover:bg-secondary-700">Back to Home</button>
+            </div>
+        );
+    }
+
+    // Payment pending state — booking saved, show payment section
+    if (submitResult?.success && submitResult?.bookingId) {
+        return (
+            <div className="max-w-xl mx-auto bg-white rounded-3xl p-8 shadow-lg border border-amber-100">
+                <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CreditCard size={32} />
+                    </div>
+                    <h2 className="text-2xl font-bold text-safari-900 mb-2">Complete Your Payment</h2>
+                    <p className="text-safari-600 text-sm">
+                        Almost done, {formData.customer_name}! Pay the USD 8 advance to confirm your safari booking for {formData.date}.
+                    </p>
+                </div>
+
+                <PaymentSection
+                    bookingId={submitResult.bookingId}
+                    amount={8}
+                    alreadyPaid={false}
+                    onPaymentSuccess={() => setSubmitResult({ ...submitResult, paid: true })}
+                />
+
+                <div className="bg-red-50 border border-red-200 p-4 rounded-xl text-xs text-red-800 mt-2">
+                    <p className="flex items-start gap-2">
+                        <AlertCircle size={14} className="text-red-500 flex-shrink-0 mt-0.5" />
+                        <span><strong>Non-Refundable Advance:</strong> The USD 8 advance payment is non-refundable. Remaining balance is paid at the destination.</span>
+                    </p>
+                </div>
             </div>
         );
     }

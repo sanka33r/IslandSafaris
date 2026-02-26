@@ -7,13 +7,19 @@ interface PaymentSectionProps {
     bookingId: string;
     amount: number;
     alreadyPaid: boolean;
+    /** Called after any payment method successfully completes. */
+    onPaymentSuccess?: () => void;
 }
 
-export default function PaymentSection({ bookingId, amount, alreadyPaid }: PaymentSectionProps) {
+export default function PaymentSection({ bookingId, amount, alreadyPaid, onPaymentSuccess }: PaymentSectionProps) {
     const router = useRouter();
 
     const handlePaymentSuccess = () => {
-        router.refresh();
+        if (onPaymentSuccess) {
+            onPaymentSuccess();
+        } else {
+            router.refresh();
+        }
     };
 
     return (

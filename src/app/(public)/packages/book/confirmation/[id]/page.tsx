@@ -1,6 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase';
 import { notFound } from 'next/navigation';
-import { CheckCircle, Calendar, Clock, Users, MapPin, Mail, Phone, Globe, Download, ArrowLeft } from 'lucide-react';
+import { CheckCircle, Calendar, Clock, Users, MapPin, Mail, Phone, Globe, ArrowLeft, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import PaymentSection from '@/components/payments/PaymentSection';
 
@@ -34,6 +34,9 @@ export default async function BookingConfirmationPage(props: ConfirmationPagePro
         notFound();
     }
 
+    const isPaid = booking.advance_payment_status === 'paid';
+    const isPaymentPending = booking.status === 'payment_pending' && !isPaid;
+
     const packageName = PACKAGE_NAMES[booking.package_type as keyof typeof PACKAGE_NAMES];
     const bookingDate = new Date(booking.date).toLocaleDateString('en-US', {
         weekday: 'long',
@@ -51,20 +54,40 @@ export default async function BookingConfirmationPage(props: ConfirmationPagePro
     return (
         <div className="bg-secondary-50 min-h-screen py-12 sm:py-16 md:py-20">
             <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
-                {/* Success Header */}
+
+                {/* Header — varies by payment state */}
                 <div className="text-center mb-10 sm:mb-12">
-                    <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-green-100 rounded-full mb-6">
-                        <CheckCircle size={40} className="text-green-600" />
-                    </div>
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-safari-900 mb-4">
-                        Booking{' '}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-green-500">
-                            Confirmed!
-                        </span>
-                    </h1>
-                    <p className="text-safari-600 text-base sm:text-lg max-w-2xl mx-auto">
-                        Thank you for booking with Island Safaris. We&apos;ve received your request and will confirm within 24 hours.
-                    </p>
+                    {isPaymentPending ? (
+                        <>
+                            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-amber-100 rounded-full mb-6">
+                                <CreditCard size={40} className="text-amber-600" />
+                            </div>
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-safari-900 mb-4">
+                                Complete Your{' '}
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-400">
+                                    Payment
+                                </span>
+                            </h1>
+                            <p className="text-safari-600 text-base sm:text-lg max-w-2xl mx-auto">
+                                Your booking details have been saved. Please complete the advance payment below to confirm your booking.
+                            </p>
+                        </>
+                    ) : (
+                        <>
+                            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-green-100 rounded-full mb-6">
+                                <CheckCircle size={40} className="text-green-600" />
+                            </div>
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-safari-900 mb-4">
+                                Booking{' '}
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-green-500">
+                                    Confirmed!
+                                </span>
+                            </h1>
+                            <p className="text-safari-600 text-base sm:text-lg max-w-2xl mx-auto">
+                                Thank you for booking with Island Safaris. We&apos;ve received your payment and will send final details shortly.
+                            </p>
+                        </>
+                    )}
                 </div>
 
                 {/* Booking Reference */}
@@ -77,6 +100,12 @@ export default async function BookingConfirmationPage(props: ConfirmationPagePro
                         <div className="text-safari-300 text-sm mt-3">
                             Please save this reference number for your records
                         </div>
+                        {isPaymentPending && (
+                            <div className="mt-3 inline-flex items-center gap-2 bg-amber-500/20 text-amber-300 text-xs font-semibold px-3 py-1.5 rounded-full border border-amber-500/30">
+                                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                                Awaiting Payment
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -181,38 +210,66 @@ export default async function BookingConfirmationPage(props: ConfirmationPagePro
                     )}
                 </div>
 
-                {/* Payment Information */}
+                {/* Payment Section */}
                 <PaymentSection
                     bookingId={booking.id}
                     amount={Number(booking.advance_payment_amount) || 5}
-                    alreadyPaid={booking.advance_payment_status === 'paid'}
+                    alreadyPaid={isPaid}
                 />
 
-                {/* Next Steps */}
+                {/* What Happens Next — only show while waiting for payment OR after confirmed */}
                 <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-safari-100 shadow-sm mb-8">
                     <h3 className="text-xl font-bold text-safari-900 mb-4">What Happens Next?</h3>
                     <ol className="space-y-4">
-                        <li className="flex gap-4">
-                            <div className="flex-shrink-0 w-8 h-8 bg-secondary-600 text-white rounded-full flex items-center justify-center font-bold text-sm">1</div>
-                            <div>
-                                <div className="font-semibold text-safari-900 mb-1">Confirmation Email</div>
-                                <div className="text-safari-600 text-sm">You&apos;ll receive a confirmation email with payment instructions within 24 hours.</div>
-                            </div>
-                        </li>
-                        <li className="flex gap-4">
-                            <div className="flex-shrink-0 w-8 h-8 bg-secondary-600 text-white rounded-full flex items-center justify-center font-bold text-sm">2</div>
-                            <div>
-                                <div className="font-semibold text-safari-900 mb-1">Complete Payment</div>
-                                <div className="text-safari-600 text-sm">Follow the instructions to complete your USD 5 advance payment.</div>
-                            </div>
-                        </li>
-                        <li className="flex gap-4">
-                            <div className="flex-shrink-0 w-8 h-8 bg-secondary-600 text-white rounded-full flex items-center justify-center font-bold text-sm">3</div>
-                            <div>
-                                <div className="font-semibold text-safari-900 mb-1">Final Confirmation</div>
-                                <div className="text-safari-600 text-sm">Once payment is received, we&apos;ll send final details and pickup information.</div>
-                            </div>
-                        </li>
+                        {isPaymentPending ? (
+                            <>
+                                <li className="flex gap-4">
+                                    <div className="flex-shrink-0 w-8 h-8 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold text-sm">1</div>
+                                    <div>
+                                        <div className="font-semibold text-safari-900 mb-1">Complete Payment</div>
+                                        <div className="text-safari-600 text-sm">Use the PayPal button above to pay the USD {Number(booking.advance_payment_amount) || 5} advance. Your booking will be confirmed instantly.</div>
+                                    </div>
+                                </li>
+                                <li className="flex gap-4">
+                                    <div className="flex-shrink-0 w-8 h-8 bg-secondary-600 text-white rounded-full flex items-center justify-center font-bold text-sm">2</div>
+                                    <div>
+                                        <div className="font-semibold text-safari-900 mb-1">Confirmation Email</div>
+                                        <div className="text-safari-600 text-sm">You&apos;ll receive a booking confirmation email after payment is processed.</div>
+                                    </div>
+                                </li>
+                                <li className="flex gap-4">
+                                    <div className="flex-shrink-0 w-8 h-8 bg-secondary-600 text-white rounded-full flex items-center justify-center font-bold text-sm">3</div>
+                                    <div>
+                                        <div className="font-semibold text-safari-900 mb-1">Final Details</div>
+                                        <div className="text-safari-600 text-sm">We&apos;ll send pickup information and final details closer to your experience date.</div>
+                                    </div>
+                                </li>
+                            </>
+                        ) : (
+                            <>
+                                <li className="flex gap-4">
+                                    <div className="flex-shrink-0 w-8 h-8 bg-secondary-600 text-white rounded-full flex items-center justify-center font-bold text-sm">1</div>
+                                    <div>
+                                        <div className="font-semibold text-safari-900 mb-1">Confirmation Email</div>
+                                        <div className="text-safari-600 text-sm">A booking confirmation has been sent to {booking.email}.</div>
+                                    </div>
+                                </li>
+                                <li className="flex gap-4">
+                                    <div className="flex-shrink-0 w-8 h-8 bg-secondary-600 text-white rounded-full flex items-center justify-center font-bold text-sm">2</div>
+                                    <div>
+                                        <div className="font-semibold text-safari-900 mb-1">Final Details</div>
+                                        <div className="text-safari-600 text-sm">We&apos;ll send pickup information and final details closer to your experience date.</div>
+                                    </div>
+                                </li>
+                                <li className="flex gap-4">
+                                    <div className="flex-shrink-0 w-8 h-8 bg-secondary-600 text-white rounded-full flex items-center justify-center font-bold text-sm">3</div>
+                                    <div>
+                                        <div className="font-semibold text-safari-900 mb-1">Remaining Balance</div>
+                                        <div className="text-safari-600 text-sm">The remaining balance is paid on the day of your experience.</div>
+                                    </div>
+                                </li>
+                            </>
+                        )}
                     </ol>
                 </div>
 
