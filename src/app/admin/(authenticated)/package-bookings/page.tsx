@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase';
+import { getExtraHourPriceUsd } from '@/lib/settings';
 import BookingsList from '@/components/admin/BookingsList';
 import BookingFilterTabs from '@/components/admin/BookingFilterTabs';
 import BookingSearch from '@/components/admin/BookingSearch';
@@ -51,6 +52,7 @@ export default async function AdminPackageBookingsPage({ searchParams }: PagePro
     }
 
     const totalPages = count ? Math.ceil(count / PAGE_SIZE) : 0;
+    const extraHourPriceUsd = await getExtraHourPriceUsd();
 
     return (
         <div className="space-y-6">
@@ -69,7 +71,7 @@ export default async function AdminPackageBookingsPage({ searchParams }: PagePro
                 </div>
             </div>
 
-            <BookingsList bookings={bookings || []} totalPages={totalPages} />
+            <BookingsList bookings={bookings || []} totalPages={totalPages} extraHourPriceUsd={extraHourPriceUsd} />
 
             <div className="md:hidden">
                 <BookingPagination totalPages={totalPages} />
