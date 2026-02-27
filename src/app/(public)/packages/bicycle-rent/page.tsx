@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import StickyPriceBar from '@/components/packages/StickyPriceBar';
+import PackageGallery from '@/components/packages/PackageGallery';
+import { packages } from '../page';
 import {
     ArrowRight, ArrowLeft, Bike, Leaf, Heart, Users, MapPin, CheckCircle,
     Sun, Mountain, Clock, Quote, Wind, Route,
@@ -20,10 +22,24 @@ const highlights = [
 ];
 
 export default function BicycleRentPage() {
+    const pkg = packages.find((p) => p.slug === 'bicycle-rent');
+    const galleryImages = pkg && 'images' in pkg ? pkg.images : undefined;
+
     return (
         <div className="bg-secondary-50 min-h-screen">
             <section className="relative py-16 sm:py-20 md:py-28 lg:py-36 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-safari-900 via-safari-800 to-safari-950" />
+                {pkg?.image && (
+                    <>
+                        <div
+                            className="absolute inset-0 bg-cover bg-center"
+                            style={{ backgroundImage: `url(${pkg.image})` }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-safari-900/90 via-safari-800/85 to-safari-950/95" />
+                    </>
+                )}
+                {!pkg?.image && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-safari-900 via-safari-800 to-safari-950" />
+                )}
                 <div className="absolute top-0 right-0 w-64 sm:w-80 md:w-[500px] h-64 sm:h-80 md:h-[500px] bg-secondary-600/10 rounded-full blur-[80px] md:blur-[100px]" />
                 <div className="absolute bottom-0 left-0 w-48 sm:w-64 md:w-[400px] h-48 sm:h-64 md:h-[400px] bg-safari-500/8 rounded-full blur-[60px] md:blur-[80px]" />
                 <div className="container mx-auto px-4 sm:px-6 relative">
@@ -59,6 +75,14 @@ export default function BicycleRentPage() {
                 advancePrice="USD 5"
                 bookHref="/packages/bicycle-rent/book"
             />
+
+            {galleryImages && (
+                <PackageGallery
+                    images={galleryImages}
+                    title="Bicycle Rent in photos"
+                    altPrefix="Bicycle rent"
+                />
+            )}
 
             <section className="container mx-auto px-4 sm:px-6 mb-12 sm:mb-16 md:mb-20">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 items-center">

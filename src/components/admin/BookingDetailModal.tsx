@@ -41,21 +41,24 @@ export default function BookingDetailModal({ booking, onClose, extraHourPriceUsd
     };
 
     const dest = booking.destinations;
+    const groupSize = Math.max(1, Number(booking.group_size) || 1);
+    const extraHours = Number(booking.extra_hours) || 0;
     // Safari: jeep only (vehicle + extra hours + extra person), all USD. Entrance ticket is paid at gate, so exclude from Total/Balance.
-    const vehicleCount = dest ? Math.ceil(booking.group_size / SAFARI_MAX_GROUP_SIZE) : 0;
+    const vehicleCount = dest ? Math.ceil(groupSize / SAFARI_MAX_GROUP_SIZE) : 0;
+    const vehiclePrice = dest ? Number(dest.vehicle_price_up_to_3) || 0 : 0;
     const safariJeepTotalUsd = !booking.package_type && dest
-        ? (dest.vehicle_price_up_to_3 ?? 0) * vehicleCount +
-          (booking.extra_hours || 0) * hourPrice * vehicleCount +
-          Math.max(0, booking.group_size - 3) * SAFARI_EXTRA_PERSON_USD
+        ? vehiclePrice * vehicleCount +
+          extraHours * hourPrice * vehicleCount +
+          Math.max(0, groupSize - 3) * SAFARI_EXTRA_PERSON_USD
         : null;
     const totalPrice = booking.package_type
-        ? (PACKAGE_INFO[booking.package_type as keyof typeof PACKAGE_INFO]?.price ?? 0) * booking.group_size
-        : safariJeepTotalUsd ?? 0;
-    const discount = booking.discount_amount ?? 0;
-    const advance = booking.advance_payment_amount ?? 0;
-    const discountUsd = discount;
+        ? (PACKAGE_INFO[booking.package_type as keyof typeof PACKAGE_INFO]?.price ?? 0) * groupSize
+        : (safariJeepTotalUsd ?? 0);
+    const discountUsd = Number(booking.discount_amount) || 0;
+    const advance = Number(booking.advance_payment_amount) || 0;
     const isPaid = booking.advance_payment_status === 'paid';
-    const balanceDue = isPaid ? 0 : Math.max(0, totalPrice - discountUsd - advance);
+    // Balance due = amount still to pay at destination (Total − discount − advance paid), not zeroed when advance is paid
+    const balanceDue = Math.max(0, Number(totalPrice) - discountUsd - advance);
 
     const DetailItem = ({ label, value, icon: Icon }: { label: string; value: string | number | null | undefined; icon?: React.ElementType }) =>
         value != null && value !== '' ? (
@@ -206,21 +209,21 @@ export default function BookingDetailModal({ booking, onClose, extraHourPriceUsd
                             <p className="text-base font-bold text-safari-500 uppercase">Payment</p>
                             <div className="flex justify-between text-base">
                                 <span className="text-safari-600">Total</span>
-                                <span className="font-semibold">${typeof totalPrice === 'number' ? (Number.isInteger(totalPrice) ? totalPrice : totalPrice.toFixed(2)) : totalPrice}</span>
+                                <span className="font-semibold">${Number(totalPrice).toFixed(2)}</span>
                             </div>
                             {discountUsd > 0 && (
                                 <div className="flex justify-between text-base text-green-600">
                                     <span>Discount</span>
-                                    <span>-${typeof discountUsd === 'number' ? discountUsd.toFixed(2) : discountUsd}</span>
+                                    <span>-${discountUsd.toFixed(2)}</span>
                                 </div>
                             )}
                             <div className="flex justify-between text-base">
                                 <span className="text-safari-600">Advance Paid</span>
-                                <span className="font-semibold">${advance}</span>
+                                <span className="font-semibold">${advance.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-base pt-2 border-t border-safari-200">
                                 <span className="font-bold text-secondary-700">Balance Due</span>
-                                <span className="font-bold text-secondary-700">${typeof balanceDue === 'number' ? (Number.isInteger(balanceDue) ? balanceDue : balanceDue.toFixed(2)) : balanceDue}</span>
+                                <span className="font-bold text-secondary-700">${Number(balanceDue).toFixed(2)}</span>
                             </div>
                             {booking.advance_payment_status && (
                                 <p className="text-base text-safari-500 mt-1">Status: {booking.advance_payment_status}</p>

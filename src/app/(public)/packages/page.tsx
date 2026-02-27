@@ -87,7 +87,13 @@ export const packages = [
         accentText: 'text-blue-600',
         accentBorder: 'border-blue-200',
         image:
-            'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=900&q=80',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772218312/24ba6f02-8af7-46af-9563-d882218b1916.png',
+        images: [
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772218312/24ba6f02-8af7-46af-9563-d882218b1916.png',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772218303/4e9dba9a-64db-4adc-a862-061ea932ff9c.png',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772218301/ab34eb81-53a1-47ae-9124-d9800b6cd715.png',
+            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772218295/90b01039-01c4-4abe-b3da-39059639c199.png',
+        ],
     },
 ];
 

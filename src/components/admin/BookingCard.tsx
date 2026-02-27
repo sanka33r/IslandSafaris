@@ -105,8 +105,8 @@ export default function BookingCard({ booking, onViewDetails, extraHourPriceUsd 
                     const totalPrice = booking.package_type
                         ? (PACKAGE_INFO[booking.package_type as keyof typeof PACKAGE_INFO]?.price ?? 0) * booking.group_size
                         : safariTotalUsd;
-                    const isPaid = booking.advance_payment_status === 'paid';
-                    const balanceDue = isPaid ? 0 : Math.max(0, totalPrice - (booking.discount_amount || 0) - (booking.advance_payment_amount || 0));
+                    // Balance due = remaining to pay at destination (Total − discount − advance), not zeroed when advance is paid
+                    const balanceDue = Math.max(0, totalPrice - (booking.discount_amount || 0) - (booking.advance_payment_amount || 0));
                     return (
                         <div className="col-span-2 mt-2 pt-2 border-t border-dashed border-safari-100">
                             <div className="flex justify-between items-center text-base">
