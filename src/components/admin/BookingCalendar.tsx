@@ -80,6 +80,7 @@ interface Booking {
     time: string;
     status: string;
     group_size: number;
+    extra_hours?: number;
     package_type: string | null;
     destination_id: string | null;
     destinations?: DestPricing | null;
@@ -255,7 +256,6 @@ function DownloadDayPdf({
         try {
             const { jsPDF } = await import('jspdf');
             const doc = new jsPDF();
-            const pageW = doc.getPageWidth();
             let y = 20;
             doc.setFontSize(18);
             doc.text(`Activities for ${friendlyDate(date)}`, 14, y);
@@ -265,10 +265,10 @@ function DownloadDayPdf({
             y += 14;
             for (const { label, bookings } of activities) {
                 const income = bookings.reduce((s, b) => s + getBookingIncomeUSD(b, extraHourPriceUsd), 0);
-                doc.setFont(undefined, 'bold');
+                doc.setFont('helvetica', 'bold');
                 doc.text(`Total No. of ${label} — ${bookings.length}`, 14, y);
                 y += 6;
-                doc.setFont(undefined, 'normal');
+                doc.setFont('helvetica', 'normal');
                 doc.text(`Income of the Day — USD ${income.toFixed(2)}`, 14, y);
                 y += 6;
                 bookings.forEach((b, i) => {
