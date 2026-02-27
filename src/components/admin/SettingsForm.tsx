@@ -32,8 +32,8 @@ export default function SettingsForm({ initialExtraHourPriceUsd }: SettingsFormP
     };
 
     return (
-        <div className="bg-white rounded-2xl shadow-sm border border-safari-100 overflow-hidden max-w-xl">
-            <div className="p-6 border-b border-safari-100">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-safari-100 overflow-hidden w-full max-w-xl">
+            <div className="p-4 sm:p-6 border-b border-safari-100">
                 <h2 className="text-lg font-bold text-safari-900 flex items-center gap-2">
                     <Clock className="text-safari-500" size={20} />
                     Safari pricing
@@ -42,7 +42,7 @@ export default function SettingsForm({ initialExtraHourPriceUsd }: SettingsFormP
                     Set the charge per extra hour per jeep (USD). Used when customers add extra hours to a safari booking.
                 </p>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
                 <div>
                     <label htmlFor="extra_hour_price" className="block text-sm font-semibold text-safari-700 mb-1">
                         Extra hour charge (USD per hour per jeep)

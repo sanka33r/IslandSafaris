@@ -74,20 +74,20 @@ export default function BookingDetailModal({ booking, onClose, extraHourPriceUsd
     const isMapLink = (s: string | null | undefined) => typeof s === 'string' && s.includes('google.com/maps');
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={onClose}>
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
             <div
-                className="relative bg-white rounded-2xl shadow-2xl border border-safari-100 max-w-5xl w-full max-h-[85vh] overflow-y-auto"
+                className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-safari-100 max-w-5xl w-full max-h-[90vh] sm:max-h-[85vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="sticky top-0 bg-white border-b border-safari-100 px-6 py-4 rounded-t-2xl flex items-center justify-between z-10">
-                    <h3 className="text-lg font-bold text-safari-900">Booking Details</h3>
+                <div className="sticky top-0 bg-white border-b border-safari-100 px-4 sm:px-6 py-3 sm:py-4 rounded-t-2xl flex items-center justify-between z-10">
+                    <h3 className="text-base sm:text-lg font-bold text-safari-900 truncate pr-2">Booking Details</h3>
                     <button onClick={onClose} className="p-1 rounded-lg hover:bg-safari-100 text-safari-400 transition-colors">
                         <X size={20} />
                     </button>
                 </div>
-                <div className="p-6">
-                    <div className="flex justify-between items-start mb-6">
+                <div className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-4 sm:mb-6">
                         <div>
                             <p className="text-base font-mono text-safari-400">Ref: {booking.id.slice(0, 8)}</p>
                             <p className="text-xl font-bold text-safari-900">{booking.customer_name}</p>

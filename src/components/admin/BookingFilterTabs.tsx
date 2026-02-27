@@ -28,13 +28,13 @@ export default function BookingFilterTabs() {
     };
 
     return (
-        <div className="flex p-1 bg-safari-100/50 rounded-2xl w-fit">
+        <div className="flex p-1 bg-safari-100/50 rounded-xl sm:rounded-2xl w-fit min-w-0">
             {tabs.map((tab) => (
                 <button
                     key={tab.id}
                     onClick={() => handleTabChange(tab.id)}
                     className={cn(
-                        "px-4 py-2 rounded-xl text-base font-bold transition-all whitespace-nowrap",
+                        "px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl text-sm sm:text-base font-bold transition-all whitespace-nowrap",
                         currentStatus === tab.id || (tab.id === 'all' && !searchParams.get('status'))
                             ? "bg-white text-safari-900 shadow-sm"
                             : "text-safari-400 hover:text-safari-600"

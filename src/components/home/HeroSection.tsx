@@ -41,7 +41,7 @@ export default function HeroSection() {
     return (
         <section
             ref={heroRef}
-            className="relative min-h-[100dvh] md:min-h-screen flex flex-col items-center justify-start md:justify-center overflow-hidden bg-safari-900 pt-32 pb-32 md:py-0"
+            className="relative min-h-[100dvh] md:min-h-screen flex flex-col items-center justify-start md:justify-center overflow-hidden bg-safari-900 pt-24 sm:pt-28 md:pt-0 pb-20 sm:pb-24 md:pb-0 px-4 sm:px-6"
             style={{ perspective: '1200px', backgroundColor: '#1e2b1b' }}
         >
             {/* ── Deep Background Layer (moves slowest) ── */}
@@ -97,7 +97,7 @@ export default function HeroSection() {
             </div>
 
             {/* ── Birds ── */}
-            <div className="absolute top-10 left-0 w-full h-[60vh] pointer-events-none z-10 opacity-30">
+            <div className="absolute top-6 sm:top-10 left-0 w-full h-[35vh] sm:h-[45vh] md:h-[60vh] pointer-events-none z-10 opacity-20 sm:opacity-25 md:opacity-30">
                 <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
                     <g className="bird-fly text-safari-950">
                         <path d="M10,50 Q25,30 40,50" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
@@ -111,7 +111,7 @@ export default function HeroSection() {
 
             {/* ── Decorative Safari Compass ── */}
             <div
-                className="absolute bottom-8 left-8 w-20 h-20 md:w-28 md:h-28 opacity-10 pointer-events-none hidden md:block"
+                className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8 w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 opacity-10 pointer-events-none hidden md:block"
                 style={{
                     transform: `rotate(${scrollY * 0.05 + mousePos.x * 20}deg)`,
                     transition: 'transform 1s cubic-bezier(0.25, 0.1, 0.25, 1)',
@@ -133,7 +133,7 @@ export default function HeroSection() {
 
             {/* ── Main Content with 3D depth ── */}
             <div
-                className="relative z-40 text-center px-6 max-w-5xl mx-auto text-white mt-10 md:mt-0"
+                className="relative z-40 text-center px-2 sm:px-4 max-w-5xl mx-auto text-white mt-6 sm:mt-8 md:mt-0"
                 style={{
                     transform: `translate3d(${mousePos.x * 12}px, ${mousePos.y * 8 - parallaxFg}px, 50px)`,
                     transition: 'transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1)',
@@ -141,21 +141,21 @@ export default function HeroSection() {
             >
                 {/* Tag */}
                 <div
-                    className={`inline-flex items-center gap-2 bg-secondary-600/20 backdrop-blur-md border border-secondary-400/30 rounded-full px-5 py-2.5 mb-8 transition-all duration-1000 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-6'
+                    className={`inline-flex items-center gap-2 bg-secondary-600/20 backdrop-blur-md border border-secondary-400/30 rounded-full px-3 py-2 sm:px-5 sm:py-2.5 mb-5 sm:mb-6 md:mb-8 transition-all duration-1000 max-w-[95vw] sm:max-w-none ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-6'
                         }`}
                 >
-                    <span className="relative flex h-2.5 w-2.5">
+                    <span className="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5 shrink-0">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-400 opacity-75" />
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-secondary-400" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-secondary-400" />
                     </span>
-                    <span className="text-secondary-200 text-sm font-medium tracking-wide">
+                    <span className="text-secondary-200 text-xs sm:text-sm font-medium tracking-wide text-center">
                         The Great Elephant Gathering Awaits
                     </span>
                 </div>
 
                 {/* Heading with staggered entrance */}
                 <h1
-                    className={`text-4xl md:text-7xl lg:text-[5.5rem] font-bold mb-6 md:mb-8 tracking-tight leading-[1.05] transition-all duration-1000 delay-200 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                    className={`text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-[5.5rem] font-bold mb-4 sm:mb-6 md:mb-8 tracking-tight leading-[1.08] sm:leading-[1.05] transition-all duration-1000 delay-200 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                         }`}
                 >
                     <span className="block">Discover the</span>
@@ -176,7 +176,7 @@ export default function HeroSection() {
 
                 {/* Description */}
                 <p
-                    className={`text-lg md:text-xl text-white/70 mb-10 md:mb-12 font-light max-w-2xl mx-auto leading-relaxed transition-all duration-1000 delay-400 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                    className={`text-base sm:text-lg md:text-xl text-white/70 mb-8 sm:mb-10 md:mb-12 font-light max-w-2xl mx-auto leading-relaxed px-1 sm:px-0 transition-all duration-1000 delay-400 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                         }`}
                 >
                     Exclusive jeep safaris through the legendary Minneriya-Kaudulla-Hurulu corridor.
@@ -185,21 +185,21 @@ export default function HeroSection() {
 
                 {/* CTA buttons */}
                 <div
-                    className={`flex flex-col sm:flex-row gap-4 justify-center transition-all duration-1000 delay-[600ms] ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                    className={`flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center w-full sm:w-auto max-w-sm sm:max-w-none mx-auto transition-all duration-1000 delay-[600ms] ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                         }`}
                 >
                     <Link
                         href="/booking"
-                        className="group relative bg-gradient-to-r from-secondary-600 to-secondary-500 hover:from-secondary-500 hover:to-secondary-400 text-white font-bold py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl shadow-secondary-900/50 active:scale-95 inline-flex items-center justify-center gap-3 overflow-hidden"
+                        className="group relative bg-gradient-to-r from-secondary-600 to-secondary-500 hover:from-secondary-500 hover:to-secondary-400 text-white font-bold py-3.5 sm:py-4 px-8 sm:px-10 rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl shadow-secondary-900/50 active:scale-95 inline-flex items-center justify-center gap-2 sm:gap-3 overflow-hidden min-h-[44px] sm:min-h-0"
                     >
-                        <span className="relative z-10">Book Your Safari</span>
-                        <ArrowRight size={20} className="relative z-10 group-hover:translate-x-1 transition-transform" />
+                        <span className="relative z-10 text-sm sm:text-base">Book Your Safari</span>
+                        <ArrowRight size={18} className="relative z-10 group-hover:translate-x-1 transition-transform shrink-0 sm:w-5 sm:h-5" />
                         {/* Button shine effect */}
                         <div className="absolute inset-0 hero-btn-shine" />
                     </Link>
                     <Link
                         href="/destinations"
-                        className="group bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 border border-white/20 hover:border-white/40 inline-flex items-center justify-center gap-2"
+                        className="group bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold py-3.5 sm:py-4 px-6 sm:px-8 rounded-full transition-all duration-300 border border-white/20 hover:border-white/40 inline-flex items-center justify-center gap-2 min-h-[44px] sm:min-h-0 text-sm sm:text-base"
                     >
                         Explore Destinations
                         <ArrowRight size={18} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
@@ -208,7 +208,7 @@ export default function HeroSection() {
 
                 {/* Stats strip */}
                 <div
-                    className={`mt-14 md:mt-16 flex flex-wrap justify-center gap-8 md:gap-12 transition-all duration-1000 delay-[800ms] ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                    className={`mt-10 sm:mt-12 md:mt-16 flex flex-wrap justify-center gap-6 sm:gap-8 md:gap-12 transition-all duration-1000 delay-[800ms] ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
                         }`}
                 >
                     {[
@@ -216,9 +216,9 @@ export default function HeroSection() {
                         { value: '3', label: 'National Parks' },
                         { value: '5★', label: 'Rated' },
                     ].map((stat) => (
-                        <div key={stat.label} className="text-center">
-                            <div className="text-2xl md:text-3xl font-bold text-secondary-400">{stat.value}</div>
-                            <div className="text-xs md:text-sm text-white/50 uppercase tracking-widest mt-1">{stat.label}</div>
+                        <div key={stat.label} className="text-center min-w-[4rem] sm:min-w-0">
+                            <div className="text-xl sm:text-2xl md:text-3xl font-bold text-secondary-400">{stat.value}</div>
+                            <div className="text-[10px] sm:text-xs md:text-sm text-white/50 uppercase tracking-widest mt-0.5 sm:mt-1">{stat.label}</div>
                         </div>
                     ))}
                 </div>
@@ -235,7 +235,7 @@ export default function HeroSection() {
                 <svg
                     viewBox="0 0 1440 120"
                     preserveAspectRatio="none"
-                    className="w-full h-16 md:h-24"
+                    className="w-full h-12 sm:h-16 md:h-24"
                     fill="none"
                 >
                     <path

@@ -20,15 +20,15 @@ export default async function AdminReviewsPage() {
     const approvedReviews = reviews?.filter((r: any) => r.approved) || [];
 
     return (
-        <div className="space-y-8">
-            <div>
-                <h1 className="text-3xl font-bold text-safari-900 mb-2">Reviews Moderation</h1>
-                <p className="text-safari-600">Approve or reject customer reviews.</p>
+        <div className="space-y-6 sm:space-y-8">
+            <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-safari-900 mb-1 sm:mb-2">Reviews Moderation</h1>
+                <p className="text-safari-600 text-sm sm:text-base">Approve or reject customer reviews.</p>
             </div>
 
             {/* Pending Reviews */}
-            <div className="space-y-6">
-                <h2 className="text-xl font-bold text-yellow-700 flex items-center gap-2">
+            <div className="space-y-4 sm:space-y-6">
+                <h2 className="text-lg sm:text-xl font-bold text-yellow-700 flex items-center gap-2 flex-wrap">
                     Pending Approval
                     <span className="bg-yellow-100 text-yellow-800 text-base px-2 py-1 rounded-full">{pendingReviews.length}</span>
                 </h2>

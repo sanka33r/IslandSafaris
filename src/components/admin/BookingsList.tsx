@@ -25,9 +25,9 @@ export default function BookingsList({ bookings, totalPages, extraHourPriceUsd }
             </div>
 
             {/* Desktop View: Table */}
-            <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-safari-100 overflow-hidden">
+            <div className="hidden md:block bg-white rounded-xl sm:rounded-2xl shadow-sm border border-safari-100 overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-base">
+                    <table className="w-full text-left text-base min-w-[640px]">
                         <thead className="bg-safari-50 border-b border-safari-100/50">
                             <tr>
                                 <th className="p-4 font-semibold text-safari-700">Ref</th>

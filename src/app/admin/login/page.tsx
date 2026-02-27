@@ -39,8 +39,8 @@ export default function AdminLoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-safari-900 px-6">
-            <div className="w-full max-w-md p-8 md:p-10 bg-white/5 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/10">
+        <div className="min-h-screen flex items-center justify-center bg-safari-900 px-4 sm:px-6 py-8">
+            <div className="w-full max-w-md p-5 sm:p-8 md:p-10 bg-white/5 backdrop-blur-xl rounded-2xl sm:rounded-[2.5rem] shadow-2xl border border-white/10">
                 <div className="flex flex-col items-center mb-10">
                     <div className="w-16 h-16 bg-secondary-600 rounded-2xl flex items-center justify-center mb-6 rotate-3 shadow-lg shadow-secondary-900/40">
                         <Lock size={32} className="text-white" />

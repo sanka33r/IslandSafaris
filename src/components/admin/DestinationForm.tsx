@@ -156,11 +156,11 @@ export default function DestinationForm({ destination, images }: DestinationForm
                 Back to Destinations
             </Link>
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 sm:gap-8">
                 {/* Core Details Form */}
-                <div className="xl:col-span-2 space-y-8">
-                    <form onSubmit={handleSubmit} className="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-sm border border-safari-100">
-                        <div className="flex items-center gap-4 mb-8">
+                <div className="xl:col-span-2 space-y-6 sm:space-y-8">
+                    <form onSubmit={handleSubmit} className="bg-white rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6 md:p-8 xl:p-10 shadow-sm border border-safari-100">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
                             <div className="bg-secondary-100/50 p-4 rounded-2xl text-secondary-600">
                                 <Globe size={28} />
                             </div>
@@ -258,7 +258,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                 <div className="rounded-2xl border border-safari-100 bg-white p-5 space-y-4">
                                     <h4 className="font-bold text-safari-900">Migration Cycle</h4>
                                     {descriptionSections.migrationCycle.map((item, idx) => (
-                                        <div key={`migration-${idx}`} className="flex gap-3">
+                                        <div key={`migration-${idx}`} className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                                             <input
                                                 type="text"
                                                 value={item}
@@ -302,7 +302,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                 <div className="rounded-2xl border border-safari-100 bg-white p-5 space-y-4">
                                     <h4 className="font-bold text-safari-900">Why Choose Hurulu</h4>
                                     {descriptionSections.whyChooseHurulu.map((item, idx) => (
-                                        <div key={`why-${idx}`} className="flex gap-3">
+                                        <div key={`why-${idx}`} className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                                             <input
                                                 type="text"
                                                 value={item}
@@ -345,7 +345,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mb-10 pb-8 border-b border-safari-50">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-x-12 md:gap-y-8 mb-8 sm:mb-10 pb-6 sm:pb-8 border-b border-safari-50">
                             <div className="space-y-6">
                                 <div className="flex items-center gap-3 text-safari-900 font-bold border-b border-safari-100 pb-2">
                                     <Ticket size={20} className="text-secondary-600" />
@@ -410,7 +410,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                             </div>
                         </div>
 
-                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
                             <label className="flex items-center gap-3 cursor-pointer group">
                                 <div className="relative">
                                     <input
@@ -445,8 +445,8 @@ export default function DestinationForm({ destination, images }: DestinationForm
 
                 {/* Image Management Sidebar */}
                 <div className="space-y-8">
-                    {isNew ? (
-                        <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-safari-100 text-center">
+                        {isNew ? (
+                        <div className="bg-white rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-8 shadow-sm border border-safari-100 text-center">
                             <div className="bg-safari-50 p-6 rounded-2xl mb-6 flex justify-center">
                                 <ImageIcon size={48} className="text-safari-200" />
                             </div>
@@ -456,7 +456,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                             </p>
                         </div>
                     ) : (
-                        <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-safari-100">
+                        <div className="bg-white rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6 md:p-8 shadow-sm border border-safari-100">
                             <div className="flex items-center gap-3 mb-2">
                                 <div className="bg-secondary-100/50 p-3 rounded-xl text-secondary-600">
                                     <ImageIcon size={20} />
@@ -466,7 +466,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                             <p className="text-safari-500 text-sm mb-6">First image is the backdrop on the destination page. Delete or add photos below; use &quot;Set as hero&quot; to change the backdrop.</p>
 
                             {/* Existing Images */}
-                            <div className="grid grid-cols-2 gap-4 mb-8">
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
                                 {images.map((image, index) => (
                                     <div key={image.id} className="group relative aspect-square rounded-2xl overflow-hidden bg-safari-50 border border-safari-100">
                                         <img

@@ -7,15 +7,15 @@ export default async function AdminDestinationsPage() {
     const destinations = await getAllDestinations();
 
     return (
-        <div className="space-y-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-safari-900">Destinations</h1>
-                    <p className="text-safari-600">Manage safari parks and tour pricing</p>
+        <div className="space-y-6 sm:space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                <div className="min-w-0">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-safari-900">Destinations</h1>
+                    <p className="text-safari-600 text-sm sm:text-base mt-0.5">Manage safari parks and tour pricing</p>
                 </div>
                 <Link
                     href="/admin/destinations/new"
-                    className="flex items-center gap-2 bg-secondary-600 hover:bg-secondary-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md active:scale-95"
+                    className="flex items-center justify-center gap-2 bg-secondary-600 hover:bg-secondary-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold transition-all shadow-md active:scale-95 shrink-0"
                 >
                     <Plus size={20} />
                     Add Destination

@@ -17,10 +17,10 @@ export default function NewDestinationPage() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto pb-20">
-            <div className="mb-12">
-                <h1 className="text-4xl font-bold text-safari-900 mb-2">Add New Destination</h1>
-                <p className="text-safari-500">Create a new safari experience for your travelers.</p>
+        <div className="max-w-6xl mx-auto pb-12 sm:pb-20 w-full min-w-0 px-0">
+            <div className="mb-8 sm:mb-12">
+                <h1 className="text-2xl sm:text-4xl font-bold text-safari-900 mb-1 sm:mb-2">Add New Destination</h1>
+                <p className="text-safari-500 text-sm sm:text-base">Create a new safari experience for your travelers.</p>
             </div>
 
             <DestinationForm destination={emptyDestination} images={[]} />

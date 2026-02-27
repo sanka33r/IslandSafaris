@@ -89,9 +89,9 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
     };
 
     return (
-        <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-safari-100 flex items-center justify-between bg-safari-50">
-                <h2 className="text-xl font-bold text-safari-900">
+        <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] sm:max-h-none">
+            <div className="p-4 sm:p-6 border-b border-safari-100 flex items-center justify-between bg-safari-50 shrink-0">
+                <h2 className="text-lg sm:text-xl font-bold text-safari-900 truncate pr-2">
                     {initialData ? 'Edit Promo Code' : 'Create New Promo Code'}
                 </h2>
                 <button onClick={onClose} className="p-2 hover:bg-safari-200 rounded-full transition-colors text-safari-500">
@@ -99,7 +99,7 @@ export default function PromoCodeForm({ initialData, onClose, onSuccess }: Promo
                 </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-6">
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 min-h-0">
                 {error && (
                     <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-center gap-3 text-base font-medium">
                         <AlertCircle size={18} />

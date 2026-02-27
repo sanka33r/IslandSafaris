@@ -54,18 +54,22 @@ export default async function AdminBookingsPage({ searchParams }: PageProps) {
     const extraHourPriceUsd = await getExtraHourPriceUsd();
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-safari-900">Bookings</h1>
-                    <p className="text-safari-600 text-base">Manage and track your safari reservations</p>
+        <div className="space-y-4 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                <div className="min-w-0">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-safari-900 truncate">Bookings</h1>
+                    <p className="text-safari-600 text-sm sm:text-base mt-0.5">Manage and track your safari reservations</p>
                 </div>
-                <BookingSearch />
+                <div className="w-full sm:w-auto min-w-0">
+                    <BookingSearch />
+                </div>
             </div>
 
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <BookingFilterTabs />
-                <div className="bg-white px-4 py-2 rounded-2xl shadow-sm text-base font-bold text-safari-600 border border-safari-100 italic">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <div className="overflow-x-auto -mx-1 px-1 sm:mx-0 sm:px-0">
+                    <BookingFilterTabs />
+                </div>
+                <div className="bg-white px-3 py-2 rounded-xl sm:rounded-2xl shadow-sm text-sm sm:text-base font-bold text-safari-600 border border-safari-100 italic shrink-0">
                     {count || 0} Results Found
                 </div>
             </div>

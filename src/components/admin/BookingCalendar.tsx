@@ -367,35 +367,35 @@ export default function BookingCalendar({ bookings, currentMonth, extraHourPrice
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-safari-900">Booking Calendar</h1>
-                    <p className="text-safari-600 text-base">Visual overview of all bookings by date</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                <div className="min-w-0">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-safari-900">Booking Calendar</h1>
+                    <p className="text-safari-600 text-sm sm:text-base mt-0.5">Visual overview of all bookings by date</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <button onClick={() => navigateMonth('prev')} className="p-2 rounded-xl bg-white border border-safari-200 hover:bg-safari-50 text-safari-600 shadow-sm transition-all">
+                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                    <button onClick={() => navigateMonth('prev')} className="p-2 rounded-xl bg-white border border-safari-200 hover:bg-safari-50 text-safari-600 shadow-sm transition-all" aria-label="Previous month">
                         <ChevronLeft size={20} />
                     </button>
-                    <span className="text-lg font-bold text-safari-900 min-w-[180px] text-center">
+                    <span className="text-base sm:text-lg font-bold text-safari-900 min-w-[140px] sm:min-w-[180px] text-center">
                         {MONTHS[current.getMonth()]} {current.getFullYear()}
                     </span>
-                    <button onClick={() => navigateMonth('next')} className="p-2 rounded-xl bg-white border border-safari-200 hover:bg-safari-50 text-safari-600 shadow-sm transition-all">
+                    <button onClick={() => navigateMonth('next')} className="p-2 rounded-xl bg-white border border-safari-200 hover:bg-safari-50 text-safari-600 shadow-sm transition-all" aria-label="Next month">
                         <ChevronRight size={20} />
                     </button>
                 </div>
             </div>
 
             {/* Legend & Stats */}
-            <div className="flex flex-wrap gap-3">
-                <div className="flex items-center gap-5 bg-white px-4 py-2.5 rounded-2xl shadow-sm border border-safari-100">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl shadow-sm border border-safari-100">
                     {Object.entries(statusConfig).map(([key, cfg]) => (
-                        <div key={key} className="flex items-center gap-1.5 text-base font-semibold">
-                            <span className={cn('w-2.5 h-2.5 rounded-full', cfg.dot)} />
+                        <div key={key} className="flex items-center gap-1.5 text-sm sm:text-base font-semibold">
+                            <span className={cn('w-2.5 h-2.5 rounded-full flex-shrink-0', cfg.dot)} />
                             <span className={cfg.text}>{cfg.label}</span>
                         </div>
                     ))}
                 </div>
-                <div className="flex items-center gap-4 bg-white px-4 py-2.5 rounded-2xl shadow-sm border border-safari-100 text-base font-bold text-safari-600">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2 bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl shadow-sm border border-safari-100 text-sm sm:text-base font-bold text-safari-600">
                     <span>🦒 Safari: {totalSafari}</span>
                     <span>📦 Package: {totalPackage}</span>
                     <span className="text-green-600">↑ {upcoming}</span>
@@ -405,13 +405,13 @@ export default function BookingCalendar({ bookings, currentMonth, extraHourPrice
             </div>
 
             {/* Calendar Grid */}
-            <div className="bg-white rounded-2xl shadow-sm border border-safari-100 overflow-hidden">
-                <div className="grid grid-cols-7 border-b border-safari-100">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-safari-100 overflow-x-auto">
+                <div className="grid grid-cols-7 min-w-[280px] sm:min-w-0 border-b border-safari-100">
                     {DAYS_SHORT.map(d => (
-                        <div key={d} className="p-3 text-center text-base font-bold text-safari-500 uppercase tracking-wider bg-safari-50/50">{d}</div>
+                        <div key={d} className="p-1.5 sm:p-3 text-center text-xs sm:text-base font-bold text-safari-500 uppercase tracking-wider bg-safari-50/50">{d}</div>
                     ))}
                 </div>
-                <div className="grid grid-cols-7">
+                <div className="grid grid-cols-7 min-w-[280px] sm:min-w-0">
                     {days.map((day, i) => {
                         const dk = formatDate(day);
                         const db = byDate[dk];
@@ -423,16 +423,16 @@ export default function BookingCalendar({ bookings, currentMonth, extraHourPrice
                                 key={i}
                                 onClick={() => inMonth && setSelectedDay(day)}
                                 className={cn(
-                                    'min-h-[110px] md:min-h-[130px] border-b border-r border-safari-100/60 p-2 transition-all',
+                                    'min-h-[90px] sm:min-h-[110px] md:min-h-[130px] border-b border-r border-safari-100/60 p-1 sm:p-2 transition-all',
                                     !inMonth && 'bg-safari-50/40',
                                     inMonth && 'bg-white cursor-pointer hover:bg-safari-50/60',
                                     isToday(day) && 'bg-secondary-50/30 ring-1 ring-inset ring-secondary-200',
                                     selectedDayKey === dk && 'ring-2 ring-inset ring-safari-400'
                                 )}
                             >
-                                <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center justify-between mb-0.5 sm:mb-1">
                                     <span className={cn(
-                                        'text-base font-bold w-7 h-7 flex items-center justify-center rounded-full',
+                                        'text-sm sm:text-base font-bold w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full',
                                         !inMonth && 'text-safari-300',
                                         inMonth && 'text-safari-700',
                                         isToday(day) && 'bg-secondary-500 text-white'
@@ -440,7 +440,7 @@ export default function BookingCalendar({ bookings, currentMonth, extraHourPrice
                                         {day.getDate()}
                                     </span>
                                     {total > 0 && (
-                                        <span className="text-base font-bold text-safari-400 bg-safari-100 px-2 py-0.5 rounded-full">{total}</span>
+                                        <span className="text-xs sm:text-base font-bold text-safari-400 bg-safari-100 px-1.5 sm:px-2 py-0.5 rounded-full">{total}</span>
                                     )}
                                 </div>
                                 {inMonth && db && (
@@ -460,10 +460,10 @@ export default function BookingCalendar({ bookings, currentMonth, extraHourPrice
             {/* Day details below calendar (scroll here when a date is clicked) */}
             <div ref={dayDetailsRef} className="scroll-mt-6">
                 {selectedDay && (
-                    <div className="bg-white rounded-2xl shadow-sm border border-safari-100 overflow-hidden">
-                        <div className="px-6 py-4 border-b border-safari-100 flex flex-wrap items-center justify-between gap-3">
-                            <h2 className="text-xl font-bold text-safari-900">Activities for {friendlyDate(selectedDay)}</h2>
-                            <div className="flex items-center gap-3">
+                    <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-safari-100 overflow-hidden">
+                        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-safari-100 flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3">
+                            <h2 className="text-lg sm:text-xl font-bold text-safari-900 break-words">Activities for {friendlyDate(selectedDay)}</h2>
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                                 <button
                                     type="button"
                                     onClick={() => setSelectedDay(null)}
@@ -479,7 +479,7 @@ export default function BookingCalendar({ bookings, currentMonth, extraHourPrice
                                 />
                             </div>
                         </div>
-                        <div className="p-6 space-y-8">
+                        <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
                             {activitiesForDay.length === 0 ? (
                                 <p className="text-safari-500 italic">No bookings on this day.</p>
                             ) : (
