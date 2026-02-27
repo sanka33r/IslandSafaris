@@ -25,9 +25,6 @@ export default function ReviewList({ reviews }: { reviews: Review[] }) {
                     <p className="text-safari-600 text-sm leading-relaxed whitespace-pre-line">
                         &quot;{review.comment}&quot;
                     </p>
-                    <p className="text-xs text-safari-300 mt-4 text-right">
-                        {new Date(review.created_at).toLocaleDateString()}
-                    </p>
                 </div>
             ))}
         </div>

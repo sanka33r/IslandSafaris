@@ -19,13 +19,27 @@ export const PACKAGE_INFO = {
     },
 };
 
-/** LKR to USD - used to display safari jeep/ticket prices in USD. Update as needed. */
-export const LKR_TO_USD_RATE = 310;
+/** Safari: USD per person when group size exceeds 3 (4th and 5th person). */
+export const SAFARI_EXTRA_PERSON_USD = 5;
 
-/** Convert LKR amount to USD display string (2 decimals). */
-export function lkrToUsd(lkr: number): string {
-    return (lkr / LKR_TO_USD_RATE).toFixed(2);
+/** Safari: max group size. */
+export const SAFARI_MAX_GROUP_SIZE = 5;
+
+/** Safari: USD per extra hour per jeep. */
+export const EXTRA_HOUR_PRICE_USD = 16;
+
+/** Format amount in USD (2 decimals). All pricing is in USD. */
+export function formatUsd(amount: number): string {
+    return Number(amount).toFixed(2);
 }
+
+/** Contact details shown in booking confirmation emails and contact page. */
+export const CONTACT_DETAILS = {
+    phone: '+94 77 000 0000',
+    email: 'info@islandsafaris.com',
+    location: 'Habarana, Sri Lanka',
+    locationNote: 'Main Safari Hub',
+};
 
 export const TIME_SLOTS = [
     { value: '06:00', label: '6:00 AM - Early Morning' },

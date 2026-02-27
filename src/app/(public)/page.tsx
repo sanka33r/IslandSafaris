@@ -1,12 +1,17 @@
 import Link from 'next/link';
 import { ArrowRight, Star, Shield, Leaf, MapPin, Clock, Camera, ChevronRight } from 'lucide-react';
 import { getDestinationsWithImages } from '@/lib/queries/destinations';
+import { getApprovedReviews } from '@/lib/queries/reviews';
 import HeroSection from '@/components/home/HeroSection';
+import ReviewList from '@/components/reviews/ReviewList';
 
 export const revalidate = 3600;
 
 export default async function HomePage() {
-  const destinations = await getDestinationsWithImages();
+  const [destinations, reviews] = await Promise.all([
+    getDestinationsWithImages(),
+    getApprovedReviews(), // all approved reviews for home
+  ]);
 
   return (
     <>
@@ -341,7 +346,21 @@ export default async function HomePage() {
         </div>
       </section>
 
-
+      {/* Reviews */}
+      <section className="py-20 md:py-28 bg-white">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12 md:mb-16">
+            <span className="inline-block text-secondary-600 font-bold uppercase tracking-widest text-xs mb-4 bg-secondary-100 px-4 py-2 rounded-full">
+              Traveler Reviews
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold text-safari-900 mb-4">What Our Guests Say</h2>
+            <p className="text-safari-600 text-lg max-w-2xl mx-auto">
+              Real experiences from visitors who explored the elephant corridor with us.
+            </p>
+          </div>
+          <ReviewList reviews={reviews.slice(0, 6)} />
+        </div>
+      </section>
 
       {/* CTA Section */}
       <section className="py-20 md:py-28 bg-safari-800 relative overflow-hidden">

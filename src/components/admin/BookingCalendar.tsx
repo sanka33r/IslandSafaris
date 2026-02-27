@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-import { ChevronLeft, ChevronRight, X, Loader2, User, MapPin, Calendar, Users, Phone, Mail, MessageSquare } from 'lucide-react';
+import { useState, useTransition, useRef, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, X, Loader2, User, MapPin, Calendar, Users, Phone, Mail, MessageSquare, Download } from 'lucide-react';
 import { updateBookingStatus } from '@/lib/actions/admin';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import { PACKAGE_INFO, SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE } from '@/lib/constants';
+import BookingDetailModal from '@/components/admin/BookingDetailModal';
 
 // ── Native date helpers ────────────────────────────────────────────
 function startOfDay(d: Date) { const r = new Date(d); r.setHours(0, 0, 0, 0); return r; }
@@ -63,6 +65,12 @@ function shortDate(d: Date) {
 }
 
 // ── Types ──────────────────────────────────────────────────────────
+interface DestPricing {
+    name: string;
+    ticket_price?: number;
+    ticket_pricing_type?: 'per_person' | 'flat';
+    vehicle_price_up_to_3?: number;
+}
 interface Booking {
     id: string;
     customer_name: string;
@@ -74,7 +82,7 @@ interface Booking {
     group_size: number;
     package_type: string | null;
     destination_id: string | null;
-    destinations?: { name: string } | null;
+    destinations?: DestPricing | null;
     country?: string | null;
     hotel_name?: string | null;
     pickup_required?: boolean;
@@ -85,11 +93,15 @@ interface Booking {
     discount_amount?: number;
     advance_payment_amount?: number;
     advance_payment_status?: string;
+    created_at?: string;
+    passport_number?: string | null;
+    dropoff_location?: string | null;
 }
 
 interface BookingCalendarProps {
     bookings: Booking[];
     currentMonth: string; // YYYY-MM
+    extraHourPriceUsd: number;
 }
 
 type BookingStatus = 'cancelled' | 'upcoming' | 'finished' | 'new';
@@ -113,6 +125,35 @@ const statusConfig: Record<BookingStatus, { bg: string; text: string; border: st
 
 function formatPackageName(type: string) {
     return type.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+// Activity type key for grouping (null = Safari)
+const ACTIVITY_ORDER: (string | null)[] = [null, 'village-tour', 'cooking-class', 'bicycle-rent'];
+const ACTIVITY_LABELS: Record<string, string> = {
+    'safari': 'Safaris',
+    'village-tour': 'Village Tours',
+    'cooking-class': 'Cooking Classes',
+    'bicycle-rent': 'Bicycle Rentals',
+};
+function getActivityLabel(packageType: string | null): string {
+    return packageType ? ACTIVITY_LABELS[packageType] ?? formatPackageName(packageType) : ACTIVITY_LABELS['safari'];
+}
+
+/** Booking total income in USD (for display and totals). */
+function getBookingIncomeUSD(booking: Booking, extraHourPriceUsd: number): number {
+    if (booking.status === 'cancelled') return 0;
+    if (booking.package_type) {
+        const price = PACKAGE_INFO[booking.package_type as keyof typeof PACKAGE_INFO]?.price ?? 0;
+        return price * booking.group_size;
+    }
+    const dest = booking.destinations;
+    if (!dest) return 0;
+    const vehiclePrice = dest.vehicle_price_up_to_3 ?? 0;
+    const vehicleCount = Math.ceil(booking.group_size / SAFARI_MAX_GROUP_SIZE);
+    const vehicleCost = vehicleCount * vehiclePrice;
+    const extraPersonUsd = Math.max(0, booking.group_size - 3) * SAFARI_EXTRA_PERSON_USD;
+    const extraHoursUsd = (booking.extra_hours || 0) * extraHourPriceUsd * vehicleCount;
+    return vehicleCost + extraPersonUsd + extraHoursUsd;
 }
 
 // ── Sub-components ─────────────────────────────────────────────────
@@ -196,163 +237,71 @@ function DetailRow({ booking, onCancel, onViewDetails }: { booking: Booking; onC
     );
 }
 
-function BookingDetailModal({ booking, onClose, onCancel }: { booking: Booking; onClose: () => void; onCancel: (id: string) => void }) {
-    const [isPending, startTransition] = useTransition();
-    const status = getBookingStatus(booking);
-    const config = statusConfig[status];
-    const name = !booking.package_type
-        ? (booking.destinations?.name || 'Safari')
-        : formatPackageName(booking.package_type);
-
-    const handleCancel = () => {
-        if (confirm(`Cancel booking for ${booking.customer_name}?`)) {
-            startTransition(() => { onCancel(booking.id); });
+// ── PDF download ───────────────────────────────────────────────────
+function DownloadDayPdf({
+    date,
+    activities,
+    totalIncome,
+    extraHourPriceUsd,
+}: {
+    date: Date;
+    activities: { key: string; label: string; bookings: Booking[] }[];
+    totalIncome: number;
+    extraHourPriceUsd: number;
+}) {
+    const [loading, setLoading] = useState(false);
+    const handleDownload = async () => {
+        setLoading(true);
+        try {
+            const { jsPDF } = await import('jspdf');
+            const doc = new jsPDF();
+            const pageW = doc.getPageWidth();
+            let y = 20;
+            doc.setFontSize(18);
+            doc.text(`Activities for ${friendlyDate(date)}`, 14, y);
+            y += 12;
+            doc.setFontSize(11);
+            doc.text(`Total income: USD ${totalIncome.toFixed(2)}`, 14, y);
+            y += 14;
+            for (const { label, bookings } of activities) {
+                const income = bookings.reduce((s, b) => s + getBookingIncomeUSD(b, extraHourPriceUsd), 0);
+                doc.setFont(undefined, 'bold');
+                doc.text(`Total No. of ${label} — ${bookings.length}`, 14, y);
+                y += 6;
+                doc.setFont(undefined, 'normal');
+                doc.text(`Income of the Day — USD ${income.toFixed(2)}`, 14, y);
+                y += 6;
+                bookings.forEach((b, i) => {
+                    if (y > 270) { doc.addPage(); y = 20; }
+                    doc.text(`${i + 1}. ${b.customer_name}`, 18, y);
+                    y += 6;
+                });
+                y += 6;
+            }
+            doc.save(`day-details-${formatDate(date)}.pdf`);
+        } catch (e) {
+            console.error('PDF download failed:', e);
+        } finally {
+            setLoading(false);
         }
     };
-
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" onClick={onClose}>
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-            <div className="relative bg-white rounded-2xl shadow-2xl border border-safari-100 max-w-md w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                <div className="sticky top-0 bg-white border-b border-safari-100 px-6 py-4 rounded-t-2xl flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-safari-900">Booking Details</h3>
-                    <button onClick={onClose} className="p-1 rounded-lg hover:bg-safari-100 text-safari-400 transition-colors"><X size={20} /></button>
-                </div>
-                <div className="p-6 space-y-4">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <p className="text-base font-mono text-safari-400">Ref: {booking.id.slice(0, 8)}</p>
-                            <p className="text-xl font-bold text-safari-900">{booking.customer_name}</p>
-                        </div>
-                        <span className={cn('px-2 py-1 rounded-full text-base font-bold uppercase', config.bg, config.text, config.border)}>{config.label}</span>
-                    </div>
-
-                    <div className="grid gap-3 text-base">
-                        <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
-                            <MapPin size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
-                            <div>
-                                <p className="text-base font-bold text-safari-500 uppercase">{booking.package_type ? 'Package' : 'Destination'}</p>
-                                <p className="font-semibold text-safari-900">{name}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
-                            <Calendar size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
-                            <div>
-                                <p className="text-base font-bold text-safari-500 uppercase">Date & Time</p>
-                                <p className="font-semibold text-safari-900">{new Date(booking.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })} at {booking.time}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
-                            <Users size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
-                            <div>
-                                <p className="text-base font-bold text-safari-500 uppercase">Group Size</p>
-                                <p className="font-semibold text-safari-900">{booking.group_size} person{booking.group_size > 1 ? 's' : ''}</p>
-                            </div>
-                        </div>
-                        {booking.email && (
-                            <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
-                                <Mail size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
-                                <div>
-                                    <p className="text-base font-bold text-safari-500 uppercase">Email</p>
-                                    <p className="font-medium text-safari-900 break-all">{booking.email}</p>
-                                </div>
-                            </div>
-                        )}
-                        {booking.phone && (
-                            <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
-                                <Phone size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
-                                <div>
-                                    <p className="text-base font-bold text-safari-500 uppercase">Phone</p>
-                                    <p className="font-medium text-safari-900">{booking.phone}</p>
-                                </div>
-                            </div>
-                        )}
-                        {booking.country && (
-                            <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
-                                <User size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
-                                <div>
-                                    <p className="text-base font-bold text-safari-500 uppercase">Country</p>
-                                    <p className="font-medium text-safari-900">{booking.country}</p>
-                                </div>
-                            </div>
-                        )}
-                        {booking.pickup_required && (booking.hotel_name || booking.pickup_location) && (
-                            <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
-                                <MapPin size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
-                                <div>
-                                    <p className="text-base font-bold text-safari-500 uppercase">Pickup</p>
-                                    <p className="font-medium text-safari-900">{booking.hotel_name || booking.pickup_location}</p>
-                                </div>
-                            </div>
-                        )}
-                        {(booking.special_requests || booking.message) && (
-                            <div className="flex items-start gap-3 p-3 rounded-xl bg-safari-50">
-                                <MessageSquare size={18} className="text-safari-500 mt-0.5 flex-shrink-0" />
-                                <div>
-                                    <p className="text-base font-bold text-safari-500 uppercase">Notes</p>
-                                    <p className="font-medium text-safari-900">{booking.special_requests || booking.message}</p>
-                                </div>
-                            </div>
-                        )}
-                        {booking.promo_code && (
-                            <div className="flex items-center gap-2 p-3 rounded-xl bg-green-50 border border-green-100">
-                                <span className="text-base font-bold text-green-700">Promo:</span>
-                                <span className="font-semibold text-green-800">{booking.promo_code}</span>
-                                {booking.discount_amount ? <span className="text-green-600">(-${booking.discount_amount})</span> : null}
-                            </div>
-                        )}
-                    </div>
-
-                    {status !== 'cancelled' && (
-                        <button onClick={handleCancel} disabled={isPending}
-                            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 font-bold transition-all disabled:opacity-50">
-                            {isPending ? <Loader2 size={16} className="animate-spin" /> : <X size={16} />}
-                            Cancel Booking
-                        </button>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function DayDetail({ date, safariBookings, packageBookings, onCancel, onClose, onViewDetails }: {
-    date: Date; safariBookings: Booking[]; packageBookings: Booking[]; onCancel: (id: string) => void; onClose: () => void; onViewDetails: (b: Booking) => void;
-}) {
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-            <div className="relative bg-white rounded-2xl shadow-2xl border border-safari-100 max-w-lg w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                <div className="sticky top-0 bg-white border-b border-safari-100 px-6 py-4 rounded-t-2xl flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-safari-900">{friendlyDate(date)}</h3>
-                    <button onClick={onClose} className="p-1 rounded-lg hover:bg-safari-100 text-safari-400 transition-colors"><X size={20} /></button>
-                </div>
-                <div className="p-6 space-y-6">
-                    <div>
-                        <h4 className="text-base font-bold uppercase tracking-wider text-safari-400 mb-3 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-safari-700" /> Safari Bookings ({safariBookings.length})
-                        </h4>
-                        {safariBookings.length === 0
-                            ? <p className="text-base text-safari-300 italic">No safari bookings</p>
-                            : <div className="space-y-2">{safariBookings.map(b => <DetailRow key={b.id} booking={b} onCancel={onCancel} onViewDetails={onViewDetails} />)}</div>}
-                    </div>
-                    <div>
-                        <h4 className="text-base font-bold uppercase tracking-wider text-purple-500 mb-3 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-purple-500" /> Package Bookings ({packageBookings.length})
-                        </h4>
-                        {packageBookings.length === 0
-                            ? <p className="text-base text-safari-300 italic">No package bookings</p>
-                            : <div className="space-y-2">{packageBookings.map(b => <DetailRow key={b.id} booking={b} onCancel={onCancel} onViewDetails={onViewDetails} />)}</div>}
-                    </div>
-                </div>
-            </div>
-        </div>
+        <button
+            type="button"
+            onClick={handleDownload}
+            disabled={loading || activities.length === 0}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-safari-100 text-safari-700 hover:bg-safari-200 font-semibold text-sm transition-colors disabled:opacity-50"
+        >
+            {loading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+            Download as PDF
+        </button>
     );
 }
 
 // ── Main calendar ──────────────────────────────────────────────────
-export default function BookingCalendar({ bookings, currentMonth }: BookingCalendarProps) {
+export default function BookingCalendar({ bookings, currentMonth, extraHourPriceUsd }: BookingCalendarProps) {
     const router = useRouter();
+    const dayDetailsRef = useRef<HTMLDivElement>(null);
     const [selectedDay, setSelectedDay] = useState<Date | null>(null);
     const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
     const current = new Date(currentMonth + '-01');
@@ -363,13 +312,41 @@ export default function BookingCalendar({ bookings, currentMonth }: BookingCalen
     const calEnd = endOfWeekMon(monthEnd);
     const days = eachDay(calStart, calEnd);
 
-    // Group bookings by date
+    // Scroll to day details when a date is selected
+    useEffect(() => {
+        if (selectedDay && dayDetailsRef.current) {
+            dayDetailsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, [selectedDay]);
+
+    // Group bookings by date (safari vs packages for grid)
     const byDate: Record<string, { safari: Booking[]; packages: Booking[] }> = {};
     bookings.forEach(b => {
         const k = b.date;
         if (!byDate[k]) byDate[k] = { safari: [], packages: [] };
         b.package_type ? byDate[k].packages.push(b) : byDate[k].safari.push(b);
     });
+
+    // For selected day: group by activity for the details section
+    const selectedDayKey = selectedDay ? formatDate(selectedDay) : null;
+    const dayData = selectedDayKey ? byDate[selectedDayKey] : null;
+    const activitiesForDay = (() => {
+        if (!dayData) return [];
+        const list: { key: string; label: string; bookings: Booking[] }[] = [];
+        for (const key of ACTIVITY_ORDER) {
+            const activityKey = key ?? 'safari';
+            const label = getActivityLabel(key);
+            const bookingsForActivity = key === null
+                ? dayData.safari
+                : dayData.packages.filter(b => b.package_type === key);
+            if (bookingsForActivity.length > 0) list.push({ key: activityKey, label, bookings: bookingsForActivity });
+        }
+        return list;
+    })();
+    const totalIncomeForDay = activitiesForDay.reduce(
+        (sum, a) => sum + a.bookings.reduce((s, b) => s + getBookingIncomeUSD(b, extraHourPriceUsd), 0),
+        0
+    );
 
     const navigateMonth = (dir: 'prev' | 'next') => {
         const m = dir === 'prev' ? subMonths(current, 1) : addMonths(current, 1);
@@ -444,13 +421,13 @@ export default function BookingCalendar({ bookings, currentMonth }: BookingCalen
                         return (
                             <div
                                 key={i}
-                                onClick={() => total > 0 && setSelectedDay(day)}
+                                onClick={() => inMonth && setSelectedDay(day)}
                                 className={cn(
                                     'min-h-[110px] md:min-h-[130px] border-b border-r border-safari-100/60 p-2 transition-all',
                                     !inMonth && 'bg-safari-50/40',
-                                    inMonth && 'bg-white',
+                                    inMonth && 'bg-white cursor-pointer hover:bg-safari-50/60',
                                     isToday(day) && 'bg-secondary-50/30 ring-1 ring-inset ring-secondary-200',
-                                    total > 0 && 'cursor-pointer hover:bg-safari-50/60'
+                                    selectedDayKey === dk && 'ring-2 ring-inset ring-safari-400'
                                 )}
                             >
                                 <div className="flex items-center justify-between mb-1">
@@ -478,6 +455,64 @@ export default function BookingCalendar({ bookings, currentMonth }: BookingCalen
                         );
                     })}
                 </div>
+            </div>
+
+            {/* Day details below calendar (scroll here when a date is clicked) */}
+            <div ref={dayDetailsRef} className="scroll-mt-6">
+                {selectedDay && (
+                    <div className="bg-white rounded-2xl shadow-sm border border-safari-100 overflow-hidden">
+                        <div className="px-6 py-4 border-b border-safari-100 flex flex-wrap items-center justify-between gap-3">
+                            <h2 className="text-xl font-bold text-safari-900">Activities for {friendlyDate(selectedDay)}</h2>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedDay(null)}
+                                    className="text-sm font-semibold text-safari-500 hover:text-safari-700"
+                                >
+                                    Close
+                                </button>
+                                <DownloadDayPdf
+                                    date={selectedDay}
+                                    activities={activitiesForDay}
+                                    totalIncome={totalIncomeForDay}
+                                    extraHourPriceUsd={extraHourPriceUsd}
+                                />
+                            </div>
+                        </div>
+                        <div className="p-6 space-y-8">
+                            {activitiesForDay.length === 0 ? (
+                                <p className="text-safari-500 italic">No bookings on this day.</p>
+                            ) : (
+                                activitiesForDay.map(({ key, label, bookings: activityBookings }) => {
+                                    const income = activityBookings.reduce((s, b) => s + getBookingIncomeUSD(b, extraHourPriceUsd), 0);
+                                    return (
+                                        <section key={key} className="space-y-3">
+                                            <p className="text-base font-bold text-safari-700">
+                                                Total No. of {label} — {activityBookings.length}
+                                            </p>
+                                            <p className="text-base font-semibold text-safari-600">
+                                                Income of the Day — USD {income.toFixed(2)}
+                                            </p>
+                                            <ol className="list-decimal list-inside space-y-1.5">
+                                                {activityBookings.map((booking, idx) => (
+                                                    <li key={booking.id}>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setSelectedBooking(booking)}
+                                                            className="text-left font-medium text-safari-800 hover:text-safari-600 hover:underline"
+                                                        >
+                                                            {booking.customer_name}
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                            </ol>
+                                        </section>
+                                    );
+                                })
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Mobile list */}
@@ -511,24 +546,12 @@ export default function BookingCalendar({ bookings, currentMonth }: BookingCalen
                 })}
             </div>
 
-            {/* Booking detail modal */}
+            {/* Full booking detail modal (when clicking a guest name) */}
             {selectedBooking && (
                 <BookingDetailModal
                     booking={selectedBooking}
                     onClose={() => setSelectedBooking(null)}
-                    onCancel={async (id) => { await handleCancel(id); setSelectedBooking(null); }}
-                />
-            )}
-
-            {/* Day detail modal */}
-            {selectedDay && byDate[formatDate(selectedDay)] && (
-                <DayDetail
-                    date={selectedDay}
-                    safariBookings={byDate[formatDate(selectedDay)]?.safari || []}
-                    packageBookings={byDate[formatDate(selectedDay)]?.packages || []}
-                    onCancel={handleCancel}
-                    onClose={() => setSelectedDay(null)}
-                    onViewDetails={(b) => { setSelectedDay(null); setSelectedBooking(b); }}
+                    extraHourPriceUsd={extraHourPriceUsd}
                 />
             )}
         </div>

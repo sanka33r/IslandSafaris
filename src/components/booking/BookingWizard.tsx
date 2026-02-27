@@ -9,7 +9,7 @@ import { BookingFormData } from '@/lib/schemas/booking';
 import { Loader2, CheckCircle, CreditCard, Car, MapPin, ExternalLink, Tag, AlertCircle } from 'lucide-react';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
-import { lkrToUsd } from '@/lib/constants';
+import { formatUsd, SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE, EXTRA_HOUR_PRICE_USD } from '@/lib/constants';
 import PaymentSection from '@/components/payments/PaymentSection';
 
 const COUNTRY_CODES = [
@@ -48,6 +48,8 @@ const COUNTRY_CODES = [
 interface BookingWizardProps {
     destinations: Destination[];
     preselectedDestinationId?: string;
+    /** Extra hour charge USD (per hour per jeep). From admin settings when provided. */
+    extraHourPriceUsd?: number;
 }
 
 const steps = [
@@ -64,7 +66,7 @@ const step1Schema = z.object({
 const step2Schema = z.object({
     date: z.string().min(1, 'Date is required'),
     time: z.string().min(1, 'Time is required'),
-    group_size: z.coerce.number().min(1, 'At least 1 person is required').max(20, 'For groups over 20, please contact us'),
+    group_size: z.coerce.number().min(1, 'At least 1 person is required').max(SAFARI_MAX_GROUP_SIZE, `Maximum group size for safari is ${SAFARI_MAX_GROUP_SIZE}`),
 });
 const step3Schema = z.object({
     pickup_required: z.boolean(),
@@ -79,7 +81,8 @@ const step4Schema = z.object({
     phone: z.string().min(8, 'Valid phone number is required'),
 });
 
-export default function BookingWizard({ destinations, preselectedDestinationId }: BookingWizardProps) {
+export default function BookingWizard({ destinations, preselectedDestinationId, extraHourPriceUsd: extraHourPriceProp }: BookingWizardProps) {
+    const extraHourPriceUsd = extraHourPriceProp ?? EXTRA_HOUR_PRICE_USD;
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState<Partial<BookingFormData>>({
         destination_id: preselectedDestinationId || '',
@@ -114,22 +117,23 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
         if (formData.destination_id && formData.group_size) {
             const dest = destinations.find(d => d.id === formData.destination_id);
             if (dest) {
-                const vehicles = Math.ceil((formData.group_size || 0) / 3);
+                const groupSize = formData.group_size || 0;
+                const vehicles = Math.ceil(groupSize / SAFARI_MAX_GROUP_SIZE);
                 const vehicleCost = vehicles * dest.vehicle_price_up_to_3;
-                const ticketCost = (dest.ticket_pricing_type === 'per_person' ? dest.ticket_price * (formData.group_size || 0) : dest.ticket_price * (formData.group_size || 0));
+                const ticketCost = dest.ticket_pricing_type === 'per_person' ? dest.ticket_price * groupSize : dest.ticket_price;
                 const extraHours = formData.extra_hours || 0;
-                const extraHourPrice = 5000;
-                const extraCost = extraHours * extraHourPrice * vehicles;
+                const extraCost = extraHours * extraHourPriceUsd * vehicles;
+                const extraPersonCount = Math.max(0, groupSize - 3);
+                const extraPersonCostUsd = extraPersonCount * SAFARI_EXTRA_PERSON_USD;
 
-                // We only charge for the safari jeep (+ extra hours). Entrance tickets are paid at the park gate.
-                const ourCharge = vehicleCost + extraCost;
+                const ourCharge = vehicleCost + extraCost + extraPersonCostUsd;
                 setEstimatedPrice({
                     total: ourCharge,
-                    breakdown: { ticketCost, vehicleCost, extraCost }
+                    breakdown: { ticketCost, vehicleCost, extraCost, extraPersonCostUsd, extraPersonCount }
                 });
             }
         }
-    }, [formData, destinations]);
+    }, [formData, destinations, extraHourPriceUsd]);
 
     // Clear discount when price-affecting factors change
     useEffect(() => {
@@ -147,7 +151,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
             if (result.valid && result.discount != null) {
                 setDiscount({ amount: result.discount, code: result.code! });
                 updateField('promo_code' as any, result.code!);
-                setPromoMessage({ type: 'success', text: `Applied! You saved USD ${lkrToUsd(result.discount)}` });
+                setPromoMessage({ type: 'success', text: `Applied! You saved USD ${formatUsd(result.discount)}` });
             } else {
                 setDiscount(null);
                 setPromoMessage({ type: 'error', text: result.message || 'Invalid promo code' });
@@ -255,21 +259,31 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
 
     // Payment confirmed state
     if (submitResult?.paid) {
+        const referenceNumber = submitResult.bookingId
+            ? `IS-${submitResult.bookingId.substring(0, 8).toUpperCase()}`
+            : null;
         return (
             <div className="max-w-xl mx-auto bg-white rounded-3xl p-12 text-center shadow-lg border border-green-100">
                 <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle size={40} />
                 </div>
                 <h2 className="text-3xl font-bold text-safari-900 mb-4">Booking Confirmed!</h2>
+                {referenceNumber && (
+                    <div className="bg-safari-900 text-white rounded-xl py-4 px-6 mb-6">
+                        <div className="text-safari-300 text-sm font-medium mb-1">Reference number</div>
+                        <div className="text-2xl font-bold font-mono tracking-wider">{referenceNumber}</div>
+                        <div className="text-safari-400 text-xs mt-1">Save this for your records. A confirmation email has been sent to {formData.email}.</div>
+                    </div>
+                )}
                 <p className="text-safari-600 mb-8">
                     Thank you, {formData.customer_name}! Your advance payment has been received and your safari booking for {formData.date} is confirmed.
                 </p>
                 <div className="bg-safari-50 p-6 rounded-xl text-left mb-6 space-y-3">
                     <h3 className="font-semibold text-safari-900 mb-2">Safari jeep (remaining balance — pay at destination)</h3>
-                    <p className="text-2xl font-bold text-secondary-600">USD {lkrToUsd(submitResult.pricing.total)}</p>
+                    <p className="text-2xl font-bold text-secondary-600">USD {formatUsd(submitResult.pricing.total)}</p>
                     {submitResult.pricing.tickets != null && submitResult.pricing.tickets > 0 && (
                         <p className="text-sm text-safari-600">
-                            Entrance ticket (approx. USD {lkrToUsd(submitResult.pricing.tickets)}) is paid separately at the park gate.
+                            Entrance ticket (approx. USD {formatUsd(submitResult.pricing.tickets)}) is paid separately at the park gate.
                         </p>
                     )}
                 </div>
@@ -444,7 +458,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
                                             <input
                                                 type="range"
                                                 min="1"
-                                                max="20"
+                                                max={SAFARI_MAX_GROUP_SIZE}
                                                 value={formData.group_size || 1}
                                                 onChange={(e) => updateField('group_size', parseInt(e.target.value))}
                                                 className="flex-1 accent-secondary-600 h-3 bg-safari-100 rounded-lg appearance-none cursor-pointer"
@@ -459,7 +473,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
                                         {stepErrors[2]?.group_size && (
                                             <p className="text-sm text-red-600 font-medium">{stepErrors[2].group_size}</p>
                                         )}
-                                        <p className="text-xs text-safari-500">For groups &gt; 20, please contact us directly.</p>
+                                        <p className="text-xs text-safari-500">Maximum {SAFARI_MAX_GROUP_SIZE} people. USD {SAFARI_EXTRA_PERSON_USD} per person for the 4th and 5th.</p>
                                     </div>
                                 </div>
                             </div>
@@ -756,7 +770,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
                                 <div className="md:hidden flex flex-col items-center">
                                     <span className="text-[10px] uppercase tracking-wider text-safari-400 font-bold">Estimated</span>
                                     <span className="text-lg font-bold text-secondary-600 leading-none">
-                                        USD {lkrToUsd(discount ? Math.max(0, estimatedPrice.total - discount.amount) : estimatedPrice.total)}
+                                        USD {formatUsd(discount ? Math.max(0, estimatedPrice.total - discount.amount) : estimatedPrice.total)}
                                     </span>
                                 </div>
                             )}
@@ -778,30 +792,36 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
                         {estimatedPrice ? (
                             <div className="space-y-3">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-safari-500">Safari Jeep (x{Math.ceil((formData.group_size || 1) / 3)})</span>
-                                    <span className="font-medium text-safari-900">USD {lkrToUsd(estimatedPrice.breakdown.vehicleCost)}</span>
+                                    <span className="text-safari-500">Safari Jeep (x{Math.ceil((formData.group_size || 1) / SAFARI_MAX_GROUP_SIZE)})</span>
+                                    <span className="font-medium text-safari-900">USD {formatUsd(estimatedPrice.breakdown.vehicleCost)}</span>
                                 </div>
                                 {estimatedPrice.breakdown.extraCost > 0 && (
                                     <div className="flex justify-between text-sm">
                                         <span className="text-safari-500">Extra Hours</span>
-                                        <span className="font-medium text-safari-900">USD {lkrToUsd(estimatedPrice.breakdown.extraCost)}</span>
+                                        <span className="font-medium text-safari-900">USD {formatUsd(estimatedPrice.breakdown.extraCost)}</span>
+                                    </div>
+                                )}
+                                {estimatedPrice.breakdown.extraPersonCount > 0 && (
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-safari-500">Extra person (4th & 5th, USD {SAFARI_EXTRA_PERSON_USD} each)</span>
+                                        <span className="font-medium text-safari-900">USD {(estimatedPrice.breakdown.extraPersonCount * SAFARI_EXTRA_PERSON_USD).toFixed(2)}</span>
                                     </div>
                                 )}
                                 {discount && (
                                     <div className="flex justify-between text-sm text-green-600">
                                         <span className="text-safari-500">Promo ({discount.code})</span>
-                                        <span className="font-medium">- USD {lkrToUsd(discount.amount)}</span>
+                                        <span className="font-medium">- USD {formatUsd(discount.amount)}</span>
                                     </div>
                                 )}
                                 <div className="border-t border-safari-100 pt-3 mt-3">
                                     <div className="flex justify-between items-end">
                                         <span className="text-safari-900 font-bold">Our charge (jeep)</span>
                                         <span className="text-2xl font-bold text-safari-900">
-                                            USD {lkrToUsd(discount ? Math.max(0, estimatedPrice.total - discount.amount) : estimatedPrice.total)}
+                                            USD {formatUsd(discount ? Math.max(0, estimatedPrice.total - discount.amount) : estimatedPrice.total)}
                                         </span>
                                     </div>
                                     {discount && (
-                                        <span className="text-sm text-safari-400 line-through">USD {lkrToUsd(estimatedPrice.total)}</span>
+                                        <span className="text-sm text-safari-400 line-through">USD {formatUsd(estimatedPrice.total)}</span>
                                     )}
                                     <p className="text-xs text-right text-safari-400 mt-1">Pay at destination</p>
                                 </div>
@@ -809,7 +829,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId }
                                     <div className="text-xs text-safari-500 mb-1.5">For your information</div>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-safari-500">Entrance ticket (approx.)</span>
-                                        <span className="font-medium text-safari-900">USD {lkrToUsd(estimatedPrice.breakdown.ticketCost)}</span>
+                                        <span className="font-medium text-safari-900">USD {formatUsd(estimatedPrice.breakdown.ticketCost)}</span>
                                     </div>
                                     <p className="text-xs text-safari-500 mt-0.5">Paid separately at the park gate</p>
                                 </div>

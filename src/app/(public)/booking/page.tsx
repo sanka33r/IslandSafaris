@@ -1,5 +1,6 @@
 import BookingWizard from '@/components/booking/BookingWizard';
 import { getDestinations } from '@/lib/queries/destinations';
+import { getExtraHourPriceUsd } from '@/lib/settings';
 
 export const metadata = {
     title: 'Book Your Safari | Island Safaris Sri Lanka',
@@ -14,7 +15,10 @@ interface PageProps {
 
 export default async function BookingPage(props: PageProps) {
     const searchParams = await props.searchParams;
-    const destinations = await getDestinations();
+    const [destinations, extraHourPriceUsd] = await Promise.all([
+        getDestinations(),
+        getExtraHourPriceUsd(),
+    ]);
     const preselectedId = searchParams.destination
         ? destinations.find(d => d.slug === searchParams.destination)?.id
         : undefined;
@@ -36,6 +40,7 @@ export default async function BookingPage(props: PageProps) {
                 <BookingWizard
                     destinations={destinations}
                     preselectedDestinationId={preselectedId}
+                    extraHourPriceUsd={extraHourPriceUsd}
                 />
             </div>
         </div>

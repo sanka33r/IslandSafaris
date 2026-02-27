@@ -4,7 +4,7 @@ export const bookingSchema = z.object({
     destination_id: z.string().uuid({ message: "Please select a valid destination" }),
     date: z.string().min(1, "Date is required"),
     time: z.string().min(1, "Time is required"),
-    group_size: z.coerce.number().min(1, "At least 1 person is required").max(20, "For groups > 20, please contact us directly"),
+    group_size: z.coerce.number().min(1, "At least 1 person is required").max(5, "Maximum group size for safari is 5"),
     pickup_required: z.boolean().default(false),
     hotel_name: z.string().optional(),
 

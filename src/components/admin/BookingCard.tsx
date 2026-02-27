@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { updateBookingStatus } from '@/lib/actions/admin';
 import { Loader2, Check, X, User, MapPin, Calendar, Users, Phone, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { PACKAGE_INFO } from '@/lib/constants';
+import { PACKAGE_INFO, SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE, EXTRA_HOUR_PRICE_USD } from '@/lib/constants';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function BookingCard({ booking, onViewDetails }: { booking: any; onViewDetails?: () => void }) {
+export default function BookingCard({ booking, onViewDetails, extraHourPriceUsd }: { booking: any; onViewDetails?: () => void; extraHourPriceUsd?: number }) {
+    const hourPrice = extraHourPriceUsd ?? EXTRA_HOUR_PRICE_USD;
     const [loading, setLoading] = useState(false);
 
     const handleUpdate = async (status: 'confirmed' | 'cancelled') => {
@@ -92,33 +93,50 @@ export default function BookingCard({ booking, onViewDetails }: { booking: any; 
                 </div>
 
                 {/* Price Breakdown */}
-                <div className="col-span-2 mt-2 pt-2 border-t border-dashed border-safari-100">
-                    <div className="flex justify-between items-center text-base">
-                        <span className="text-safari-500">Total Price:</span>
-                        <span className="font-bold text-safari-900">
-                            ${booking.package_type ? (PACKAGE_INFO[booking.package_type as keyof typeof PACKAGE_INFO]?.price * booking.group_size) : booking.ticket_price}
-                        </span>
-                    </div>
-                    {booking.discount_amount > 0 && (
-                        <div className="flex justify-between items-center text-base text-green-600 font-medium">
-                            <span className="flex items-center gap-1">
-                                <Tag size={10} />
-                                Promo ({booking.promo_code}):
-                            </span>
-                            <span>-${booking.discount_amount}</span>
+                {(() => {
+                    const dest = booking.destinations;
+                    const vehicleCount = dest ? Math.ceil(booking.group_size / SAFARI_MAX_GROUP_SIZE) : 0;
+                    // Safari: jeep only (vehicle + extra hours + extra person), all USD. Entrance ticket paid at gate — exclude from Total/Balance.
+                    const safariTotalUsd = !booking.package_type && dest
+                        ? (dest.vehicle_price_up_to_3 ?? 0) * vehicleCount +
+                          (booking.extra_hours || 0) * hourPrice * vehicleCount +
+                          Math.max(0, booking.group_size - 3) * SAFARI_EXTRA_PERSON_USD
+                        : 0;
+                    const totalPrice = booking.package_type
+                        ? (PACKAGE_INFO[booking.package_type as keyof typeof PACKAGE_INFO]?.price ?? 0) * booking.group_size
+                        : safariTotalUsd;
+                    const isPaid = booking.advance_payment_status === 'paid';
+                    const balanceDue = isPaid ? 0 : Math.max(0, totalPrice - (booking.discount_amount || 0) - (booking.advance_payment_amount || 0));
+                    return (
+                        <div className="col-span-2 mt-2 pt-2 border-t border-dashed border-safari-100">
+                            <div className="flex justify-between items-center text-base">
+                                <span className="text-safari-500">Total Price:</span>
+                                <span className="font-bold text-safari-900">
+                                    ${typeof totalPrice === 'number' && totalPrice >= 0 ? (booking.package_type ? totalPrice : totalPrice.toFixed(2)) : (booking.ticket_price ?? 0)}
+                                </span>
+                            </div>
+                            {booking.discount_amount > 0 && (
+                                <div className="flex justify-between items-center text-base text-green-600 font-medium">
+                                    <span className="flex items-center gap-1">
+                                        <Tag size={10} />
+                                        Promo ({booking.promo_code}):
+                                    </span>
+                                    <span>-${booking.discount_amount}</span>
+                                </div>
+                            )}
+                            <div className="flex justify-between items-center text-base">
+                                <span className="text-safari-500">Advance Paid:</span>
+                                <span className="font-bold text-safari-900">${booking.advance_payment_amount || 0}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-base mt-1 pt-1 border-t border-safari-100">
+                                <span className="font-bold text-secondary-700">Balance Due:</span>
+                                <span className="font-bold text-secondary-700">
+                                    ${typeof balanceDue === 'number' ? (booking.package_type ? balanceDue : balanceDue.toFixed(2)) : 0}
+                                </span>
+                            </div>
                         </div>
-                    )}
-                    <div className="flex justify-between items-center text-base">
-                        <span className="text-safari-500">Advance Paid:</span>
-                        <span className="font-bold text-safari-900">${booking.advance_payment_amount || 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-base mt-1 pt-1 border-t border-safari-100">
-                        <span className="font-bold text-secondary-700">Balance Due:</span>
-                        <span className="font-bold text-secondary-700">
-                            ${Math.max(0, (booking.package_type ? (PACKAGE_INFO[booking.package_type as keyof typeof PACKAGE_INFO]?.price * booking.group_size) : booking.ticket_price) - (booking.discount_amount || 0) - (booking.advance_payment_amount || 0))}
-                        </span>
-                    </div>
-                </div>
+                    );
+                })()}
             </div>
 
             <div className="pt-4 flex gap-2" onClick={(e) => e.stopPropagation()}>

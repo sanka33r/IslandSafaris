@@ -7,7 +7,7 @@ import BookingDetailModal from './BookingDetailModal';
 import BookingPagination from './BookingPagination';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function BookingsList({ bookings, totalPages }: { bookings: any[]; totalPages: number }) {
+export default function BookingsList({ bookings, totalPages, extraHourPriceUsd }: { bookings: any[]; totalPages: number; extraHourPriceUsd: number }) {
     const [selectedBooking, setSelectedBooking] = useState<typeof bookings[0] | null>(null);
 
     return (
@@ -15,7 +15,7 @@ export default function BookingsList({ bookings, totalPages }: { bookings: any[]
             {/* Mobile View: List of Cards */}
             <div className="grid grid-cols-1 gap-4 md:hidden">
                 {bookings?.map((booking: any) => (
-                    <BookingCard key={booking.id} booking={booking} onViewDetails={() => setSelectedBooking(booking)} />
+                    <BookingCard key={booking.id} booking={booking} onViewDetails={() => setSelectedBooking(booking)} extraHourPriceUsd={extraHourPriceUsd} />
                 ))}
                 {(!bookings || bookings.length === 0) && (
                     <div className="bg-white p-12 text-center text-safari-400 rounded-3xl border border-safari-100 shadow-sm">
@@ -64,6 +64,7 @@ export default function BookingsList({ bookings, totalPages }: { bookings: any[]
                 <BookingDetailModal
                     booking={selectedBooking}
                     onClose={() => setSelectedBooking(null)}
+                    extraHourPriceUsd={extraHourPriceUsd}
                 />
             )}
         </>

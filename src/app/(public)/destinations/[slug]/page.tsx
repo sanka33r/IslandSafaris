@@ -4,7 +4,7 @@ import { useGlobalData } from '@/providers/GlobalDataProvider';
 import { notFound, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { lkrToUsd } from '@/lib/constants';
+import { formatUsd } from '@/lib/constants';
 import {
     Clock, Ticket, Car, Camera, DollarSign,
     MapPin, Star, Repeat, Compass, Sparkles, Sun,
@@ -346,7 +346,7 @@ export default function DestinationDetailPage() {
                                 <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-secondary-600 mb-1.5 sm:mb-2 block">Starting from</span>
                                 <div className="flex items-baseline gap-1 flex-wrap">
                                     <span className="text-3xl sm:text-4xl font-bold text-safari-900">
-                                        USD {lkrToUsd(destination.vehicle_price_up_to_3)}
+                                        USD {formatUsd(destination.vehicle_price_up_to_3)}
                                     </span>
                                     <span className="text-safari-500 font-medium text-sm sm:text-base">/ jeep</span>
                                 </div>
@@ -373,12 +373,12 @@ export default function DestinationDetailPage() {
                                     <div className="min-w-0">
                                         <p className="text-xs text-safari-500 font-bold uppercase tracking-wider mb-0.5">Entrance Ticket</p>
                                         <p className="text-safari-900 font-bold text-sm sm:text-base">
-                                            USD {lkrToUsd(destination.ticket_price)}
+                                            USD {formatUsd(destination.ticket_price)}
                                             <span className="text-xs sm:text-sm font-normal text-safari-500">
                                                 {destination.ticket_pricing_type === 'per_person' ? ' / person' : ' flat rate'}
                                             </span>
                                         </p>
-                                        <p className="text-xs text-secondary-600 font-bold uppercase mt-1 bg-secondary-50 inline-block px-1.5 py-0.5 rounded">Paid at gate</p>
+                                        <p className="text-xs text-secondary-600 font-bold uppercase mt-1 bg-secondary-50 inline-block px-1.5 py-0.5 rounded">Tickets payable at gate</p>
                                     </div>
                                 </div>
 
@@ -389,7 +389,7 @@ export default function DestinationDetailPage() {
                                     <div className="min-w-0">
                                         <p className="text-xs text-safari-500 font-bold uppercase tracking-wider mb-0.5">Jeep Fee</p>
                                         <p className="text-safari-900 font-bold text-sm sm:text-base">
-                                            USD {lkrToUsd(destination.vehicle_price_up_to_3)}
+                                            USD {formatUsd(destination.vehicle_price_up_to_3)}
                                             <span className="text-xs sm:text-sm font-normal text-safari-500"> (up to 3 pax)</span>
                                         </p>
                                     </div>

@@ -52,7 +52,7 @@ export default async function AdminDestinationsPage() {
                             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-safari-50 text-base">
                                 <div>
                                     <p className="text-base text-safari-400 font-bold uppercase mb-1">Pricing</p>
-                                    <p className="font-semibold text-safari-900">Rs. {dest.ticket_price.toLocaleString()}</p>
+                                    <p className="font-semibold text-safari-900">USD {Number(dest.ticket_price).toFixed(2)}</p>
                                     <p className="text-base text-safari-500">
                                         {dest.ticket_pricing_type === 'per_person' ? 'Per Person' : 'Flat'}
                                     </p>
@@ -105,13 +105,13 @@ export default async function AdminDestinationsPage() {
                                     <td className="p-6">
                                         <div className="text-base">
                                             <div className="font-semibold text-safari-900">
-                                                Rs. {dest.ticket_price.toLocaleString()}
+                                                USD {Number(dest.ticket_price).toFixed(2)}
                                                 <span className="text-base font-normal text-safari-500 ml-1">
                                                     ({dest.ticket_pricing_type === 'per_person' ? 'Per Person' : 'Flat'})
                                                 </span>
                                             </div>
                                             <div className="text-base text-safari-500">
-                                                Jeep: Rs. {dest.vehicle_price_up_to_3.toLocaleString()}
+                                                Jeep: USD {Number(dest.vehicle_price_up_to_3).toFixed(2)}
                                             </div>
                                         </div>
                                     </td>

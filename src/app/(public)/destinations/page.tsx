@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useGlobalData } from '@/providers/GlobalDataProvider';
 import { ArrowRight, MapPin, Clock, Calendar, Camera, Car, ChevronDown } from 'lucide-react';
-import { lkrToUsd } from '@/lib/constants';
+import { formatUsd } from '@/lib/constants';
 
 // export const revalidate = 3600; // Not needed for client component
 
@@ -236,7 +236,7 @@ export default function DestinationsPage() {
                                                         <span className="font-medium text-xs sm:text-sm">Private Jeep</span>
                                                     </div>
                                                     <span className="font-bold text-safari-900 text-sm sm:text-base">
-                                                        USD {lkrToUsd(destination.vehicle_price_up_to_3)}
+                                                        USD {formatUsd(destination.vehicle_price_up_to_3)}
                                                     </span>
                                                 </div>
                                             </div>

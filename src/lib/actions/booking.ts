@@ -3,10 +3,11 @@
 import { bookingSchema, BookingFormData } from '@/lib/schemas/booking';
 import { supabaseAdmin } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
+import { SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE } from '@/lib/constants';
+import { getExtraHourPriceUsd } from '@/lib/settings';
 
-// Helper to calculate price implementation
+// All amounts in USD. Destination ticket_price and vehicle_price_up_to_3 are stored in USD.
 async function calculatePrice(data: BookingFormData) {
-    // Fetch destination pricing
     const { data: dest } = await supabaseAdmin
         .from('destinations')
         .select('*')
@@ -15,40 +16,31 @@ async function calculatePrice(data: BookingFormData) {
 
     if (!dest) throw new Error("Destination not found");
 
-    // Fetch extra hour price from settings
-    // Ideally this should be cached or fetched once
-    // For now assuming 5000 or fetching
-    const { data: settings } = await supabaseAdmin
-        .from('settings')
-        .select('value')
-        .eq('key', 'extra_hour_price')
-        .single();
-
-    const extraHourPrice = settings ? parseInt(settings.value) : 5000;
-
-    const vehicleCount = Math.ceil(data.group_size / 3);
+    const vehicleCount = Math.ceil(data.group_size / SAFARI_MAX_GROUP_SIZE);
     const vehicleCost = vehicleCount * dest.vehicle_price_up_to_3;
 
     let ticketCost = 0;
     if (dest.ticket_pricing_type === 'per_person') {
         ticketCost = dest.ticket_price * data.group_size;
     } else {
-        // flat rate? implied per jeep usually but assume flat per group or similar?
-        ticketCost = dest.ticket_price * data.group_size;
+        ticketCost = dest.ticket_price;
     }
 
-    const extraHoursCost = data.extra_hours * extraHourPrice * vehicleCount; // Extra hours per jeep? Usually yes.
+    const extraHourPriceUsd = await getExtraHourPriceUsd();
+    const extraHoursCost = data.extra_hours * extraHourPriceUsd * vehicleCount;
+    const extraPersonCount = Math.max(0, data.group_size - 3);
+    const extraPersonCostUsd = extraPersonCount * SAFARI_EXTRA_PERSON_USD;
 
-    // We only charge for the safari jeep (+ extra hours). Entrance tickets are paid at the park gate.
-    const ourCharge = vehicleCost + extraHoursCost;
+    const ourCharge = vehicleCost + extraHoursCost + extraPersonCostUsd;
 
     return {
         tickets: ticketCost,
         vehicle: vehicleCost,
         extra_hours: extraHoursCost,
-        total: ourCharge, // Jeep + extra only; tickets paid at gate
+        extra_person: extraPersonCostUsd,
+        total: ourCharge,
         vehicle_count: vehicleCount,
-        currency: 'LKR'
+        currency: 'USD'
     };
 }
 

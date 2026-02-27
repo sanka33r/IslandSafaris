@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase';
+import { getExtraHourPriceUsd } from '@/lib/settings';
 import BookingCalendar from '@/components/admin/BookingCalendar';
 
 export const revalidate = 0;
@@ -29,7 +30,7 @@ export default async function AdminCalendarPage({ searchParams }: PageProps) {
 
     const { data: bookings, error } = await supabaseAdmin
         .from('bookings')
-        .select('*, destinations(name)')
+        .select('*, destinations(name, ticket_price, ticket_pricing_type, vehicle_price_up_to_3)')
         .gte('date', start)
         .lte('date', end)
         .order('date', { ascending: true })
@@ -40,5 +41,6 @@ export default async function AdminCalendarPage({ searchParams }: PageProps) {
         return <div className="text-red-500">Error loading bookings</div>;
     }
 
-    return <BookingCalendar bookings={bookings || []} currentMonth={monthParam} />;
+    const extraHourPriceUsd = await getExtraHourPriceUsd();
+    return <BookingCalendar bookings={bookings || []} currentMonth={monthParam} extraHourPriceUsd={extraHourPriceUsd} />;
 }

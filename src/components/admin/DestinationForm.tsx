@@ -177,7 +177,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full p-4 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 focus:bg-white outline-none transition-all"
+                                    className="w-full p-4 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 focus:bg-white outline-none transition-all text-safari-900 placeholder:text-safari-400"
                                     required
                                 />
                             </div>
@@ -187,7 +187,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                     type="text"
                                     value={formData.slug}
                                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                                    className="w-full p-4 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 focus:bg-white outline-none transition-all"
+                                    className="w-full p-4 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 focus:bg-white outline-none transition-all text-safari-900 placeholder:text-safari-400"
                                     required
                                 />
                             </div>
@@ -196,7 +196,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                 <textarea
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="w-full p-4 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 focus:bg-white outline-none transition-all min-h-[200px]"
+                                    className="w-full p-4 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 focus:bg-white outline-none transition-all min-h-[200px] text-safari-900 placeholder:text-safari-400"
                                     required
                                 />
                             </div>
@@ -210,13 +210,13 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                         value={descriptionSections.introTitle}
                                         onChange={(e) => setDescriptionSections({ ...descriptionSections, introTitle: e.target.value })}
                                         placeholder="Section title"
-                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all"
+                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all text-safari-900 placeholder:text-safari-400"
                                     />
                                     <textarea
                                         value={descriptionSections.introContent}
                                         onChange={(e) => setDescriptionSections({ ...descriptionSections, introContent: e.target.value })}
                                         placeholder="Section content"
-                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all min-h-[140px]"
+                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all min-h-[140px] text-safari-900 placeholder:text-safari-400"
                                     />
                                 </div>
 
@@ -227,14 +227,14 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                         value={descriptionSections.bestTimeMorning}
                                         onChange={(e) => setDescriptionSections({ ...descriptionSections, bestTimeMorning: e.target.value })}
                                         placeholder="Morning"
-                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all"
+                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all text-safari-900 placeholder:text-safari-400"
                                     />
                                     <input
                                         type="text"
                                         value={descriptionSections.bestTimeAfternoon}
                                         onChange={(e) => setDescriptionSections({ ...descriptionSections, bestTimeAfternoon: e.target.value })}
                                         placeholder="Afternoon"
-                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all"
+                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all text-safari-900 placeholder:text-safari-400"
                                     />
                                 </div>
 
@@ -245,13 +245,13 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                         value={descriptionSections.experienceTitle}
                                         onChange={(e) => setDescriptionSections({ ...descriptionSections, experienceTitle: e.target.value })}
                                         placeholder="Section title"
-                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all"
+                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all text-safari-900 placeholder:text-safari-400"
                                     />
                                     <textarea
                                         value={descriptionSections.experienceContent}
                                         onChange={(e) => setDescriptionSections({ ...descriptionSections, experienceContent: e.target.value })}
                                         placeholder="Section content"
-                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all min-h-[140px]"
+                                        className="w-full p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all min-h-[140px] text-safari-900 placeholder:text-safari-400"
                                     />
                                 </div>
 
@@ -267,7 +267,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                                     updated[idx] = e.target.value;
                                                     setDescriptionSections({ ...descriptionSections, migrationCycle: updated });
                                                 }}
-                                                className="flex-1 p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all"
+                                                className="flex-1 p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all text-safari-900 placeholder:text-safari-400"
                                             />
                                             <button
                                                 type="button"
@@ -311,7 +311,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                                     updated[idx] = e.target.value;
                                                     setDescriptionSections({ ...descriptionSections, whyChooseHurulu: updated });
                                                 }}
-                                                className="flex-1 p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all"
+                                                className="flex-1 p-3 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all text-safari-900 placeholder:text-safari-400"
                                             />
                                             <button
                                                 type="button"
@@ -349,27 +349,32 @@ export default function DestinationForm({ destination, images }: DestinationForm
                             <div className="space-y-6">
                                 <div className="flex items-center gap-3 text-safari-900 font-bold border-b border-safari-100 pb-2">
                                     <Ticket size={20} className="text-secondary-600" />
-                                    <span>Entrance Pricing</span>
+                                    <span>Entrance Ticket (paid at gate)</span>
                                 </div>
+                                <p className="text-sm text-safari-500">This price is shown to guests during booking as the approximate entrance ticket cost. Guests pay it separately at the park gate.</p>
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="block text-base font-bold text-safari-500 uppercase tracking-wider ml-1">Ticket Price (Rs.)</label>
+                                        <label className="block text-base font-bold text-safari-500 uppercase tracking-wider ml-1">
+                                            {formData.ticket_pricing_type === 'per_person' ? 'Entrance ticket price per person (USD)' : 'Entrance ticket price — flat total (USD)'}
+                                        </label>
                                         <input
                                             type="number"
+                                            min={0}
+                                            step={0.01}
                                             value={formData.ticket_price}
-                                            onChange={(e) => setFormData({ ...formData, ticket_price: parseInt(e.target.value) })}
-                                            className="w-full p-4 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all font-mono"
+                                            onChange={(e) => setFormData({ ...formData, ticket_price: parseFloat(e.target.value) || 0 })}
+                                            className="w-full p-4 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all font-mono text-safari-900 placeholder:text-safari-400"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-base font-bold text-safari-500 uppercase tracking-wider ml-1">Pricing Type</label>
+                                        <label className="block text-base font-bold text-safari-500 uppercase tracking-wider ml-1">Pricing type</label>
                                         <select
                                             value={formData.ticket_pricing_type}
-                                            onChange={(e) => setFormData({ ...formData, ticket_pricing_type: e.target.value as any })}
-                                            className="w-full p-4 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all"
+                                            onChange={(e) => setFormData({ ...formData, ticket_pricing_type: e.target.value as 'per_person' | 'flat' })}
+                                            className="w-full p-4 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all text-safari-900"
                                         >
-                                            <option value="per_person">Per Person</option>
-                                            <option value="flat">Flat Fee</option>
+                                            <option value="per_person">Per person</option>
+                                            <option value="flat">Flat (total at gate)</option>
                                         </select>
                                     </div>
                                 </div>
@@ -382,12 +387,14 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                 </div>
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="block text-base font-bold text-safari-500 uppercase tracking-wider ml-1">Jeep Price (up to 3 pax)</label>
+                                        <label className="block text-base font-bold text-safari-500 uppercase tracking-wider ml-1">Jeep price (up to 3 pax) (USD)</label>
                                         <input
                                             type="number"
+                                            min={0}
+                                            step={0.01}
                                             value={formData.vehicle_price_up_to_3}
-                                            onChange={(e) => setFormData({ ...formData, vehicle_price_up_to_3: parseInt(e.target.value) })}
-                                            className="w-full p-4 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all font-mono"
+                                            onChange={(e) => setFormData({ ...formData, vehicle_price_up_to_3: parseFloat(e.target.value) || 0 })}
+                                            className="w-full p-4 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all font-mono text-safari-900 placeholder:text-safari-400"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -396,7 +403,7 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                             type="number"
                                             value={formData.standard_duration_hours}
                                             onChange={(e) => setFormData({ ...formData, standard_duration_hours: parseInt(e.target.value) })}
-                                            className="w-full p-4 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all font-mono"
+                                            className="w-full p-4 bg-safari-50/50 rounded-2xl border border-safari-100 focus:border-secondary-500 outline-none transition-all font-mono text-safari-900 placeholder:text-safari-400"
                                         />
                                     </div>
                                 </div>
@@ -515,14 +522,14 @@ export default function DestinationForm({ destination, images }: DestinationForm
                                         placeholder="https://res.cloudinary.com/... or any image URL"
                                         value={newImageUrl}
                                         onChange={(e) => setNewImageUrl(e.target.value)}
-                                        className="w-full p-3 bg-safari-50 rounded-xl border border-safari-100 text-base outline-none focus:border-secondary-500"
+                                        className="w-full p-3 bg-safari-50 rounded-xl border border-safari-100 text-base outline-none focus:border-secondary-500 text-safari-900 placeholder:text-safari-400"
                                     />
                                     <input
                                         type="text"
                                         placeholder="Alt text (optional, e.g. Elephant at waterhole)"
                                         value={newImageAlt}
                                         onChange={(e) => setNewImageAlt(e.target.value)}
-                                        className="w-full p-3 bg-safari-50 rounded-xl border border-safari-100 text-base outline-none focus:border-secondary-500"
+                                        className="w-full p-3 bg-safari-50 rounded-xl border border-safari-100 text-base outline-none focus:border-secondary-500 text-safari-900 placeholder:text-safari-400"
                                     />
                                     <button
                                         onClick={handleAddImage}
