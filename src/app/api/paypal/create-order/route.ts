@@ -38,8 +38,12 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ orderId });
     } catch (err) {
+        // Log full error server-side (visible in Vercel/server logs)
         console.error('PayPal create-order error:', err);
-        const message = err instanceof Error ? err.message : 'Failed to create order';
-        return NextResponse.json({ error: message }, { status: 500 });
+        // Return a generic message to the client — never expose API/stack details to users
+        return NextResponse.json(
+            { error: 'Payment is temporarily unavailable. Please try again later or contact us.' },
+            { status: 500 }
+        );
     }
 }

@@ -39,8 +39,12 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ success: true, captureId: result.captureId, bookingId });
     } catch (err) {
+        // Log full error server-side (visible in Vercel/server logs)
         console.error('PayPal capture-order error:', err);
-        const message = err instanceof Error ? err.message : 'Failed to capture payment';
-        return NextResponse.json({ error: message }, { status: 500 });
+        // Return a generic message to the client — never expose API/stack details to users
+        return NextResponse.json(
+            { error: 'Payment could not be completed. Please try again or contact us.' },
+            { status: 500 }
+        );
     }
 }

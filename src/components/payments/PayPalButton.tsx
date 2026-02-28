@@ -38,6 +38,16 @@ export default function PayPalButton({
     const [loading, setLoading] = useState(true);
     const [paid, setPaid] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Never show raw API/JSON errors to users; show a safe fallback
+    const safeErrorMessage = (msg: string): string => {
+        if (!msg || msg.length > 200) return 'Payment is temporarily unavailable. Please try again or contact us.';
+        if (/^\s*\{[\s\S]*\}\s*$/.test(msg) || msg.includes('"debug_id"') || msg.includes('UNPROCESSABLE_ENTITY')) {
+            return 'Payment is temporarily unavailable. Please try again or contact us.';
+        }
+        return msg;
+    };
+
     // Track whether buttons have been rendered to prevent double-initialization
     // (React StrictMode fires effects twice in development)
     const renderedRef = useRef(false);
@@ -101,7 +111,10 @@ export default function PayPalButton({
                                 body: JSON.stringify({ bookingId }),
                             });
                             const data = await res.json();
-                            if (!res.ok) throw new Error(data.error || 'Failed to create order');
+                            if (!res.ok) {
+                                const userMsg = safeErrorMessage(data.error || 'Failed to create order');
+                                throw new Error(userMsg);
+                            }
                             return data.orderId;
                         },
                         onApprove: async (data: { orderID: string }) => {
@@ -112,15 +125,16 @@ export default function PayPalButton({
                             });
                             const result = await res.json();
                             if (!res.ok) {
-                                onError?.(result.error || 'Payment failed');
-                                setError(result.error || 'Payment failed');
+                                const userMsg = safeErrorMessage(result.error || 'Payment failed');
+                                onError?.(userMsg);
+                                setError(userMsg);
                                 return;
                             }
                             setPaid(true);
                             onSuccess?.();
                         },
                         onError: (err: Error) => {
-                            const msg = err?.message || 'PayPal error';
+                            const msg = safeErrorMessage(err?.message || 'PayPal error');
                             setError(msg);
                             onError?.(msg);
                         },
@@ -132,7 +146,7 @@ export default function PayPalButton({
                         if (!cancelled) {
                             const msg: string = err?.message ?? '';
                             if (!msg.toLowerCase().includes('zoid')) {
-                                setError(msg || 'Could not load PayPal');
+                                setError(safeErrorMessage(msg || 'Could not load PayPal'));
                             }
                         }
                     })
@@ -142,7 +156,7 @@ export default function PayPalButton({
             })
             .catch((err) => {
                 if (!cancelled) {
-                    setError(err?.message || 'PayPal not available');
+                    setError(safeErrorMessage(err?.message || 'PayPal not available'));
                     setLoading(false);
                 }
             });
