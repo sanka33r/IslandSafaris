@@ -261,7 +261,7 @@ export default async function HomePage() {
                 title: 'Bicycle Rent',
                 tagline: 'Explore Freely',
                 price: '5',
-                image: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&q=80',
+                image: 'https://res.cloudinary.com/dxau42ovy/image/upload/v1772218312/24ba6f02-8af7-46af-9563-d882218b1916.png',
                 href: '/packages/bicycle-rent',
               },
             ].map((pkg) => (
