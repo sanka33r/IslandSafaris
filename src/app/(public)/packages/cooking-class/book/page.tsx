@@ -1,12 +1,19 @@
 import BookingForm from '@/components/booking/BookingForm';
 import { Calendar, Shield, HeadphonesIcon } from 'lucide-react';
+import { notFound } from 'next/navigation';
+import { getVisiblePackageBySlug } from '@/lib/packages';
+import { buildMetadata } from '@/lib/seo';
 
-export const metadata = {
-    title: 'Book Cooking Class | Island Safaris Sri Lanka',
-    description: 'Book your Organic Cooking Experience with Island Safaris. Secure your spot with just USD 5 advance payment.',
-};
+export const metadata = buildMetadata({
+    title: 'Book Organic Cooking Experience Sigiriya',
+    description: 'Secure your Organic Cooking Experience in Sigiriya with easy online booking and local support for timing, pickups, and dietary preferences.',
+    path: '/packages/cooking-class/booking',
+});
 
-export default function CookingClassBookingPage() {
+export default async function CookingClassBookingPage() {
+    const pkg = await getVisiblePackageBySlug('cooking-class');
+    if (!pkg) notFound();
+
     return (
         <div className="bg-secondary-50 min-h-screen py-12 sm:py-16 md:py-20">
             <div className="container mx-auto px-4 sm:px-6">
@@ -40,7 +47,7 @@ export default function CookingClassBookingPage() {
                     <div className="space-y-6">
                         {/* Why Book With Us */}
                         <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-safari-100 shadow-sm">
-                            <h3 className="text-xl font-bold text-safari-900 mb-6">Why Book With Us</h3>
+                            <h2 className="text-xl font-bold text-safari-900 mb-6">Why Book With Us</h2>
                             <div className="space-y-6">
                                 <div className="flex items-start gap-4">
                                     <div className="w-10 h-10 bg-secondary-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -66,15 +73,15 @@ export default function CookingClassBookingPage() {
 
                         {/* Contact Info */}
                         <div className="bg-gradient-to-br from-safari-900 to-safari-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-white">
-                            <h3 className="text-xl font-bold mb-4">Need Help?</h3>
+                            <h2 className="text-xl font-bold mb-4">Need Help?</h2>
                             <div className="space-y-3 text-sm">
                                 <div>
                                     <div className="text-safari-400 text-xs mb-1">WhatsApp / Phone</div>
-                                    <div className="font-semibold">+94 77 000 0000</div>
+                                    <div className="font-semibold">0707682401</div>
                                 </div>
                                 <div>
                                     <div className="text-safari-400 text-xs mb-1">Email</div>
-                                    <div className="font-semibold">info@islandsafaris.com</div>
+                                    <div className="font-semibold">islandsafariessrilanka@gmail.com</div>
                                 </div>
                             </div>
                         </div>

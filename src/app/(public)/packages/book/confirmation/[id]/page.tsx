@@ -3,11 +3,14 @@ import { notFound } from 'next/navigation';
 import { CheckCircle, Calendar, Clock, Users, MapPin, Mail, Phone, Globe, ArrowLeft, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import PaymentSection from '@/components/payments/PaymentSection';
+import { buildMetadata } from '@/lib/seo';
 
-export const metadata = {
-    title: 'Booking Confirmation | Island Safaris Sri Lanka',
-    description: 'Your booking has been confirmed. Thank you for choosing Island Safaris!',
-};
+export const metadata = buildMetadata({
+    title: 'Booking Confirmation',
+    description: 'Review your booking details and payment status for your Island Safaris experience.',
+    path: '/packages/booking/confirmation',
+    noIndex: true,
+});
 
 const PACKAGE_NAMES = {
     'cooking-class': 'Organic Cooking Experience',
@@ -57,37 +60,24 @@ export default async function BookingConfirmationPage(props: ConfirmationPagePro
 
                 {/* Header — varies by payment state */}
                 <div className="text-center mb-10 sm:mb-12">
-                    {isPaymentPending ? (
-                        <>
-                            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-amber-100 rounded-full mb-6">
-                                <CreditCard size={40} className="text-amber-600" />
-                            </div>
-                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-safari-900 mb-4">
-                                Complete Your{' '}
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-400">
-                                    Payment
-                                </span>
-                            </h1>
-                            <p className="text-safari-600 text-base sm:text-lg max-w-2xl mx-auto">
-                                Your booking details have been saved. Please complete the advance payment below to confirm your booking.
-                            </p>
-                        </>
-                    ) : (
-                        <>
-                            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-green-100 rounded-full mb-6">
-                                <CheckCircle size={40} className="text-green-600" />
-                            </div>
-                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-safari-900 mb-4">
-                                Booking{' '}
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-green-500">
-                                    Confirmed!
-                                </span>
-                            </h1>
-                            <p className="text-safari-600 text-base sm:text-lg max-w-2xl mx-auto">
-                                Thank you for booking with Island Safaris. We&apos;ve received your payment and will send final details shortly.
-                            </p>
-                        </>
-                    )}
+                    <div className={`inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-6 ${isPaymentPending ? 'bg-amber-100' : 'bg-green-100'}`}>
+                        {isPaymentPending ? (
+                            <CreditCard size={40} className="text-amber-600" />
+                        ) : (
+                            <CheckCircle size={40} className="text-green-600" />
+                        )}
+                    </div>
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-safari-900 mb-4">
+                        {isPaymentPending ? 'Complete Your ' : 'Booking '}
+                        <span className={`text-transparent bg-clip-text bg-gradient-to-r ${isPaymentPending ? 'from-amber-500 to-amber-400' : 'from-green-600 to-green-500'}`}>
+                            {isPaymentPending ? 'Payment' : 'Confirmed!'}
+                        </span>
+                    </h1>
+                    <p className="text-safari-600 text-base sm:text-lg max-w-2xl mx-auto">
+                        {isPaymentPending
+                            ? 'Your booking details have been saved. Please complete the advance payment below to confirm your booking.'
+                            : "Thank you for booking with Island Safaris. We've received your payment and will send final details shortly."}
+                    </p>
                 </div>
 
                 {/* Booking Reference */}

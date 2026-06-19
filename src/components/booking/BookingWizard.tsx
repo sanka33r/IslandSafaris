@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 import { Destination } from '@/types/db';
 import { submitBooking } from '@/lib/actions/booking';
 import { validatePromoCode } from '@/lib/actions/promo-codes';
@@ -605,6 +606,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                                         <input
                                             type="text"
                                             placeholder="Full Name"
+                                            autoComplete="name"
                                             className={cn(
                                                 "w-full p-3 rounded-lg border text-safari-900 placeholder:text-safari-500 focus:ring-2 focus:ring-secondary-500 outline-none",
                                                 stepErrors[4]?.customer_name ? "border-red-400" : "border-safari-200"
@@ -620,6 +622,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                                         <input
                                             type="email"
                                             placeholder="Email Address"
+                                            autoComplete="email"
                                             className={cn(
                                                 "w-full p-3 rounded-lg border text-safari-900 placeholder:text-safari-500 focus:ring-2 focus:ring-secondary-500 outline-none",
                                                 stepErrors[4]?.email ? "border-red-400" : "border-safari-200"
@@ -654,6 +657,8 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                                             <input
                                                 type="tel"
                                                 placeholder="Phone Number"
+                                                autoComplete="tel"
+                                                inputMode="tel"
                                                 className={cn(
                                                     "flex-1 p-3 rounded-lg border text-safari-900 placeholder:text-safari-500 focus:ring-2 focus:ring-secondary-500 outline-none",
                                                     stepErrors[4]?.phone ? "border-red-400" : "border-safari-200"
@@ -750,6 +755,22 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
 
                                 <div className="bg-safari-50 border border-safari-200 p-4 rounded-xl text-sm text-safari-800">
                                     <p><strong>Entrance ticket:</strong> Paid separately by you at the park entrance gate. We only charge for the safari jeep; the remaining balance shown is for the jeep (pay at destination).</p>
+                                </div>
+
+                                <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-sm text-amber-900">
+                                    Peak season departures can fill quickly. Confirming now helps secure your preferred date and time.
+                                </div>
+
+                                <div className="bg-secondary-50 border border-secondary-100 p-4 rounded-xl flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
+                                    <p className="text-sm font-medium text-safari-800">Need help before you confirm?</p>
+                                    <Link
+                                        href={`https://wa.me/94707682401?text=${encodeURIComponent(`Hi! I need help finalizing my safari booking for ${selectedDest?.name || 'a Sri Lanka safari'}.`)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-sm font-bold text-secondary-700 hover:text-secondary-800"
+                                    >
+                                        Chat on WhatsApp
+                                    </Link>
                                 </div>
                             </div>
                         )}

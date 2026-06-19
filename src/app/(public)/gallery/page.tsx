@@ -2,12 +2,18 @@ import { supabasePublic } from '@/lib/supabase';
 import { Image } from '@/types/db';
 import { Camera, MapPin } from 'lucide-react';
 import Link from 'next/link';
+import NextImage from 'next/image';
+import { buildMetadata } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
+import { breadcrumbSchema, faqSchema } from '@/lib/schema';
+import { optimizeCloudinaryUrl } from '@/lib/images';
 
 export const revalidate = 3600;
-export const metadata = {
-    title: 'Gallery | Island Safaris Sri Lanka',
-    description: 'Explore stunning wildlife photography from our safaris in Minneriya, Kaudulla, and Hurulu Eco Park.',
-};
+export const metadata = buildMetadata({
+    title: 'Safari Gallery: Minneriya, Kaudulla, Hurulu',
+    description: 'Browse real safari moments from Minneriya elephant gatherings, Kaudulla wildlife drives, and Hurulu Eco Park adventures before you book.',
+    path: '/gallery',
+});
 
 async function getImagesWithDestinations() {
     const { data: images, error } = await supabasePublic
@@ -35,6 +41,22 @@ async function getImagesWithDestinations() {
 
 export default async function GalleryPage() {
     const images = await getImagesWithDestinations();
+    const schemas = [
+        breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Gallery', path: '/gallery' },
+        ]),
+        faqSchema([
+            {
+                question: 'Are these real safari photos?',
+                answer: 'Yes. Gallery images are captured from actual Island Safaris experiences across Sri Lanka safari destinations.',
+            },
+            {
+                question: 'Can I book the same destinations shown in the gallery?',
+                answer: 'Yes. You can explore destination pages and book safaris directly online.',
+            },
+        ]),
+    ];
 
     // Create masonry-style sizing (assign sizes based on index pattern)
     const getSizeClass = (index: number) => {
@@ -46,6 +68,9 @@ export default async function GalleryPage() {
 
     return (
         <div className="min-h-screen bg-secondary-50">
+            {schemas.map((schema, index) => (
+                <JsonLd key={`gallery-schema-${index}`} data={schema} />
+            ))}
             {/* Hero Header */}
             <div className="relative py-24 md:py-32 bg-gradient-to-br from-safari-900 via-safari-800 to-safari-900 overflow-hidden">
                 
@@ -69,7 +94,7 @@ export default async function GalleryPage() {
                         <div className="w-24 h-24 bg-safari-100 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Camera size={40} className="text-safari-300" />
                         </div>
-                        <h3 className="text-2xl font-bold text-safari-900 mb-2">No Photos Yet</h3>
+                        <h2 className="text-2xl font-bold text-safari-900 mb-2">No Photos Yet</h2>
                         <p className="text-safari-600 mb-8">Our gallery is being curated. Check back soon for stunning wildlife photography!</p>
                         <Link 
                             href="/destinations" 
@@ -87,10 +112,12 @@ export default async function GalleryPage() {
                                     key={img.id} 
                                     className={`group relative overflow-hidden rounded-2xl bg-safari-200 cursor-pointer ${getSizeClass(index)}`}
                                 >
-                                    <img
-                                        src={img.secure_url}
-                                        alt={img.alt_text || 'Safari Image'}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    <NextImage
+                                        src={optimizeCloudinaryUrl(img.secure_url, { width: 1200, quality: 70 })}
+                                        alt={img.alt_text || `Sri Lanka safari wildlife photo${img.destination ? ` from ${img.destination.name}` : ''}`}
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                        className="object-cover transition-transform duration-700 group-hover:scale-110"
                                     />
                                     
                                     {/* Overlay */}
@@ -126,7 +153,7 @@ export default async function GalleryPage() {
 
                         {/* View by Destination */}
                         <div className="mt-16 text-center">
-                            <h3 className="text-2xl font-bold text-safari-900 mb-6">View by Destination</h3>
+                            <h2 className="text-2xl font-bold text-safari-900 mb-6">View by Destination</h2>
                             <div className="flex flex-wrap justify-center gap-4">
                                 <Link 
                                     href="/destinations/minneriya-national-park" 

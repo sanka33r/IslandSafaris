@@ -274,6 +274,11 @@
   animation: shimmer 1.5s infinite;
 }
 
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 900px;
+}
+
 /* Focus states */
 button:focus-visible,
 a:focus-visible,
@@ -296,5 +301,16 @@ textarea:focus-visible {
 
   html {
     scroll-behavior: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-particle,
+  .hero-mist-drift,
+  .hero-mist-drift-slow,
+  .hero-btn-shine,
+  .hero-text-shimmer,
+  .bird-fly {
+    animation: none !important;
   }
 }

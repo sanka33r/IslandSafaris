@@ -6,20 +6,21 @@ import { Menu, X, Compass, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
-
-const navItems = [
-    { name: 'Home', href: '/' },
-    { name: 'Destinations', href: '/destinations' },
-    { name: 'Packages', href: '/packages' },
-    { name: 'Gallery', href: '/gallery' },
-    { name: 'About Us', href: '/about' },
-    { name: 'Contact', href: '/contact' },
-];
+import { useLocale } from '@/providers/LocaleProvider';
 
 export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const pathname = usePathname();
+    const { messages } = useLocale();
+    const navItems = [
+        { name: messages.nav.home, href: '/' },
+        { name: messages.nav.destinations, href: '/destinations' },
+        { name: messages.nav.packages, href: '/packages' },
+        { name: messages.nav.gallery, href: '/gallery' },
+        { name: messages.nav.about, href: '/about' },
+        { name: messages.nav.contact, href: '/contact' },
+    ];
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -82,7 +83,7 @@ export default function Header() {
                                 href="/booking"
                                 className="group flex items-center gap-2 pl-6 pr-2 py-2 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 active:scale-95 text-white"
                             >
-                                <span className="text-secondary-100 group-hover:text-white transition-colors">Book Now</span>
+                                <span className="text-secondary-100 group-hover:text-white transition-colors">{messages.nav.bookNow}</span>
                                 <div className="w-8 h-8 rounded-full bg-secondary-600 flex items-center justify-center group-hover:bg-secondary-500 transition-colors shadow-lg shadow-secondary-900/50">
                                     <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
                                 </div>
@@ -166,7 +167,7 @@ export default function Header() {
                                     onClick={() => setIsOpen(false)}
                                     className="inline-flex items-center gap-4 bg-secondary-600 text-white py-4 px-10 rounded-full text-lg font-bold shadow-xl shadow-secondary-900/50 hover:bg-secondary-500 active:scale-95 transition-all w-full justify-center group"
                                 >
-                                    Book Your Safari
+                                    {messages.nav.bookSafari}
                                     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                                 </Link>
                             </motion.div>

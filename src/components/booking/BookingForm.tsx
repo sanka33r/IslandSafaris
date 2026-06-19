@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Calendar, Clock, Users, MapPin, Mail, Phone, Globe, MessageSquare, Loader2, CheckCircle, AlertCircle, ExternalLink, Tag, ChevronDown } from 'lucide-react';
 import { validatePromoCode } from '@/lib/actions/promo-codes';
+import Link from 'next/link';
 
 interface BookingFormProps {
     preselectedPackage?: 'cooking-class' | 'village-tour' | 'bicycle-rent';
@@ -49,6 +50,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [packageInfo, setPackageInfo] = useState(PACKAGE_INFO);
 
     const [showPromoCode, setShowPromoCode] = useState(false);
 
@@ -79,9 +81,26 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
 
     // ... existing state ...
 
-    const selectedPackage = PACKAGE_INFO[formData.package_type as keyof typeof PACKAGE_INFO];
+    const selectedPackage = packageInfo[formData.package_type as keyof typeof packageInfo];
     const basePrice = selectedPackage.price * formData.group_size;
     const totalPrice = discount ? Math.max(0, basePrice - discount.amount) : basePrice;
+
+    useEffect(() => {
+        const loadPackagePricing = async () => {
+            try {
+                const response = await fetch('/api/packages/pricing', { method: 'GET' });
+                if (!response.ok) return;
+                const data = await response.json();
+                if (data?.packageInfo) {
+                    setPackageInfo(data.packageInfo);
+                }
+            } catch (fetchError) {
+                console.error('Failed to load package pricing:', fetchError);
+            }
+        };
+
+        loadPackagePricing();
+    }, []);
 
     // Reset discount when package or group size changes
     // We can use useEffect or just reset it in the onChange handlers (which is cumbersome)
@@ -223,7 +242,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
             }
 
             // Redirect to confirmation page
-            router.push(`/packages/book/confirmation/${data.id}`);
+            router.push(`/packages/booking/confirmation/${data.id}`);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Something went wrong');
             setLoading(false);
@@ -238,6 +257,20 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
 
     return (
         <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="bg-secondary-50 border border-secondary-100 rounded-2xl p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <p className="text-sm font-semibold text-safari-900">Quick booking: usually takes under 2 minutes.</p>
+                    <Link
+                        href="https://wa.me/94707682401?text=Hi!%20I%20want%20help%20with%20my%20booking."
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-bold text-secondary-700 hover:text-secondary-800"
+                    >
+                        Prefer WhatsApp booking help?
+                    </Link>
+                </div>
+            </div>
+
             {error && (
                 <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
                     <AlertCircle size={20} className="text-red-600 flex-shrink-0 mt-0.5" />
@@ -255,11 +288,13 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                         <div className="w-10 h-10 bg-secondary-100 rounded-full flex items-center justify-center">
                             <CheckCircle size={20} className="text-secondary-600" />
                         </div>
-                        <h3 className="text-xl font-bold text-safari-900">Select Experience</h3>
+                        <h2 className="text-xl font-bold text-safari-900">Select Experience</h2>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                        {Object.entries(PACKAGE_INFO).map(([key, info]) => (
+                        {Object.entries(packageInfo)
+                            .filter(([, info]) => info.visible !== false)
+                            .map(([key, info]) => (
                             <button
                                 key={key}
                                 type="button"
@@ -277,7 +312,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                                 <div className="text-secondary-600 font-bold text-lg sm:text-xl">USD {info.price}</div>
                                 <div className="text-safari-500 text-xs sm:text-sm mt-1">{info.duration}</div>
                             </button>
-                        ))}
+                            ))}
                     </div>
                 </div>
             )}
@@ -304,7 +339,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                     <div className="w-10 h-10 bg-secondary-100 rounded-full flex items-center justify-center">
                         <Calendar size={20} className="text-secondary-600" />
                     </div>
-                    <h3 className="text-xl font-bold text-safari-900">Date & Time</h3>
+                    <h2 className="text-xl font-bold text-safari-900">Date & Time</h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
@@ -382,7 +417,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                         <div className="w-10 h-10 bg-secondary-100 rounded-full flex items-center justify-center">
                             <MapPin size={20} className="text-secondary-600" />
                         </div>
-                        <h3 className="text-xl font-bold text-safari-900">Pickup Details</h3>
+                        <h2 className="text-xl font-bold text-safari-900">Pickup Details</h2>
                     </div>
 
                     <label className="flex items-center gap-3 cursor-pointer mb-4 p-4 rounded-xl hover:bg-safari-50 transition-colors">
@@ -475,7 +510,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                     <div className="w-10 h-10 bg-secondary-100 rounded-full flex items-center justify-center">
                         <Mail size={20} className="text-secondary-600" />
                     </div>
-                    <h3 className="text-xl font-bold text-safari-900">Your Information</h3>
+                    <h2 className="text-xl font-bold text-safari-900">Your Information</h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
@@ -488,6 +523,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                             onChange={(e) => handleChange('customer_name', e.target.value)}
                             onBlur={handleBlur}
                             placeholder="John Doe"
+                            autoComplete="name"
                             className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border text-safari-900 placeholder:text-safari-500 focus:bg-white outline-none transition-all ${errors.customer_name ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
                         />
                         {errors.customer_name && <p className="text-red-500 text-xs ml-1">{errors.customer_name}</p>}
@@ -502,6 +538,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                             onChange={(e) => handleChange('email', e.target.value)}
                             onBlur={handleBlur}
                             placeholder="john@example.com"
+                            autoComplete="email"
                             className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border text-safari-900 placeholder:text-safari-500 focus:bg-white outline-none transition-all ${errors.email ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
                         />
                         {errors.email && <p className="text-red-500 text-xs ml-1">{errors.email}</p>}
@@ -534,6 +571,8 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                                     onChange={(e) => handleChange('phone', e.target.value)}
                                     onBlur={handleBlur}
                                     placeholder="771 234 567"
+                                    autoComplete="tel"
+                                    inputMode="tel"
                                     className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border text-safari-900 placeholder:text-safari-500 focus:bg-white outline-none transition-all ${errors.phone ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
                                 />
                                 {errors.phone && <p className="text-red-500 text-xs ml-1">{errors.phone}</p>}

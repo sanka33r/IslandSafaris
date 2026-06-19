@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, BarChart3, MessageSquare, MapPin, LogOut, Shield, Menu, X, CalendarDays, Tag, Settings } from 'lucide-react';
+import { LayoutDashboard, BarChart3, MessageSquare, MapPin, LogOut, Shield, Menu, X, CalendarDays, Tag, Settings, Compass } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -26,6 +26,7 @@ export default function AdminSidebar() {
         { name: 'Package Bookings', href: '/admin/package-bookings', icon: LayoutDashboard },
         { name: 'Calendar', href: '/admin/calendar', icon: CalendarDays },
         { name: 'Destinations', href: '/admin/destinations', icon: MapPin },
+        { name: 'Packages', href: '/admin/packages', icon: Compass },
         { name: 'Promo Codes', href: '/admin/promo-codes', icon: Tag },
         { name: 'Reviews', href: '/admin/reviews', icon: MessageSquare },
         { name: 'Settings', href: '/admin/settings', icon: Settings },

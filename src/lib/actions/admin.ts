@@ -2,6 +2,7 @@
 
 import { supabaseAdmin } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
+import { PACKAGE_SLUGS, upsertPackageOverride } from '@/lib/packages';
 
 export async function updateBookingStatus(id: string, status: 'new' | 'confirmed' | 'cancelled') {
     const { error } = await supabaseAdmin
@@ -167,5 +168,36 @@ export async function deleteDestinationImage(id: string) {
 
     revalidatePath('/admin/destinations');
     revalidatePath('/');
+    return { success: true };
+}
+
+export async function updatePackageOverride(
+    slug: string,
+    data: { price: number; visible: boolean }
+) {
+    if (!PACKAGE_SLUGS.includes(slug as (typeof PACKAGE_SLUGS)[number])) {
+        return { success: false, message: 'Invalid package slug' };
+    }
+
+    const parsedPrice = Number(data.price);
+    if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
+        return { success: false, message: 'Price must be a number greater than or equal to zero' };
+    }
+
+    const result = await upsertPackageOverride({
+        slug: slug as (typeof PACKAGE_SLUGS)[number],
+        price: parsedPrice,
+        visible: Boolean(data.visible),
+    });
+
+    if (!result.success) {
+        return result;
+    }
+
+    revalidatePath('/admin/packages');
+    revalidatePath('/packages');
+    revalidatePath('/packages/booking');
+    revalidatePath(`/packages/${slug}`);
+    revalidatePath(`/packages/${slug}/booking`);
     return { success: true };
 }

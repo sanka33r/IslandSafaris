@@ -2,22 +2,32 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
+import { useLocale } from '@/providers/LocaleProvider';
+import { optimizeCloudinaryUrl } from '@/lib/images';
 
 export default function HeroSection() {
     const heroRef = useRef<HTMLElement>(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [scrollY, setScrollY] = useState(0);
-    const [loaded, setLoaded] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+    const loaded = true;
+    const { messages } = useLocale();
 
     useEffect(() => {
-        setLoaded(true);
+        const updateViewport = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        updateViewport();
 
         const handleScroll = () => {
             setScrollY(window.scrollY);
         };
 
         const handleMouseMove = (e: MouseEvent) => {
+            if (isMobile) return;
             if (!heroRef.current) return;
             const rect = heroRef.current.getBoundingClientRect();
             const x = (e.clientX - rect.left) / rect.width - 0.5;
@@ -25,24 +35,28 @@ export default function HeroSection() {
             setMousePos({ x, y });
         };
 
+        window.addEventListener('resize', updateViewport, { passive: true });
         window.addEventListener('scroll', handleScroll, { passive: true });
-        window.addEventListener('mousemove', handleMouseMove, { passive: true });
+        if (!isMobile) {
+            window.addEventListener('mousemove', handleMouseMove, { passive: true });
+        }
 
         return () => {
+            window.removeEventListener('resize', updateViewport);
             window.removeEventListener('scroll', handleScroll);
             window.removeEventListener('mousemove', handleMouseMove);
         };
-    }, []);
+    }, [isMobile]);
 
-    const parallaxBg = scrollY * 0.4;
-    const parallaxMid = scrollY * 0.2;
-    const parallaxFg = scrollY * 0.1;
+    const parallaxBg = isMobile ? 0 : scrollY * 0.4;
+    const parallaxMid = isMobile ? 0 : scrollY * 0.2;
+    const parallaxFg = isMobile ? 0 : scrollY * 0.1;
 
     return (
         <section
             ref={heroRef}
             className="relative min-h-[100dvh] md:min-h-screen flex flex-col items-center justify-start md:justify-center overflow-hidden bg-safari-900 pt-24 sm:pt-28 md:pt-0 pb-20 sm:pb-24 md:pb-0 px-4 sm:px-6"
-            style={{ perspective: '1200px', backgroundColor: '#1e2b1b' }}
+            style={{ perspective: isMobile ? 'none' : '1200px', backgroundColor: '#1e2b1b' }}
         >
             {/* ── Deep Background Layer (moves slowest) ── */}
             <div
@@ -52,10 +66,13 @@ export default function HeroSection() {
                     transition: 'transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)',
                 }}
             >
-                <img
-                    src="https://res.cloudinary.com/dxau42ovy/image/upload/v1770663701/IMG_6199.JPG_mxebtr.jpg"
-                    alt="Sri Lankan safari wilderness"
-                    className="w-full h-full object-cover"
+                <Image
+                    src={optimizeCloudinaryUrl('https://res.cloudinary.com/dxau42ovy/image/upload/v1770663701/IMG_6199.JPG_mxebtr.jpg', { width: 1920, quality: 75 })}
+                    alt="Sri Lanka safari wilderness landscape with elephants"
+                    fill
+                    priority
+                    sizes="100vw"
+                    className="object-cover"
                 />
             </div>
 
@@ -79,7 +96,7 @@ export default function HeroSection() {
 
             {/* ── Floating Particles (fireflies/dust motes) ── */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                {[...Array(18)].map((_, i) => (
+                {[...Array(isMobile ? 8 : 18)].map((_, i) => (
                     <div
                         key={i}
                         className="hero-particle"
@@ -149,7 +166,7 @@ export default function HeroSection() {
                         <span className="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-secondary-400" />
                     </span>
                     <span className="text-secondary-200 text-xs sm:text-sm font-medium tracking-wide text-center">
-                        The Great Elephant Gathering Awaits
+                        {messages.hero.tag}
                     </span>
                 </div>
 
@@ -158,10 +175,10 @@ export default function HeroSection() {
                     className={`text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-[5.5rem] font-bold mb-4 sm:mb-6 md:mb-8 tracking-tight leading-[1.08] sm:leading-[1.05] transition-all duration-1000 delay-200 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                         }`}
                 >
-                    <span className="block">Discover the</span>
+                    <span className="block">{messages.hero.titleTop}</span>
                     <span className="relative inline-block">
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary-300 via-secondary-400 to-secondary-500 hero-text-shimmer">
-                            Wild Heart
+                            {messages.hero.titleHighlight}
                         </span>
                         {/* Animated underline accent */}
                         <span
@@ -169,9 +186,7 @@ export default function HeroSection() {
                                 }`}
                         />
                     </span>
-                    <span className="block">
-                        of Sri Lanka
-                    </span>
+                    <span className="block">{messages.hero.titleBottom}</span>
                 </h1>
 
                 {/* Description */}
@@ -179,8 +194,9 @@ export default function HeroSection() {
                     className={`text-base sm:text-lg md:text-xl text-white/70 mb-8 sm:mb-10 md:mb-12 font-light max-w-2xl mx-auto leading-relaxed px-1 sm:px-0 transition-all duration-1000 delay-400 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                         }`}
                 >
-                    Exclusive jeep safaris through the legendary Minneriya-Kaudulla-Hurulu corridor.
-                    Where hundreds of Asian elephants roam free.
+                    {messages.hero.descriptionTop}
+                    {' '}
+                    {messages.hero.descriptionBottom}
                 </p>
 
                 {/* CTA buttons */}
@@ -192,7 +208,7 @@ export default function HeroSection() {
                         href="/booking"
                         className="group relative bg-gradient-to-r from-secondary-600 to-secondary-500 hover:from-secondary-500 hover:to-secondary-400 text-white font-bold py-3.5 sm:py-4 px-8 sm:px-10 rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl shadow-secondary-900/50 active:scale-95 inline-flex items-center justify-center gap-2 sm:gap-3 overflow-hidden min-h-[44px] sm:min-h-0"
                     >
-                        <span className="relative z-10 text-sm sm:text-base">Book Your Safari</span>
+                        <span className="relative z-10 text-sm sm:text-base">{messages.hero.ctaBook}</span>
                         <ArrowRight size={18} className="relative z-10 group-hover:translate-x-1 transition-transform shrink-0 sm:w-5 sm:h-5" />
                         {/* Button shine effect */}
                         <div className="absolute inset-0 hero-btn-shine" />
@@ -201,7 +217,7 @@ export default function HeroSection() {
                         href="/destinations"
                         className="group bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold py-3.5 sm:py-4 px-6 sm:px-8 rounded-full transition-all duration-300 border border-white/20 hover:border-white/40 inline-flex items-center justify-center gap-2 min-h-[44px] sm:min-h-0 text-sm sm:text-base"
                     >
-                        Explore Destinations
+                        {messages.hero.ctaExplore}
                         <ArrowRight size={18} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                     </Link>
                 </div>
@@ -212,9 +228,9 @@ export default function HeroSection() {
                         }`}
                 >
                     {[
-                        { value: '300+', label: 'Elephants' },
-                        { value: '3', label: 'National Parks' },
-                        { value: '5★', label: 'Rated' },
+                        { value: '300+', label: messages.hero.statElephants },
+                        { value: '3', label: messages.hero.statParks },
+                        { value: '5★', label: messages.hero.statRated },
                     ].map((stat) => (
                         <div key={stat.label} className="text-center min-w-[4rem] sm:min-w-0">
                             <div className="text-xl sm:text-2xl md:text-3xl font-bold text-secondary-400">{stat.value}</div>

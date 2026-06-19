@@ -4,18 +4,21 @@ export const PACKAGE_INFO = {
         price: 22,
         duration: '4-5 Hours',
         advance: 5,
+        visible: true,
     },
     'village-tour': {
         name: 'Sigiriya Village Tour',
         price: 22,
         duration: '4-5 Hours',
         advance: 5,
+        visible: true,
     },
     'bicycle-rent': {
         name: 'Bicycle Rent',
         price: 5,
         duration: 'Flexible',
         advance: 5,
+        visible: true,
     },
 };
 
@@ -35,8 +38,9 @@ export function formatUsd(amount: number): string {
 
 /** Contact details shown in booking confirmation emails and contact page. */
 export const CONTACT_DETAILS = {
-    phone: '+94 77 000 0000',
-    email: 'info@islandsafaris.com',
+    phone: '0707682401',
+    phoneHref: '+94707682401',
+    email: 'islandsafariessrilanka@gmail.com',
     location: 'Habarana, Sri Lanka',
     locationNote: 'Main Safari Hub',
 };

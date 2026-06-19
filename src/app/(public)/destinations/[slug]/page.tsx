@@ -3,6 +3,7 @@
 import { useGlobalData } from '@/providers/GlobalDataProvider';
 import { notFound, useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { formatUsd } from '@/lib/constants';
 import {
@@ -15,6 +16,10 @@ import ReviewForm from '@/components/reviews/ReviewForm';
 import { useEffect, useState } from 'react';
 import { getApprovedReviews } from '@/lib/queries/reviews';
 import { Review } from '@/types/db';
+import JsonLd from '@/components/seo/JsonLd';
+import { breadcrumbSchema, faqSchema, reviewSchemas, touristTripSchema } from '@/lib/schema';
+import { optimizeCloudinaryUrl } from '@/lib/images';
+import BreadcrumbNav from '@/components/layout/BreadcrumbNav';
 
 const toTitle = (value: string) =>
     value
@@ -144,6 +149,109 @@ const renderDescriptionSections = (sections: Record<string, unknown>) => {
     );
 };
 
+const keywordIntroBySlug: Record<string, string> = {
+    'minneriya-national-park':
+        'This Minneriya elephant safari Sri Lanka route is ideal for travelers who want dramatic herd sightings with expert local timing.',
+    'kaudulla-national-park':
+        'Our Kaudulla safari Sri Lanka option is perfect for calmer game drives and close seasonal elephant encounters.',
+    'hurulu-eco-park':
+        'A Hurulu Eco Park safari offers forest-edge elephant viewing with fewer vehicles and a more intimate wild setting.',
+};
+
+type SafariLandingContent = {
+    intro: string;
+    wildlife: string[];
+    bestMonths: string;
+    duration: string;
+    pricing: string;
+    pickup: string;
+    faq: Array<{ q: string; a: string }>;
+};
+
+const safariContentBySlug: Record<string, SafariLandingContent> = {
+    'minneriya-national-park': {
+        intro:
+            'Book your Minneriya National Park Safari for the best chance to witness large elephant gatherings in Sri Lanka with private-jeep comfort and flexible pickup support.',
+        wildlife: [
+            'Large herds of Asian elephants, especially in dry months near the tank.',
+            'Peacocks, eagles, and water birds around open grassland and wetlands.',
+            'Macaques, deer, and occasional crocodile sightings in suitable zones.',
+        ],
+        bestMonths: 'July to September are typically peak months for Minneriya elephant activity.',
+        duration: 'Standard safari duration is around 3 to 4 hours depending on entry time and wildlife movement.',
+        pricing: 'Jeep pricing starts from the displayed base fare, while park entrance tickets are generally paid separately at the gate.',
+        pickup: 'Hotel pickup can be arranged from Sigiriya, Habarana, and nearby areas with confirmed booking details.',
+        faq: [
+            {
+                q: 'Is Minneriya the best park for elephant gathering season?',
+                a: 'During peak dry months, Minneriya is often the top choice for herd sightings, but final recommendation depends on recent movement.',
+            },
+            {
+                q: 'Can I book a same-day Minneriya safari?',
+                a: 'Same-day bookings may be possible based on jeep and driver availability, but early booking is strongly recommended.',
+            },
+        ],
+    },
+    'kaudulla-national-park': {
+        intro:
+            'Reserve your Kaudulla National Park Safari for quieter game drives, excellent elephant sightings, and private safari booking support in Sri Lanka.',
+        wildlife: [
+            'Seasonal elephant herds moving through grassland and water reservoirs.',
+            'Birdlife including storks, herons, and raptors near wetland edges.',
+            'Spotted deer, monkeys, and other dry-zone wildlife during drives.',
+        ],
+        bestMonths: 'October to November are commonly strong months for Kaudulla safari sightings.',
+        duration: 'Most Kaudulla safari drives run around 3 to 4 hours with timing adjusted for best light and activity.',
+        pricing: 'Private jeep fees are shown on this page; entrance fees are usually paid separately at the park entrance.',
+        pickup: 'Pickup is available from major nearby tourist towns with advance confirmation and clear meeting time.',
+        faq: [
+            {
+                q: 'Why choose Kaudulla over Minneriya?',
+                a: 'Kaudulla can offer better sightings in transition months and often provides a calmer safari atmosphere.',
+            },
+            {
+                q: 'Are private safaris available for couples or families?',
+                a: 'Yes, private-jeep bookings are suitable for couples, families, and small groups.',
+            },
+        ],
+    },
+    'hurulu-eco-park': {
+        intro:
+            'Book a Hurulu Eco Park Safari for a more intimate wildlife experience with forest-edge elephant encounters and flexible private-safari booking.',
+        wildlife: [
+            'Elephant movement through forest margins and open clearings.',
+            'Bird species, butterflies, and diverse dry-zone flora and fauna.',
+            'Monkey troops and other small mammals seen during calm game drives.',
+        ],
+        bestMonths: 'December to January are usually favorable for Hurulu Eco Park safari activity.',
+        duration: 'Typical safari duration is about 3 to 4 hours, with route adjustments based on tracking updates.',
+        pricing: 'Jeep rates start from the listed base price, and ticket charges are usually paid directly at the gate.',
+        pickup: 'Pickup can be arranged from nearby hotels and guesthouses, with timing confirmed after reservation.',
+        faq: [
+            {
+                q: 'Is Hurulu good for fewer-crowd safaris?',
+                a: 'Yes, Hurulu is often chosen by travelers seeking a quieter and more nature-immersive safari setting.',
+            },
+            {
+                q: 'Can your team advise which park to book?',
+                a: 'Absolutely. We provide park recommendations based on real-time seasonal movement before confirmation.',
+            },
+        ],
+    },
+};
+
+const safariNamesBySlug: Record<string, string> = {
+    'minneriya-national-park': 'Minneriya National Park Safari',
+    'kaudulla-national-park': 'Kaudulla National Park Safari',
+    'hurulu-eco-park': 'Hurulu Eco Park Safari',
+};
+
+const relatedSigiriyaExperiences = [
+    { href: '/packages/village-tour', label: 'Sigiriya Village Tour experience' },
+    { href: '/packages/cooking-class', label: 'Organic Cooking Experience in Sigiriya' },
+    { href: '/packages/bicycle-rental', label: 'Bicycle Rental around Sigiriya' },
+];
+
 export default function DestinationDetailPage() {
     const params = useParams();
     const slug = params?.slug as string;
@@ -182,10 +290,52 @@ export default function DestinationDetailPage() {
         destination.description_sections && typeof destination.description_sections === 'object'
             ? destination.description_sections
             : null;
+    const safariLandingContent = safariContentBySlug[destination.slug];
+    const relatedSafaris = Object.entries(safariNamesBySlug)
+        .filter(([entrySlug]) => entrySlug !== destination.slug)
+        .map(([entrySlug, name]) => ({ slug: entrySlug, name }));
+    const schemas = [
+        breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Destinations', path: '/destinations' },
+            { name: destination.name, path: `/destinations/${destination.slug}` },
+        ]),
+        touristTripSchema({
+            name: `${destination.name} Safari`,
+            description: destination.summary || destination.description,
+            path: `/destinations/${destination.slug}`,
+            price: destination.vehicle_price_up_to_3,
+            duration: `PT${destination.standard_duration_hours}H`,
+            location: destination.name,
+        }),
+        faqSchema([
+            {
+                question: `What is the safari jeep price for ${destination.name}?`,
+                answer: `Jeep pricing starts from USD ${formatUsd(destination.vehicle_price_up_to_3)} for private trips.`,
+            },
+            {
+                question: 'Are entrance tickets included?',
+                answer: 'Entrance tickets are generally paid separately at the park gate unless stated otherwise during booking.',
+            },
+        ]),
+        ...reviewSchemas(reviews, `${destination.name} Safari`, `/destinations/${destination.slug}`),
+    ];
 
 
     return (
         <div className="bg-safari-50 min-h-screen pb-20">
+            {schemas.map((schema, index) => (
+                <JsonLd key={`destination-schema-${index}`} data={schema} />
+            ))}
+            <div className="container mx-auto px-4 sm:px-6 pt-6">
+                <BreadcrumbNav
+                    items={[
+                        { label: 'Home', href: '/' },
+                        { label: 'Destinations', href: '/destinations' },
+                        { label: destination.name },
+                    ]}
+                />
+            </div>
             {/* Hero Header */}
             <div className="relative h-[55vh] min-h-[280px] sm:h-[65vh] md:h-[75vh] lg:h-[85vh] bg-safari-900 text-white overflow-hidden group">
                 <div className="absolute inset-0 bg-black/30 z-10" />
@@ -193,10 +343,13 @@ export default function DestinationDetailPage() {
                 <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent z-20" />
 
                 {heroImage ? (
-                    <img
-                        src={heroImage}
-                        alt={destination.name}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-[20s] ease-in-out group-hover:scale-110"
+                    <Image
+                        src={optimizeCloudinaryUrl(heroImage, { width: 1920, quality: 72 })}
+                        alt={`${destination.name} safari landscape in Sri Lanka`}
+                        fill
+                        priority
+                        sizes="100vw"
+                        className="absolute inset-0 object-cover transition-transform duration-[20s] ease-in-out group-hover:scale-110"
                     />
                 ) : (
                     <div className="absolute inset-0 bg-gradient-to-r from-safari-900/50 to-secondary-900/30" />
@@ -210,6 +363,11 @@ export default function DestinationDetailPage() {
                         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-9xl font-bold mb-4 sm:mb-6 font-display tracking-tight text-white drop-shadow-lg leading-tight px-1">
                             {destination.name}
                         </h1>
+                        {keywordIntroBySlug[destination.slug] ? (
+                            <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-2xl mx-auto leading-relaxed">
+                                {keywordIntroBySlug[destination.slug]}
+                            </p>
+                        ) : null}
                     </div>
                 </div>
 
@@ -297,6 +455,102 @@ export default function DestinationDetailPage() {
                                 );
                             })()}
                         </div>
+
+                        {safariLandingContent ? (
+                            <div className="mt-6 bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm border border-safari-100 space-y-6">
+                                <div>
+                                    <h2 className="text-xl sm:text-2xl font-bold text-safari-900 mb-3">Safari Introduction</h2>
+                                    <p className="text-safari-700 leading-relaxed">{safariLandingContent.intro}</p>
+                                </div>
+
+                                <div>
+                                    <h3 className="text-lg sm:text-xl font-bold text-safari-900 mb-3">Wildlife You Can Expect</h3>
+                                    <ul className="list-disc pl-6 space-y-2 text-safari-700">
+                                        {safariLandingContent.wildlife.map((item) => (
+                                            <li key={item}>{item}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="rounded-xl border border-safari-100 bg-safari-50 p-4">
+                                        <h3 className="font-bold text-safari-900 mb-2">Best Visiting Months</h3>
+                                        <p className="text-sm text-safari-700">{safariLandingContent.bestMonths}</p>
+                                    </div>
+                                    <div className="rounded-xl border border-safari-100 bg-safari-50 p-4">
+                                        <h3 className="font-bold text-safari-900 mb-2">Safari Duration</h3>
+                                        <p className="text-sm text-safari-700">{safariLandingContent.duration}</p>
+                                    </div>
+                                    <div className="rounded-xl border border-safari-100 bg-safari-50 p-4">
+                                        <h3 className="font-bold text-safari-900 mb-2">Pricing</h3>
+                                        <p className="text-sm text-safari-700">{safariLandingContent.pricing}</p>
+                                    </div>
+                                    <div className="rounded-xl border border-safari-100 bg-safari-50 p-4">
+                                        <h3 className="font-bold text-safari-900 mb-2">Pickup Information</h3>
+                                        <p className="text-sm text-safari-700">{safariLandingContent.pickup}</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 className="text-lg sm:text-xl font-bold text-safari-900 mb-3">Frequently Asked Questions</h3>
+                                    <div className="space-y-3">
+                                        {safariLandingContent.faq.map((item) => (
+                                            <details key={item.q} className="rounded-xl border border-safari-100 bg-white p-4">
+                                                <summary className="cursor-pointer font-semibold text-safari-900">{item.q}</summary>
+                                                <p className="mt-2 text-sm text-safari-700 leading-relaxed">{item.a}</p>
+                                            </details>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row gap-3">
+                                    <Link
+                                        href={`/booking?destination=${destination.slug}`}
+                                        className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-secondary-600 hover:bg-secondary-700 text-white font-bold transition-colors"
+                                    >
+                                        Book {destination.name} Safari
+                                    </Link>
+                                    <Link
+                                        href={`https://wa.me/94707682401?text=${encodeURIComponent(`Hi! I want to check availability for ${destination.name} safari.`)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center justify-center px-5 py-3 rounded-xl border border-safari-200 text-safari-900 font-semibold hover:bg-safari-50 transition-colors"
+                                    >
+                                        Check Availability on WhatsApp
+                                    </Link>
+                                </div>
+
+                                <div>
+                                    <h3 className="text-lg sm:text-xl font-bold text-safari-900 mb-3">Related Sri Lanka Safaris</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {relatedSafaris.map((item) => (
+                                            <Link
+                                                key={item.slug}
+                                                href={`/destinations/${item.slug}`}
+                                                className="inline-flex items-center px-3 py-2 rounded-full bg-safari-50 border border-safari-100 text-sm font-semibold text-safari-800 hover:bg-safari-100 transition-colors"
+                                            >
+                                                {item.name}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 className="text-lg sm:text-xl font-bold text-safari-900 mb-3">Related Sigiriya Experiences</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {relatedSigiriyaExperiences.map((item) => (
+                                            <Link
+                                                key={item.href}
+                                                href={item.href}
+                                                className="inline-flex items-center px-3 py-2 rounded-full bg-white border border-safari-200 text-sm font-semibold text-safari-800 hover:bg-safari-50 transition-colors"
+                                            >
+                                                {item.label}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        ) : null}
                     </div>
 
                     {/* Gallery - mobile: 2nd, lg: col 1 row 2 */}
@@ -317,9 +571,11 @@ export default function DestinationDetailPage() {
                                                 idx === 0 && "sm:col-span-2 sm:aspect-video"
                                             )}
                                         >
-                                            <img
-                                                src={image.secure_url}
-                                                alt={image.alt_text || destination.name}
+                                            <Image
+                                                src={optimizeCloudinaryUrl(image.secure_url, { width: 1200, quality: 70 })}
+                                                alt={image.alt_text || `${destination.name} wildlife safari photo`}
+                                                fill
+                                                sizes="(max-width: 768px) 50vw, 33vw"
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             />
                                             <div className="absolute inset-x-0 bottom-0 p-2 sm:p-4 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">

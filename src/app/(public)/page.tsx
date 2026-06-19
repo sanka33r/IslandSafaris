@@ -1,20 +1,248 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Star, Shield, Leaf, MapPin, Clock, Camera, ChevronRight } from 'lucide-react';
 import { getDestinationsWithImages } from '@/lib/queries/destinations';
 import { getApprovedReviews } from '@/lib/queries/reviews';
 import HeroSection from '@/components/home/HeroSection';
 import ReviewList from '@/components/reviews/ReviewList';
+import { getRequestLocale } from '@/i18n/locale';
+import { buildMetadata } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
+import { breadcrumbSchema, faqSchema, reviewSchemas, touristTripSchema } from '@/lib/schema';
+import { optimizeCloudinaryUrl } from '@/lib/images';
 
 export const revalidate = 3600;
+export const metadata = buildMetadata({
+  title: 'Minneriya Elephant Safari Sri Lanka',
+  description: 'Plan your Minneriya elephant safari in Sri Lanka with expert local guides, plus Kaudulla and Hurulu Eco Park options based on seasonal movement.',
+  path: '/',
+});
+
+const enCopy = {
+    migrationStory: 'The Migration Story',
+    rhythmTitle: 'The Rhythm of the Wild',
+    rhythmBody:
+      'Welcome to the heart of the Cultural Triangle, where the ancient pulse of nature dictates the journey. Unlike ordinary safari operators, we specialize in the Minneriya-Kaudulla-Hurulu Corridor - a vast, interconnected wilderness where hundreds of Asian elephants roam freely.',
+    whyBook: 'Why Book With Us?',
+    whyBookBody:
+      "Nature doesn't stay in one place, and neither do we. The Great Elephant Gathering is a seasonal masterpiece, and we ensure you're always in the front row. Our expert guides track the migration daily to bring you exactly where the magic is happening.",
+    corridorLabel: 'Elephant Corridor',
+    corridorParks: 'Minneriya • Kaudulla • Hurulu',
+    learnMore: 'Learn More About Us',
+    destinations: 'Destinations',
+    safariParks: 'Our Safari Parks',
+    parksBody: 'Discover the iconic parks of the elephant migration corridor',
+    viewAllParks: 'View All Parks',
+    nationalPark: 'National Park',
+    hours: 'Hours',
+    explore: 'Explore',
+    greatMigration: 'The Great Migration',
+    followElephants: 'Follow the Elephants',
+    migrationBody: "The herds move with the seasons. We know exactly where they'll be.",
+    peakSeason: 'Peak Season',
+    transition: 'Transition',
+    winterHaven: 'Winter Haven',
+    parkPeakMonth: 'Aug-Sep',
+    parkTransitionMonth: 'Oct-Nov',
+    parkWinterMonth: 'Dec-Jan',
+    minneBody:
+      'The legendary gathering peaks here. Up to 300 elephants congregate around the ancient tank as water sources dry up elsewhere.',
+    kaudullaBody:
+      'As rains fill the tanks, herds migrate north. Kaudulla offers intimate encounters with fewer crowds.',
+    huruluBody:
+      'The final leg of the migration. Dense forests create dramatic close encounters in golden morning light.',
+    timelinePeakMonth: 'Jul - Sep',
+    timelineTransitionMonth: 'Oct - Nov',
+    timelineWinterMonth: 'Dec - Jan',
+    timelineParkMinneriya: 'Minneriya',
+    timelineParkKaudulla: 'Kaudulla',
+    timelineParkHurulu: 'Hurulu Eco Park',
+    beyondSafari: 'Beyond the Safari',
+    experienceCulture: 'Experience The Culture',
+    viewAllExperiences: 'View All Experiences',
+    from: 'From',
+    perPerson: '/person',
+    pkgOrganicTitle: 'Organic Cooking',
+    pkgOrganicTagline: 'Farm to Table',
+    pkgVillageTitle: 'Village Tour',
+    pkgVillageTagline: 'Cultural Immersion',
+    pkgBicycleTitle: 'Bicycle Rent',
+    pkgBicycleTagline: 'Explore Freely',
+    whyChooseUs: 'Why Choose Us',
+    difference: 'The Island Safaris Difference',
+    differenceBody:
+      "We're not just tour operators-we're passionate naturalists dedicated to authentic wildlife experiences.",
+    topRated: 'Top Rated Service',
+    topRatedBody:
+      'Consistently rated 5-stars by travelers from around the world for our reliable, friendly, and knowledgeable service.',
+    safetyFirst: 'Safety First',
+    safetyFirstBody:
+      'Well-maintained 4x4 jeeps and experienced drivers ensure your safety while navigating the wild terrain.',
+    ecoConscious: 'Eco-Conscious',
+    ecoConsciousBody:
+      "We respect the wildlife and strictly adhere to park rules. It's their home-we're just the guests.",
+    travelerReviews: 'Traveler Reviews',
+    guestsSay: 'What Our Guests Say',
+    reviewsBody: 'Real experiences from visitors who explored the elephant corridor with us.',
+    readyAdventure: 'Ready for Your Adventure?',
+    ctaBody:
+      "Book your safari today and witness nature's greatest spectacle-the Great Elephant Gathering of Sri Lanka.",
+    bookNow: 'Book Now',
+    contactUs: 'Contact Us',
+  };
+
+const esCopy = {
+    migrationStory: 'La historia de la migracion',
+    rhythmTitle: 'El ritmo de la naturaleza',
+    rhythmBody:
+      'Bienvenido al corazon del Triangulo Cultural, donde el pulso de la naturaleza guia el viaje. Nos especializamos en el corredor Minneriya-Kaudulla-Hurulu, una gran zona silvestre conectada donde los elefantes asiaticos se mueven libremente.',
+    whyBook: 'Por que reservar con nosotros?',
+    whyBookBody:
+      'La naturaleza no se queda en un solo lugar, y nosotros tampoco. Nuestros guias expertos siguen la migracion cada dia para llevarte justo donde ocurre la magia.',
+    corridorLabel: 'Corredor de elefantes',
+    corridorParks: 'Minneriya • Kaudulla • Hurulu',
+    learnMore: 'Conoce mas sobre nosotros',
+    destinations: 'Destinos',
+    safariParks: 'Nuestros parques de safari',
+    parksBody: 'Descubre los parques iconicos del corredor de migracion de elefantes',
+    viewAllParks: 'Ver todos los parques',
+    nationalPark: 'Parque nacional',
+    hours: 'Horas',
+    explore: 'Explorar',
+    greatMigration: 'La gran migracion',
+    followElephants: 'Sigue a los elefantes',
+    migrationBody: 'Las manadas se mueven con las estaciones. Sabemos exactamente donde estaran.',
+    peakSeason: 'Temporada alta',
+    transition: 'Transicion',
+    winterHaven: 'Refugio de invierno',
+    parkPeakMonth: 'Ago-Sep',
+    parkTransitionMonth: 'Oct-Nov',
+    parkWinterMonth: 'Dic-Ene',
+    minneBody:
+      'La legendaria concentracion alcanza su punto maximo aqui. Hasta 300 elefantes se reunen alrededor del antiguo embalse.',
+    kaudullaBody:
+      'Cuando las lluvias llenan los embalses, las manadas migran al norte. Kaudulla ofrece encuentros mas cercanos y menos concurridos.',
+    huruluBody:
+      'La etapa final de la migracion. Los bosques densos crean encuentros espectaculares con luz dorada.',
+    timelinePeakMonth: 'Jul - Sep',
+    timelineTransitionMonth: 'Oct - Nov',
+    timelineWinterMonth: 'Dic - Ene',
+    timelineParkMinneriya: 'Minneriya',
+    timelineParkKaudulla: 'Kaudulla',
+    timelineParkHurulu: 'Parque Eco Hurulu',
+    beyondSafari: 'Mas alla del safari',
+    experienceCulture: 'Vive la cultura',
+    viewAllExperiences: 'Ver todas las experiencias',
+    from: 'Desde',
+    perPerson: '/persona',
+    pkgOrganicTitle: 'Cocina organica',
+    pkgOrganicTagline: 'De la huerta a la mesa',
+    pkgVillageTitle: 'Tour de aldea',
+    pkgVillageTagline: 'Inmersion cultural',
+    pkgBicycleTitle: 'Alquiler de bicicleta',
+    pkgBicycleTagline: 'Explora libremente',
+    whyChooseUs: 'Por que elegirnos',
+    difference: 'La diferencia de Island Safaris',
+    differenceBody:
+      'No somos solo operadores turisticos: somos amantes de la naturaleza dedicados a experiencias autenticas.',
+    topRated: 'Servicio mejor valorado',
+    topRatedBody:
+      'Valorado de forma constante con 5 estrellas por viajeros de todo el mundo por nuestro servicio confiable y amable.',
+    safetyFirst: 'Seguridad primero',
+    safetyFirstBody:
+      'Jeeps 4x4 bien mantenidos y conductores con experiencia garantizan tu seguridad en terrenos salvajes.',
+    ecoConscious: 'Eco-consciente',
+    ecoConsciousBody:
+      'Respetamos la vida silvestre y cumplimos estrictamente las normas del parque. Es su hogar, nosotros somos visitantes.',
+    travelerReviews: 'Resenas de viajeros',
+    guestsSay: 'Lo que dicen nuestros visitantes',
+    reviewsBody: 'Experiencias reales de visitantes que exploraron el corredor de elefantes con nosotros.',
+    readyAdventure: 'Listo para tu aventura?',
+    ctaBody:
+      'Reserva tu safari hoy y presencia el mayor espectaculo natural: la gran concentracion de elefantes de Sri Lanka.',
+    bookNow: 'Reservar ahora',
+    contactUs: 'Contactanos',
+  };
+
+const copyByLocale = {
+  en: enCopy,
+  es: esCopy,
+  ru: { ...enCopy, destinations: 'Направления', viewAllParks: 'Все парки', bookNow: 'Забронировать' },
+  fr: { ...enCopy, destinations: 'Destinations', viewAllParks: 'Voir tous les parcs', bookNow: 'Reserver' },
+  ja: { ...enCopy, destinations: '目的地', viewAllParks: 'すべての公園を見る', bookNow: '今すぐ予約' },
+  'zh-CN': { ...enCopy, destinations: '目的地', viewAllParks: '查看所有公园', bookNow: '立即预订' },
+  hi: { ...enCopy, destinations: 'गंतव्य', viewAllParks: 'सभी पार्क देखें', bookNow: 'अभी बुक करें' },
+  it: { ...enCopy, destinations: 'Destinazioni', viewAllParks: 'Vedi tutti i parchi', bookNow: 'Prenota ora' },
+  'pt-BR': { ...enCopy, destinations: 'Destinos', viewAllParks: 'Ver todos os parques', bookNow: 'Reserve agora' },
+  tr: { ...enCopy, destinations: 'Rotalar', viewAllParks: 'Tum parklari gor', bookNow: 'Hemen rezervasyon yap' },
+  ar: { ...enCopy, destinations: 'الوجهات', viewAllParks: 'عرض جميع المتنزهات', bookNow: 'احجز الآن' },
+  pl: { ...enCopy, destinations: 'Miejsca', viewAllParks: 'Zobacz wszystkie parki', bookNow: 'Zarezerwuj teraz' },
+  gd: { ...enCopy, destinations: 'Cinn-uidhe', viewAllParks: 'Faic a h-uile pairc', bookNow: 'Glèidh a-nis' },
+  nl: { ...enCopy, destinations: 'Bestemmingen', viewAllParks: 'Bekijk alle parken', bookNow: 'Boek nu' },
+  de: { ...enCopy, destinations: 'Reiseziele', viewAllParks: 'Alle Parks ansehen', bookNow: 'Jetzt buchen' },
+} as const;
 
 export default async function HomePage() {
+  const locale = await getRequestLocale();
+  const t = copyByLocale[(locale as keyof typeof copyByLocale)] ?? copyByLocale.en;
+
   const [destinations, reviews] = await Promise.all([
     getDestinationsWithImages(),
     getApprovedReviews(), // all approved reviews for home
   ]);
+  const packagePreview = [
+    {
+      title: t.pkgOrganicTitle,
+      tagline: t.pkgOrganicTagline,
+      price: '22',
+      image: 'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045142/WhatsApp_Image_2026-02-15_at_12.06.43_PM_bxpezn.jpg',
+      href: '/packages/cooking-class',
+    },
+    {
+      title: t.pkgVillageTitle,
+      tagline: t.pkgVillageTagline,
+      price: '22',
+      image: 'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045164/WhatsApp_Image_2026-02-15_at_12.06.47_PM_aknrgc.jpg',
+      href: '/packages/village-tour',
+    },
+    {
+      title: t.pkgBicycleTitle,
+      tagline: t.pkgBicycleTagline,
+      price: '5',
+      image: 'https://res.cloudinary.com/dxau42ovy/image/upload/v1772218312/24ba6f02-8af7-46af-9563-d882218b1916.png',
+      href: '/packages/bicycle-rental',
+    },
+  ];
+  const homeSchemas = [
+    breadcrumbSchema([{ name: 'Home', path: '/' }]),
+    faqSchema([
+      {
+        question: 'Which safari park is best right now?',
+        answer:
+          'It depends on seasonality. Our team recommends Minneriya, Kaudulla, or Hurulu Eco Park based on current elephant movement and weather.',
+      },
+      {
+        question: 'What is included in safari pricing?',
+        answer:
+          'Safari pricing covers the private jeep and guiding support. Park entrance tickets are usually paid separately at the gate.',
+      },
+    ]),
+    touristTripSchema({
+      name: 'Minneriya Elephant Safari Sri Lanka',
+      description: 'Private safari experience in the Minneriya-Kaudulla-Hurulu corridor.',
+      path: '/booking',
+      price: 65,
+      duration: 'PT3H',
+      location: 'Minneriya, Kaudulla, Hurulu Eco Park',
+    }),
+    ...reviewSchemas(reviews, 'Island Safaris Sri Lanka', '/'),
+  ];
 
   return (
     <>
+      {homeSchemas.map((schema, index) => (
+        <JsonLd key={`home-schema-${index}`} data={schema} />
+      ))}
       <HeroSection />
 
       {/* About Section - The Rhythm of the Wild */}
@@ -25,69 +253,77 @@ export default async function HomePage() {
             <div className="relative order-2 lg:order-1">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4">
-                  <div className="aspect-[3/4] rounded-3xl overflow-hidden shadow-xl border border-safari-100 bg-safari-200">
-                    <img
-                      src="https://res.cloudinary.com/dxau42ovy/image/upload/v1772045462/IMG_6163.JPG_tewuwz.jpg"
-                      alt="Safari wildlife - The Rhythm of the Wild"
-                      className="w-full h-full object-cover"
+                  <div className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-xl border border-safari-100 bg-safari-200">
+                    <Image
+                      src={optimizeCloudinaryUrl('https://res.cloudinary.com/dxau42ovy/image/upload/v1772045462/IMG_6163.JPG_tewuwz.jpg', { width: 900, quality: 70 })}
+                      alt="Sri Lanka safari wildlife near Minneriya corridor"
+                      fill
+                      sizes="(max-width: 1024px) 50vw, 30vw"
+                      className="object-cover"
+                      loading="lazy"
                     />
                   </div>
-                  <div className="aspect-square rounded-3xl overflow-hidden shadow-xl border border-safari-100 bg-secondary-200">
-                    <img
-                      src="https://res.cloudinary.com/dxau42ovy/image/upload/v1772045450/IMG_6181_xxilcs.avif"
-                      alt="Elephant corridor - The Rhythm of the Wild"
-                      className="w-full h-full object-cover"
+                  <div className="relative aspect-square rounded-3xl overflow-hidden shadow-xl border border-safari-100 bg-secondary-200">
+                    <Image
+                      src={optimizeCloudinaryUrl('https://res.cloudinary.com/dxau42ovy/image/upload/v1772045450/IMG_6181_xxilcs.avif', { width: 900, quality: 70 })}
+                      alt="Elephants in the Minneriya Kaudulla Hurulu safari corridor"
+                      fill
+                      sizes="(max-width: 1024px) 50vw, 30vw"
+                      className="object-cover"
+                      loading="lazy"
                     />
                   </div>
                 </div>
                 <div className="space-y-4 pt-8">
-                  <div className="aspect-square rounded-3xl overflow-hidden shadow-xl border border-safari-100 bg-safari-200">
-                    <img
-                      src="https://res.cloudinary.com/dxau42ovy/image/upload/v1772045443/IMG_6164_klnyzg.webp"
-                      alt="Safari experience - The Rhythm of the Wild"
-                      className="w-full h-full object-cover"
+                  <div className="relative aspect-square rounded-3xl overflow-hidden shadow-xl border border-safari-100 bg-safari-200">
+                    <Image
+                      src={optimizeCloudinaryUrl('https://res.cloudinary.com/dxau42ovy/image/upload/v1772045443/IMG_6164_klnyzg.webp', { width: 900, quality: 70 })}
+                      alt="Private jeep safari experience in Sri Lanka"
+                      fill
+                      sizes="(max-width: 1024px) 50vw, 30vw"
+                      className="object-cover"
+                      loading="lazy"
                     />
                   </div>
-                  <div className="aspect-[3/4] rounded-3xl overflow-hidden shadow-xl border border-safari-100 bg-secondary-200">
-                    <img
-                      src="https://res.cloudinary.com/dxau42ovy/image/upload/v1772045344/IMG_6203.JPG_nh8v7m.jpg"
-                      alt="Wildlife in the wild - The Rhythm of the Wild"
-                      className="w-full h-full object-cover"
+                  <div className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-xl border border-safari-100 bg-secondary-200">
+                    <Image
+                      src={optimizeCloudinaryUrl('https://res.cloudinary.com/dxau42ovy/image/upload/v1772045344/IMG_6203.JPG_nh8v7m.jpg', { width: 900, quality: 70 })}
+                      alt="Wild elephant sighting in Sri Lanka national park"
+                      fill
+                      sizes="(max-width: 1024px) 50vw, 30vw"
+                      className="object-cover"
+                      loading="lazy"
                     />
                   </div>
                 </div>
               </div>
               <div className="absolute -bottom-6 -right-6 bg-white rounded-2xl px-5 py-4 shadow-lg border border-safari-100">
-                <div className="text-sm font-semibold text-safari-900">Elephant Corridor</div>
-                <div className="text-xs text-safari-500">Minneriya • Kaudulla • Hurulu</div>
+                <div className="text-sm font-semibold text-safari-900">{t.corridorLabel}</div>
+                <div className="text-xs text-safari-500">{t.corridorParks}</div>
               </div>
             </div>
 
             {/* Content */}
             <div className="order-1 lg:order-2">
               <span className="inline-block text-secondary-600 font-bold uppercase tracking-widest text-xs mb-3 bg-secondary-100 px-4 py-2 rounded-full">
-                The Migration Story
+                {t.migrationStory}
               </span>
               <h2 className="text-4xl md:text-5xl font-bold text-safari-900 mb-4 leading-tight">
-                The Rhythm of the Wild
+                {t.rhythmTitle}
               </h2>
               <p className="text-lg text-safari-600 leading-relaxed mb-4">
-                Welcome to the heart of the Cultural Triangle, where the ancient pulse of nature dictates the journey.
-                Unlike ordinary safari operators, we specialize in the <strong>Minneriya-Kaudulla-Hurulu Corridor</strong>—a
-                vast, interconnected wilderness where hundreds of Asian elephants roam freely.
+                {t.rhythmBody}
               </p>
               <div className="rounded-3xl bg-white border border-safari-100 p-5 md:p-6 shadow-sm">
-                <h3 className="text-2xl font-bold text-safari-900 mb-2">Why Book With Us?</h3>
+                <h3 className="text-2xl font-bold text-safari-900 mb-2">{t.whyBook}</h3>
                 <p className="text-safari-600 leading-relaxed mb-4">
-                  Nature doesn&apos;t stay in one place, and neither do we. The Great Elephant Gathering is a seasonal masterpiece,
-                  and we ensure you&apos;re always in the front row. Our expert guides track the migration daily to bring you
-                  exactly where the magic is happening.
+                  {t.whyBookBody}
                 </p>
                 <Link
                   href="/about"
                   className="inline-flex items-center gap-2 text-secondary-600 font-bold hover:gap-3 transition-all"
                 >
-                  Learn More About Us <ChevronRight size={20} />
+                  {t.learnMore} <ChevronRight size={20} />
                 </Link>
               </div>
             </div>
@@ -96,18 +332,18 @@ export default async function HomePage() {
       </section>
 
       {/* Destinations Preview */}
-      <section className="pt-12 pb-20 md:pt-16 md:pb-24 bg-white relative">
+      <section className="pt-12 pb-20 md:pt-16 md:pb-24 bg-white relative content-visibility-auto">
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-16 gap-4">
             <div>
               <span className="inline-block text-secondary-600 font-bold uppercase tracking-widest text-xs mb-4 bg-secondary-100 px-4 py-2 rounded-full">
-                Destinations
+                {t.destinations}
               </span>
-              <h2 className="text-4xl md:text-5xl font-bold text-safari-900 mb-3">Our Safari Parks</h2>
-              <p className="text-safari-500 text-lg">Discover the iconic parks of the elephant migration corridor</p>
+              <h2 className="text-4xl md:text-5xl font-bold text-safari-900 mb-3">{t.safariParks}</h2>
+              <p className="text-safari-500 text-lg">{t.parksBody}</p>
             </div>
             <Link href="/destinations" className="flex items-center gap-2 text-secondary-600 font-bold hover:gap-3 transition-all text-lg">
-              View All Parks <ArrowRight size={20} />
+              {t.viewAllParks} <ArrowRight size={20} />
             </Link>
           </div>
 
@@ -120,10 +356,12 @@ export default async function HomePage() {
               >
                 <div className="relative aspect-[4/3] bg-safari-200 overflow-hidden">
                   {dest.images[0] ? (
-                    <img
-                      src={dest.images[0].secure_url}
-                      alt={dest.images[0].alt_text || dest.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    <Image
+                      src={optimizeCloudinaryUrl(dest.images[0].secure_url, { width: 900, quality: 70 })}
+                      alt={dest.images[0].alt_text || `${dest.name} safari wildlife in Sri Lanka`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-safari-400 to-safari-600 flex items-center justify-center">
@@ -136,7 +374,7 @@ export default async function HomePage() {
                   <div className="absolute top-4 left-4">
                     <span className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-sm text-safari-800 text-xs font-bold px-3 py-1.5 rounded-full">
                       <span className={`w-2 h-2 rounded-full ${index === 0 ? 'bg-green-500' : index === 1 ? 'bg-yellow-500' : 'bg-blue-500'}`} />
-                      {index === 0 ? 'Aug-Sep' : index === 1 ? 'Oct-Nov' : 'Dec-Jan'}
+                      {index === 0 ? t.parkPeakMonth : index === 1 ? t.parkTransitionMonth : t.parkWinterMonth}
                     </span>
                   </div>
                 </div>
@@ -144,7 +382,7 @@ export default async function HomePage() {
                 <div className="p-6 md:p-7">
                   <div className="flex items-center gap-2 text-xs font-semibold text-safari-500 uppercase tracking-wide mb-3">
                     <MapPin size={14} className="text-secondary-600" />
-                    <span>National Park</span>
+                    <span>{t.nationalPark}</span>
                   </div>
                   <h3 className="text-xl md:text-2xl font-bold text-safari-900 mb-3 group-hover:text-secondary-600 transition-colors">
                     {dest.name}
@@ -155,10 +393,10 @@ export default async function HomePage() {
                   <div className="flex items-center justify-between text-sm font-semibold text-safari-500 pt-4 border-t border-safari-100">
                     <span className="inline-flex items-center gap-2">
                       <Clock size={16} />
-                      {dest.standard_duration_hours} Hours
+                      {dest.standard_duration_hours} {t.hours}
                     </span>
                     <span className="inline-flex items-center gap-2 text-secondary-600 group-hover:gap-3 transition-all">
-                      Explore <ArrowRight size={16} />
+                      {t.explore} <ArrowRight size={16} />
                     </span>
                   </div>
                 </div>
@@ -169,49 +407,49 @@ export default async function HomePage() {
       </section>
 
       {/* Migration Timeline */}
-      <section className="py-20 md:py-28 bg-safari-900 text-white relative overflow-hidden">
+      <section className="py-20 md:py-28 bg-safari-900 text-white relative overflow-hidden content-visibility-auto">
         <div className="container mx-auto px-6 relative">
           <div className="text-center mb-16">
             <span className="inline-block text-secondary-400 font-bold uppercase tracking-widest text-xs mb-4 bg-secondary-900/50 px-4 py-2 rounded-full border border-secondary-700/50">
-              The Great Migration
+              {t.greatMigration}
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Follow the Elephants</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">{t.followElephants}</h2>
             <p className="text-safari-300 text-lg max-w-2xl mx-auto">
-              The herds move with the seasons. We know exactly where they&apos;ll be.
+              {t.migrationBody}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="relative p-8 rounded-3xl bg-gradient-to-br from-green-900/50 to-green-800/30 border border-green-700/30 backdrop-blur-sm">
               <div className="absolute -top-4 left-8 bg-green-500 text-white text-sm font-bold px-4 py-1 rounded-full">
-                Peak Season
+                {t.peakSeason}
               </div>
-              <div className="text-green-400 text-5xl font-bold mb-2">Jul - Sep</div>
-              <h3 className="text-2xl font-bold text-white mb-3">Minneriya</h3>
+              <div className="text-green-400 text-5xl font-bold mb-2">{t.timelinePeakMonth}</div>
+              <h3 className="text-2xl font-bold text-white mb-3">{t.timelineParkMinneriya}</h3>
               <p className="text-safari-300 leading-relaxed">
-                The legendary gathering peaks here. Up to 300 elephants congregate around the ancient tank as water sources dry up elsewhere.
+                {t.minneBody}
               </p>
             </div>
 
             <div className="relative p-8 rounded-3xl bg-gradient-to-br from-yellow-900/50 to-yellow-800/30 border border-yellow-700/30 backdrop-blur-sm">
               <div className="absolute -top-4 left-8 bg-yellow-500 text-white text-sm font-bold px-4 py-1 rounded-full">
-                Transition
+                {t.transition}
               </div>
-              <div className="text-yellow-400 text-5xl font-bold mb-2">Oct - Nov</div>
-              <h3 className="text-2xl font-bold text-white mb-3">Kaudulla</h3>
+              <div className="text-yellow-400 text-5xl font-bold mb-2">{t.timelineTransitionMonth}</div>
+              <h3 className="text-2xl font-bold text-white mb-3">{t.timelineParkKaudulla}</h3>
               <p className="text-safari-300 leading-relaxed">
-                As rains fill the tanks, herds migrate north. Kaudulla offers intimate encounters with fewer crowds.
+                {t.kaudullaBody}
               </p>
             </div>
 
             <div className="relative p-8 rounded-3xl bg-gradient-to-br from-blue-900/50 to-blue-800/30 border border-blue-700/30 backdrop-blur-sm">
               <div className="absolute -top-4 left-8 bg-blue-500 text-white text-sm font-bold px-4 py-1 rounded-full">
-                Winter Haven
+                {t.winterHaven}
               </div>
-              <div className="text-blue-400 text-5xl font-bold mb-2">Dec - Jan</div>
-              <h3 className="text-2xl font-bold text-white mb-3">Hurulu Eco Park</h3>
+              <div className="text-blue-400 text-5xl font-bold mb-2">{t.timelineWinterMonth}</div>
+              <h3 className="text-2xl font-bold text-white mb-3">{t.timelineParkHurulu}</h3>
               <p className="text-safari-300 leading-relaxed">
-                The final leg of the migration. Dense forests create dramatic close encounters in golden morning light.
+                {t.huruluBody}
               </p>
             </div>
           </div>
@@ -219,61 +457,41 @@ export default async function HomePage() {
       </section>
 
       {/* Packages Sneak Peek */}
-      <section className="py-20 md:py-28 bg-[#faf8f4] relative overflow-hidden">
+      <section className="py-20 md:py-28 bg-[#faf8f4] relative overflow-hidden content-visibility-auto">
         <div className="absolute top-0 right-0 w-[30rem] h-[30rem] bg-secondary-100/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
 
         <div className="container mx-auto px-6 relative">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-14">
             <div>
               <span className="text-secondary-600 text-sm font-semibold tracking-[0.2em] uppercase mb-3 block">
-                Beyond the Safari
+                {t.beyondSafari}
               </span>
               <h2 className="text-3xl md:text-5xl font-bold text-safari-900">
-                Experience The Culture
+                {t.experienceCulture}
               </h2>
             </div>
             <Link
               href="/packages"
               className="group mt-4 md:mt-0 inline-flex items-center gap-2 text-secondary-600 hover:text-secondary-500 font-semibold transition-colors"
             >
-              View All Experiences
+              {t.viewAllExperiences}
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                title: 'Organic Cooking',
-                tagline: 'Farm to Table',
-                price: '22',
-                image: 'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045142/WhatsApp_Image_2026-02-15_at_12.06.43_PM_bxpezn.jpg',
-                href: '/packages/cooking-class',
-              },
-              {
-                title: 'Village Tour',
-                tagline: 'Cultural Immersion',
-                price: '22',
-                image: 'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045164/WhatsApp_Image_2026-02-15_at_12.06.47_PM_aknrgc.jpg',
-                href: '/packages/village-tour',
-              },
-              {
-                title: 'Bicycle Rent',
-                tagline: 'Explore Freely',
-                price: '5',
-                image: 'https://res.cloudinary.com/dxau42ovy/image/upload/v1772218312/24ba6f02-8af7-46af-9563-d882218b1916.png',
-                href: '/packages/bicycle-rent',
-              },
-            ].map((pkg) => (
+            {packagePreview.map((pkg) => (
               <Link
                 key={pkg.title}
                 href={pkg.href}
                 className="group relative rounded-2xl overflow-hidden aspect-[4/3] block"
               >
-                <img
-                  src={pkg.image}
-                  alt={pkg.title}
-                  className="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110"
+                <Image
+                  src={optimizeCloudinaryUrl(pkg.image, { width: 800, quality: 70 })}
+                  alt={`${pkg.title} in Sigiriya Sri Lanka`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -285,7 +503,7 @@ export default async function HomePage() {
                   </h3>
                   <div className="flex items-center justify-between">
                     <span className="text-white/80 text-sm">
-                      From <span className="text-lg font-bold text-white">${pkg.price}</span>/person
+                      {t.from} <span className="text-lg font-bold text-white">${pkg.price}</span>{t.perPerson}
                     </span>
                     <div className="w-9 h-9 rounded-full border border-white/30 group-hover:border-secondary-400 group-hover:bg-secondary-600 flex items-center justify-center transition-all duration-400">
                       <ArrowRight size={14} className="text-white" />
@@ -300,15 +518,15 @@ export default async function HomePage() {
 
 
       {/* Features Grid */}
-      <section className="py-20 md:py-28 bg-secondary-50">
+      <section className="py-20 md:py-28 bg-secondary-50 content-visibility-auto">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <span className="inline-block text-secondary-600 font-bold uppercase tracking-widest text-xs mb-4 bg-secondary-100 px-4 py-2 rounded-full">
-              Why Choose Us
+              {t.whyChooseUs}
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold text-safari-900 mb-4">The Island Safaris Difference</h2>
+            <h2 className="text-4xl md:text-5xl font-bold text-safari-900 mb-4">{t.difference}</h2>
             <p className="text-safari-600 text-lg max-w-2xl mx-auto">
-              We&apos;re not just tour operators—we&apos;re passionate naturalists dedicated to authentic wildlife experiences.
+              {t.differenceBody}
             </p>
           </div>
 
@@ -317,9 +535,9 @@ export default async function HomePage() {
               <div className="w-16 h-16 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-secondary-500/20 group-hover:scale-110 transition-transform">
                 <Star size={32} className="text-white" />
               </div>
-              <h3 className="text-xl font-bold text-safari-900 mb-4">Top Rated Service</h3>
+              <h3 className="text-xl font-bold text-safari-900 mb-4">{t.topRated}</h3>
               <p className="text-safari-600 leading-relaxed">
-                Consistently rated 5-stars by travelers from around the world for our reliable, friendly, and knowledgeable service.
+                {t.topRatedBody}
               </p>
             </div>
 
@@ -327,9 +545,9 @@ export default async function HomePage() {
               <div className="w-16 h-16 bg-gradient-to-br from-safari-500 to-safari-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-safari-500/20 group-hover:scale-110 transition-transform">
                 <Shield size={32} className="text-white" />
               </div>
-              <h3 className="text-xl font-bold text-safari-900 mb-4">Safety First</h3>
+              <h3 className="text-xl font-bold text-safari-900 mb-4">{t.safetyFirst}</h3>
               <p className="text-safari-600 leading-relaxed">
-                Well-maintained 4x4 jeeps and experienced drivers ensure your safety while navigating the wild terrain.
+                {t.safetyFirstBody}
               </p>
             </div>
 
@@ -337,9 +555,9 @@ export default async function HomePage() {
               <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-green-500/20 group-hover:scale-110 transition-transform">
                 <Leaf size={32} className="text-white" />
               </div>
-              <h3 className="text-xl font-bold text-safari-900 mb-4">Eco-Conscious</h3>
+              <h3 className="text-xl font-bold text-safari-900 mb-4">{t.ecoConscious}</h3>
               <p className="text-safari-600 leading-relaxed">
-                We respect the wildlife and strictly adhere to park rules. It&apos;s their home—we&apos;re just the guests.
+                {t.ecoConsciousBody}
               </p>
             </div>
           </div>
@@ -347,15 +565,15 @@ export default async function HomePage() {
       </section>
 
       {/* Reviews */}
-      <section className="py-20 md:py-28 bg-white">
+      <section className="py-20 md:py-28 bg-white content-visibility-auto">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12 md:mb-16">
             <span className="inline-block text-secondary-600 font-bold uppercase tracking-widest text-xs mb-4 bg-secondary-100 px-4 py-2 rounded-full">
-              Traveler Reviews
+              {t.travelerReviews}
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold text-safari-900 mb-4">What Our Guests Say</h2>
+            <h2 className="text-4xl md:text-5xl font-bold text-safari-900 mb-4">{t.guestsSay}</h2>
             <p className="text-safari-600 text-lg max-w-2xl mx-auto">
-              Real experiences from visitors who explored the elephant corridor with us.
+              {t.reviewsBody}
             </p>
           </div>
           <ReviewList reviews={reviews.slice(0, 6)} />
@@ -370,24 +588,24 @@ export default async function HomePage() {
 
         <div className="container mx-auto px-6 relative text-center">
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            Ready for Your Adventure?
+            {t.readyAdventure}
           </h2>
           <p className="text-safari-300 text-lg md:text-xl max-w-2xl mx-auto mb-10">
-            Book your safari today and witness nature&apos;s greatest spectacle—the Great Elephant Gathering of Sri Lanka.
+            {t.ctaBody}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/booking"
               className="group bg-secondary-600 hover:bg-secondary-500 text-white font-bold py-4 px-10 rounded-full transition-all transform hover:scale-105 shadow-2xl shadow-secondary-900/50 active:scale-95 inline-flex items-center justify-center gap-3"
             >
-              Book Now
+              {t.bookNow}
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               href="/contact"
               className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold py-4 px-8 rounded-full transition-all border border-white/20 hover:border-white/40"
             >
-              Contact Us
+              {t.contactUs}
             </Link>
           </div>
         </div>

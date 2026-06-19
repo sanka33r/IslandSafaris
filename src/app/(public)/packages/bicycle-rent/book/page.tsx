@@ -1,12 +1,19 @@
 import BookingForm from '@/components/booking/BookingForm';
 import { Calendar, Shield, HeadphonesIcon } from 'lucide-react';
+import { notFound } from 'next/navigation';
+import { getVisiblePackageBySlug } from '@/lib/packages';
+import { buildMetadata } from '@/lib/seo';
 
-export const metadata = {
-    title: 'Book Bicycle Rent | Island Safaris Sri Lanka',
-    description: 'Rent a bicycle with Island Safaris. Secure your rental with just USD 5 advance payment.',
-};
+export const metadata = buildMetadata({
+    title: 'Book Bicycle Rental Sigiriya',
+    description: 'Book a Bicycle Rental in Sigiriya for flexible countryside exploration with route tips, convenient support, and quick confirmation.',
+    path: '/packages/bicycle-rental/booking',
+});
 
-export default function BicycleRentBookingPage() {
+export default async function BicycleRentBookingPage() {
+    const pkg = await getVisiblePackageBySlug('bicycle-rent');
+    if (!pkg) notFound();
+
     return (
         <div className="bg-secondary-50 min-h-screen py-12 sm:py-16 md:py-20">
             <div className="container mx-auto px-4 sm:px-6">
@@ -40,7 +47,7 @@ export default function BicycleRentBookingPage() {
                     <div className="space-y-6">
                         {/* Why Book With Us */}
                         <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-safari-100 shadow-sm">
-                            <h3 className="text-xl font-bold text-safari-900 mb-6">Why Book With Us</h3>
+                            <h2 className="text-xl font-bold text-safari-900 mb-6">Why Book With Us</h2>
                             <div className="space-y-6">
                                 <div className="flex items-start gap-4">
                                     <div className="w-10 h-10 bg-secondary-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -66,15 +73,15 @@ export default function BicycleRentBookingPage() {
 
                         {/* Contact Info */}
                         <div className="bg-gradient-to-br from-safari-900 to-safari-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-white">
-                            <h3 className="text-xl font-bold mb-4">Need Help?</h3>
+                            <h2 className="text-xl font-bold mb-4">Need Help?</h2>
                             <div className="space-y-3 text-sm">
                                 <div>
                                     <div className="text-safari-400 text-sm mb-1">WhatsApp / Phone</div>
-                                    <div className="font-semibold">+94 77 000 0000</div>
+                                    <div className="font-semibold">0707682401</div>
                                 </div>
                                 <div>
                                     <div className="text-safari-400 text-sm mb-1">Email</div>
-                                    <div className="font-semibold">info@islandsafaris.com</div>
+                                    <div className="font-semibold">islandsafariessrilanka@gmail.com</div>
                                 </div>
                             </div>
                         </div>

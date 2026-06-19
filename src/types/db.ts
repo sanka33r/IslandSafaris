@@ -94,3 +94,10 @@ export interface PromoCode {
     created_at: string
 }
 
+export interface PackageOverride {
+    slug: 'cooking-class' | 'village-tour' | 'bicycle-rent'
+    price?: number | null
+    visible: boolean
+    updated_at: string
+}
+

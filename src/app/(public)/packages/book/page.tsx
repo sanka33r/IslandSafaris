@@ -1,10 +1,14 @@
 import BookingForm from '@/components/booking/BookingForm';
 import { Calendar, Shield, HeadphonesIcon } from 'lucide-react';
+import { buildMetadata } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
+import { breadcrumbSchema, faqSchema } from '@/lib/schema';
 
-export const metadata = {
-    title: 'Book Your Experience | Island Safaris Sri Lanka',
-    description: 'Book your authentic Sri Lankan experience with Island Safaris. Secure your spot with just USD 5 advance payment.',
-};
+export const metadata = buildMetadata({
+    title: 'Book Sigiriya Experiences',
+    description: 'Reserve your Sigiriya village tour, organic cooking experience, or bicycle rental in a few quick steps with secure confirmation support.',
+    path: '/packages/booking',
+});
 
 interface BookingPageProps {
     searchParams: {
@@ -14,9 +18,29 @@ interface BookingPageProps {
 
 export default function PackageBookingPage({ searchParams }: BookingPageProps) {
     const preselectedPackage = searchParams.package;
+    const schemas = [
+        breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Packages', path: '/packages' },
+            { name: 'Booking', path: '/packages/booking' },
+        ]),
+        faqSchema([
+            {
+                question: 'How much is the advance payment for package bookings?',
+                answer: 'A small USD 5 non-refundable advance is typically required to secure package availability.',
+            },
+            {
+                question: 'Can I choose a package before paying?',
+                answer: 'Yes. You can select a package and travel date first, then complete the booking confirmation flow.',
+            },
+        ]),
+    ];
 
     return (
         <div className="bg-secondary-50 min-h-screen py-12 sm:py-16 md:py-20">
+            {schemas.map((schema, index) => (
+                <JsonLd key={`package-book-schema-${index}`} data={schema} />
+            ))}
             <div className="container mx-auto px-4 sm:px-6">
                 {/* Header */}
                 <div className="text-center mb-10 sm:mb-12 md:mb-16">
@@ -48,7 +72,7 @@ export default function PackageBookingPage({ searchParams }: BookingPageProps) {
                     <div className="space-y-6">
                         {/* Why Book With Us */}
                         <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-safari-100 shadow-sm">
-                            <h3 className="text-xl font-bold text-safari-900 mb-6">Why Book With Us</h3>
+                            <h2 className="text-xl font-bold text-safari-900 mb-6">Why Book With Us</h2>
                             <div className="space-y-6">
                                 <div className="flex items-start gap-4">
                                     <div className="w-10 h-10 bg-secondary-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -84,18 +108,18 @@ export default function PackageBookingPage({ searchParams }: BookingPageProps) {
 
                         {/* Contact Info */}
                         <div className="bg-gradient-to-br from-safari-900 to-safari-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-white">
-                            <h3 className="text-xl font-bold mb-4">Need Help?</h3>
+                            <h2 className="text-xl font-bold mb-4">Need Help?</h2>
                             <p className="text-safari-200 mb-6 text-sm">
                                 Have questions about your booking? Our team is here to assist you.
                             </p>
                             <div className="space-y-3 text-sm">
                                 <div>
                                     <div className="text-safari-400 text-sm mb-1">WhatsApp / Phone</div>
-                                    <div className="font-semibold">+94 77 000 0000</div>
+                                    <div className="font-semibold">0707682401</div>
                                 </div>
                                 <div>
                                     <div className="text-safari-400 text-sm mb-1">Email</div>
-                                    <div className="font-semibold">info@islandsafaris.com</div>
+                                    <div className="font-semibold">islandsafariessrilanka@gmail.com</div>
                                 </div>
                             </div>
                         </div>

@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
+import { optimizeCloudinaryUrl } from '@/lib/images';
 
 interface PackageGalleryProps {
     images: string[];
@@ -36,11 +38,13 @@ export default function PackageGallery({ images, title = 'Gallery', altPrefix = 
                             onClick={() => setSelectedIndex(i)}
                             className="relative aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 group"
                         >
-                            <img
-                                src={src}
-                                alt={`${altPrefix} photo ${i + 1}`}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                loading={i < 6 ? 'eager' : 'lazy'}
+                            <Image
+                                src={optimizeCloudinaryUrl(src, { width: 1200, quality: 70 })}
+                                alt={`${altPrefix} photo ${i + 1} in Sri Lanka`}
+                                fill
+                                sizes="(max-width: 768px) 50vw, 33vw"
+                                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                loading={i < 2 ? 'eager' : 'lazy'}
                             />
                         </button>
                     ))}
@@ -75,10 +79,12 @@ export default function PackageGallery({ images, title = 'Gallery', altPrefix = 
                     >
                         ‹
                     </button>
-                    <img
-                        src={images[selectedIndex]}
-                        alt={`${altPrefix} photo ${selectedIndex + 1}`}
-                        className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                    <Image
+                        src={optimizeCloudinaryUrl(images[selectedIndex], { width: 1600, quality: 75 })}
+                        alt={`${altPrefix} photo ${selectedIndex + 1} in Sri Lanka`}
+                        width={1600}
+                        height={1067}
+                        className="max-w-full max-h-[90vh] object-contain rounded-lg w-auto h-auto"
                         onClick={(e) => e.stopPropagation()}
                     />
                     <button

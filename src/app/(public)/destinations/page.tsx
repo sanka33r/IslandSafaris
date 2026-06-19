@@ -1,9 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useGlobalData } from '@/providers/GlobalDataProvider';
 import { ArrowRight, MapPin, Clock, Calendar, Camera, Car, ChevronDown } from 'lucide-react';
 import { formatUsd } from '@/lib/constants';
+import JsonLd from '@/components/seo/JsonLd';
+import { breadcrumbSchema, faqSchema, touristTripSchema } from '@/lib/schema';
+import { optimizeCloudinaryUrl } from '@/lib/images';
+import BreadcrumbNav from '@/components/layout/BreadcrumbNav';
 
 // export const revalidate = 3600; // Not needed for client component
 
@@ -51,6 +56,32 @@ export default function DestinationsPage() {
     const currentSeasonSlug = getCurrentSeasonParkSlug(currentMonth);
     const sortedDestinations = sortDestinationsByCurrentSeason(destinations, currentSeasonSlug);
     const migrationPillOrder = orderedMigrationPills(currentSeasonSlug);
+    const schemas = [
+        breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Destinations', path: '/destinations' },
+        ]),
+        faqSchema([
+            {
+                question: 'Which destination is best for elephant sightings?',
+                answer: 'The best park changes seasonally between Minneriya, Kaudulla, and Hurulu Eco Park based on rainfall and herd movement.',
+            },
+            {
+                question: 'What safari pricing is shown?',
+                answer: 'Displayed prices are typically private jeep rates, while park entrance tickets may be paid separately at the park gate.',
+            },
+        ]),
+        ...sortedDestinations.slice(0, 3).map((destination) =>
+            touristTripSchema({
+                name: `${destination.name} Safari`,
+                description: destination.summary || destination.description,
+                path: `/destinations/${destination.slug}`,
+                price: destination.vehicle_price_up_to_3,
+                duration: `PT${destination.standard_duration_hours}H`,
+                location: destination.name,
+            })
+        ),
+    ];
 
     if (isLoading) {
         return (
@@ -62,12 +93,23 @@ export default function DestinationsPage() {
 
     return (
         <div className="min-h-screen bg-secondary-50">
+            {schemas.map((schema, index) => (
+                <JsonLd key={`destinations-schema-${index}`} data={schema} />
+            ))}
+            <div className="container mx-auto px-4 sm:px-6 pt-6">
+                <BreadcrumbNav
+                    items={[
+                        { label: 'Home', href: '/' },
+                        { label: 'Destinations' },
+                    ]}
+                />
+            </div>
             {/* Hero Header */}
             <div className="relative min-h-[60vh] sm:min-h-[70vh] md:min-h-[75vh] bg-safari-900 overflow-hidden flex items-end">
                 {/* Full-bleed background image */}
                 <div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                    style={{ backgroundImage: `url('https://res.cloudinary.com/dxau42ovy/image/upload/v1772045435/IMG_6160.JPG_gxx9vc.jpg')` }}
+                    style={{ backgroundImage: `url('${optimizeCloudinaryUrl('https://res.cloudinary.com/dxau42ovy/image/upload/v1772045435/IMG_6160.JPG_gxx9vc.jpg', { width: 1920, quality: 70 })}')` }}
                 />
                 {/* Overlay: darken from top (image visible) to bottom (readable text) */}
                 <div className="absolute inset-0 bg-gradient-to-b from-safari-900/30 via-safari-900/70 to-safari-900/95" />
@@ -119,7 +161,7 @@ export default function DestinationsPage() {
                                 <Calendar className="text-secondary-600" size={28} />
                             </div>
                             <div className="min-w-0">
-                                <h3 className="text-xl sm:text-2xl font-bold text-safari-900 mb-1.5 sm:mb-2">The Great Elephant Migration</h3>
+                                <h2 className="text-xl sm:text-2xl font-bold text-safari-900 mb-1.5 sm:mb-2">The Great Elephant Migration</h2>
                                 <p className="text-sm sm:text-base text-safari-600 leading-relaxed max-w-xl">
                                     Experience one of the world's greatest natural spectacles.
                                     Our elephants move between parks following the rains and water availability.
@@ -171,10 +213,12 @@ export default function DestinationsPage() {
                                     {/* Image Section */}
                                     <div className={`relative ${isFeature ? 'md:col-span-3 aspect-[4/3] md:aspect-auto' : 'aspect-[16/10]'} bg-safari-200 overflow-hidden`}>
                                         {destination.images[0] ? (
-                                            <img
-                                                src={destination.images[0].secure_url}
-                                                alt={destination.images[0].alt_text || destination.name}
-                                                className="w-full h-full object-cover transition-transform duration-[20s] ease-in-out group-hover:scale-110"
+                                            <Image
+                                                src={optimizeCloudinaryUrl(destination.images[0].secure_url, { width: 1200, quality: 70 })}
+                                                alt={destination.images[0].alt_text || `${destination.name} safari wildlife in Sri Lanka`}
+                                                fill
+                                                sizes={isFeature ? "(max-width: 768px) 100vw, 60vw" : "(max-width: 768px) 100vw, 50vw"}
+                                                className="object-cover transition-transform duration-[20s] ease-in-out group-hover:scale-110"
                                             />
                                         ) : (
                                             <div className="w-full h-full bg-gradient-to-br from-safari-400 to-safari-600 flex items-center justify-center">
@@ -260,10 +304,12 @@ export default function DestinationsPage() {
                                                             className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white overflow-hidden shadow-md"
                                                             style={{ zIndex: 3 - idx }}
                                                         >
-                                                            <img
-                                                                src={img.secure_url}
+                                                            <Image
+                                                                src={optimizeCloudinaryUrl(img.secure_url, { width: 120, quality: 60 })}
                                                                 alt=""
-                                                                className="w-full h-full object-cover"
+                                                                fill
+                                                                sizes="40px"
+                                                                className="object-cover"
                                                             />
                                                         </div>
                                                     ))}

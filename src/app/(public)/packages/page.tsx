@@ -1,105 +1,272 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import {
     ArrowRight,
-    ChefHat,
-    Bike,
-    TreePalm,
     Compass,
     Clock,
     MapPin,
     Sparkles,
 } from 'lucide-react';
+import { getRequestLocale } from '@/i18n/locale';
+import { getVisiblePackages } from '@/lib/packages';
+import { buildMetadata } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
+import { breadcrumbSchema, faqSchema, touristTripSchema } from '@/lib/schema';
+import { optimizeCloudinaryUrl } from '@/lib/images';
+import BreadcrumbNav from '@/components/layout/BreadcrumbNav';
 
-export const metadata = {
-    title: 'Packages | Island Safaris Sri Lanka',
-    description:
-        'Explore our curated experience packages — organic cooking classes, authentic village tours, and scenic bicycle rentals in Sri Lanka.',
-};
+export const metadata = buildMetadata({
+    title: 'Sigiriya Experiences: Village Tour, Cooking, Bicycle Rental',
+    description: 'Compare our top Sigiriya experiences in one place: village tour, organic cooking class, and bicycle rental packages with simple booking.',
+    path: '/packages',
+});
 
-export const packages = [
-    {
-        slug: 'cooking-class',
-        icon: ChefHat,
-        number: '01',
-        title: 'Organic Cooking Experience',
-        tagline: 'Farm to Table',
-        price: '22',
-        duration: '4–5 Hours',
-        location: 'Sigiriya',
-        description:
+const enCopy = {
+        curated: 'Curated Experiences',
+        packages: 'Packages',
+        heroDescription: "Immerse yourself in Sri Lanka's culture, cuisine, and countryside.",
+        exploreExperience: 'Explore this experience',
+        from: 'From',
+        perPerson: '/person',
+        closingTitle: 'Combine experiences. Make it yours.',
+        closingDescription: 'Pair any package with a safari for the complete Sri Lankan adventure.',
+        closingNote: 'USD 5 advance for packages · USD 8 advance for safaris (non-refundable)',
+        bookSafari: 'Book a Safari',
+        contact: 'Get in Touch',
+        cookingTitle: 'Organic Cooking Experience',
+        cookingTagline: 'Farm to Table',
+        cookingDescription:
             'Step into a peaceful organic garden and learn to cook authentic Sri Lankan dishes using handpicked, homegrown ingredients. A true farm-to-table experience guided by a local host.',
-        accent: 'bg-gradient-to-br from-orange-500 to-rose-500',
-        accentLight: 'bg-orange-50',
-        accentText: 'text-orange-600',
-        accentBorder: 'border-orange-200',
-        image:
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045142/WhatsApp_Image_2026-02-15_at_12.06.43_PM_bxpezn.jpg',
-        images: [
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045142/WhatsApp_Image_2026-02-15_at_12.06.43_PM_bxpezn.jpg',
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045142/WhatsApp_Image_2026-02-15_at_12.06.44_PM_lc1rkx.jpg',
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045142/WhatsApp_Image_2026-02-15_at_12.06.42_PM_qqz6qf.jpg',
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045142/WhatsApp_Image_2026-02-15_at_12.06.44_PM_1_vfcznz.jpg',
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045141/WhatsApp_Image_2026-02-15_at_12.06.45_PM_nx8h5a.jpg',
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045143/WhatsApp_Image_2026-02-15_at_12.06.45_PM_1_icz8ge.jpg',
-        ],
-    },
-    {
-        slug: 'village-tour',
-        icon: TreePalm,
-        number: '02',
-        title: 'Sigiriya Village Tour',
-        tagline: 'Cultural Immersion',
-        price: '22',
-        duration: '4–5 Hours',
-        location: 'Sigiriya Village',
-        description:
+        villageTitle: 'Sigiriya Village Tour',
+        villageTagline: 'Cultural Immersion',
+        villageDescription:
             'Drift through the countryside on a bullock cart, glide across a serene lake by catamaran, and walk through lush paddy fields to a village home. A journey into the soul of rural Sri Lanka.',
-        accent: 'bg-gradient-to-br from-emerald-500 to-teal-500',
-        accentLight: 'bg-emerald-50',
-        accentText: 'text-emerald-600',
-        accentBorder: 'border-emerald-200',
-        image:
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045164/WhatsApp_Image_2026-02-15_at_12.06.47_PM_aknrgc.jpg',
-        images: [
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045164/WhatsApp_Image_2026-02-15_at_12.06.47_PM_aknrgc.jpg',
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045168/WhatsApp_Image_2026-02-15_at_12.06.50_PM_rkm6et.jpg',
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045167/WhatsApp_Image_2026-02-15_at_12.06.49_PM_qfmjwa.jpg',
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045165/WhatsApp_Image_2026-02-15_at_12.06.49_PM_1_oox3hc.jpg',
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045165/WhatsApp_Image_2026-02-15_at_12.06.46_PM_nycn67.jpg',
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045165/WhatsApp_Image_2026-02-15_at_12.06.48_PM_ro3ulg.jpg',
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045164/WhatsApp_Image_2026-02-15_at_12.06.48_PM_1_bqpavw.jpg',
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772045163/WhatsApp_Image_2026-02-15_at_12.06.46_PM_1_fi57kd.jpg',
-        ],
-    },
-    {
-        slug: 'bicycle-rent',
-        icon: Bike,
-        number: '03',
-        title: 'Bicycle Rent',
-        tagline: 'Explore Freely',
-        price: '5',
-        duration: 'Flexible',
-        location: 'Sigiriya & Beyond',
-        description:
+        bicycleTitle: 'Bicycle Rent',
+        bicycleTagline: 'Explore Freely',
+        bicycleDescription:
             'Set your own pace through quiet village roads, shaded forest trails, and golden paddy fields. The most peaceful and eco-friendly way to discover the countryside.',
-        accent: 'bg-gradient-to-br from-blue-500 to-indigo-500',
-        accentLight: 'bg-blue-50',
-        accentText: 'text-blue-600',
-        accentBorder: 'border-blue-200',
-        image:
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772218312/24ba6f02-8af7-46af-9563-d882218b1916.png',
-        images: [
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772218312/24ba6f02-8af7-46af-9563-d882218b1916.png',
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772218303/4e9dba9a-64db-4adc-a862-061ea932ff9c.png',
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772218301/ab34eb81-53a1-47ae-9124-d9800b6cd715.png',
-            'https://res.cloudinary.com/dxau42ovy/image/upload/v1772218295/90b01039-01c4-4abe-b3da-39059639c199.png',
-        ],
-    },
-];
+        hours45: '4-5 Hours',
+        flexible: 'Flexible',
+        sigiriya: 'Sigiriya',
+        sigiriyaVillage: 'Sigiriya Village',
+        sigiriyaBeyond: 'Sigiriya & Beyond',
+    };
 
-export default function PackagesPage() {
+const esCopy = {
+        curated: 'Experiencias seleccionadas',
+        packages: 'Paquetes',
+        heroDescription: 'Sumérgete en la cultura, cocina y paisajes de Sri Lanka.',
+        exploreExperience: 'Explora esta experiencia',
+        from: 'Desde',
+        perPerson: '/persona',
+        closingTitle: 'Combina experiencias. Hazla tuya.',
+        closingDescription: 'Combina cualquier paquete con un safari para la aventura completa en Sri Lanka.',
+        closingNote: 'Anticipo USD 5 para paquetes · Anticipo USD 8 para safaris (no reembolsable)',
+        bookSafari: 'Reservar un safari',
+        contact: 'Contáctanos',
+        cookingTitle: 'Experiencia de cocina organica',
+        cookingTagline: 'De la granja a la mesa',
+        cookingDescription:
+            'Entra en un tranquilo jardin organico y aprende a cocinar platos autenticos de Sri Lanka con ingredientes frescos cultivados en casa.',
+        villageTitle: 'Tour de aldea en Sigiriya',
+        villageTagline: 'Inmersion cultural',
+        villageDescription:
+            'Recorre el campo en carreta, cruza un lago en catamaran y camina por arrozales hasta una casa local.',
+        bicycleTitle: 'Alquiler de bicicleta',
+        bicycleTagline: 'Explora libremente',
+        bicycleDescription:
+            'Recorre caminos rurales, senderos boscosos y campos dorados a tu propio ritmo.',
+        hours45: '4-5 horas',
+        flexible: 'Flexible',
+        sigiriya: 'Sigiriya',
+        sigiriyaVillage: 'Aldea de Sigiriya',
+        sigiriyaBeyond: 'Sigiriya y alrededores',
+    };
+
+const copyByLocale = {
+    en: enCopy,
+    es: esCopy,
+    ru: {
+        ...enCopy,
+        curated: 'Тщательно подобранные впечатления',
+        packages: 'Пакеты',
+        exploreExperience: 'Подробнее о пакете',
+        bookSafari: 'Забронировать сафари',
+        contact: 'Связаться',
+    },
+    fr: {
+        ...enCopy,
+        curated: 'Experiences selectionnees',
+        packages: 'Forfaits',
+        exploreExperience: 'Explorer cette experience',
+        bookSafari: 'Reserver un safari',
+        contact: 'Nous contacter',
+    },
+    ja: {
+        ...enCopy,
+        curated: '厳選された体験',
+        packages: 'パッケージ',
+        exploreExperience: 'この体験を見る',
+        bookSafari: 'サファリを予約',
+        contact: 'お問い合わせ',
+    },
+    'zh-CN': {
+        ...enCopy,
+        curated: '精选体验',
+        packages: '套餐',
+        exploreExperience: '查看此体验',
+        bookSafari: '预订Safari',
+        contact: '联系我们',
+    },
+    hi: {
+        ...enCopy,
+        curated: 'चयनित अनुभव',
+        packages: 'पैकेज',
+        exploreExperience: 'इस अनुभव को देखें',
+        bookSafari: 'सफारी बुक करें',
+        contact: 'संपर्क करें',
+    },
+    it: {
+        ...enCopy,
+        curated: 'Esperienze selezionate',
+        packages: 'Pacchetti',
+        exploreExperience: 'Esplora questa esperienza',
+        bookSafari: 'Prenota un safari',
+        contact: 'Contattaci',
+    },
+    'pt-BR': {
+        ...enCopy,
+        curated: 'Experiencias selecionadas',
+        packages: 'Pacotes',
+        exploreExperience: 'Explorar esta experiencia',
+        bookSafari: 'Reservar um safari',
+        contact: 'Fale conosco',
+    },
+    tr: {
+        ...enCopy,
+        curated: 'Secilmis deneyimler',
+        packages: 'Paketler',
+        exploreExperience: 'Bu deneyimi kesfet',
+        bookSafari: 'Safari rezervasyonu yap',
+        contact: 'Bize ulasin',
+    },
+    ar: {
+        ...enCopy,
+        curated: 'تجارب مختارة',
+        packages: 'الباقات',
+        exploreExperience: 'استكشف هذه التجربة',
+        bookSafari: 'احجز سفاري',
+        contact: 'تواصل معنا',
+    },
+    pl: {
+        ...enCopy,
+        curated: 'Wybrane doswiadczenia',
+        packages: 'Pakiety',
+        exploreExperience: 'Poznaj to doswiadczenie',
+        bookSafari: 'Zarezerwuj safari',
+        contact: 'Skontaktuj sie',
+    },
+    gd: {
+        ...enCopy,
+        curated: 'Eòlasan taghte',
+        packages: 'Pasganan',
+        exploreExperience: 'Rannsaich an t-eòlas seo',
+        bookSafari: 'Glèidh safari',
+        contact: 'Cuir fios',
+    },
+    nl: {
+        ...enCopy,
+        curated: 'Geselecteerde ervaringen',
+        packages: 'Pakketten',
+        exploreExperience: 'Verken deze ervaring',
+        bookSafari: 'Boek een safari',
+        contact: 'Neem contact op',
+    },
+    de: {
+        ...enCopy,
+        curated: 'Ausgewahlte Erlebnisse',
+        packages: 'Pakete',
+        exploreExperience: 'Dieses Erlebnis entdecken',
+        bookSafari: 'Safari buchen',
+        contact: 'Kontakt',
+    },
+} as const;
+
+export default async function PackagesPage() {
+    const locale = await getRequestLocale();
+    const t = copyByLocale[(locale as keyof typeof copyByLocale)] ?? copyByLocale.en;
+    const packages = await getVisiblePackages();
+    const localizedPackages = packages.map((pkg) => {
+        if (pkg.slug === 'cooking-class') {
+            return {
+                ...pkg,
+                title: t.cookingTitle,
+                tagline: t.cookingTagline,
+                description: t.cookingDescription,
+                duration: t.hours45,
+                location: t.sigiriya,
+            };
+        }
+
+        if (pkg.slug === 'village-tour') {
+            return {
+                ...pkg,
+                title: t.villageTitle,
+                tagline: t.villageTagline,
+                description: t.villageDescription,
+                duration: t.hours45,
+                location: t.sigiriyaVillage,
+            };
+        }
+
+        return {
+            ...pkg,
+            title: t.bicycleTitle,
+            tagline: t.bicycleTagline,
+            description: t.bicycleDescription,
+            duration: t.flexible,
+            location: t.sigiriyaBeyond,
+        };
+    });
+    const schemas = [
+        breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Packages', path: '/packages' },
+        ]),
+        faqSchema([
+            {
+                question: 'Which Sigiriya experience should I choose?',
+                answer: 'Choose village tour for culture, cooking class for food immersion, or bicycle rental for flexible exploration.',
+            },
+            {
+                question: 'How much is the advance payment?',
+                answer: 'Packages typically require a small USD 5 advance to secure availability.',
+            },
+        ]),
+        ...packages.map((pkg) =>
+            touristTripSchema({
+                name: pkg.title,
+                description: pkg.description,
+                path: pkg.slug === 'bicycle-rent' ? '/packages/bicycle-rental' : `/packages/${pkg.slug}`,
+                price: pkg.price,
+                location: pkg.location,
+            })
+        ),
+    ];
+
     return (
         <div className="min-h-screen bg-[#faf8f4]">
+            {schemas.map((schema, index) => (
+                <JsonLd key={`packages-schema-${index}`} data={schema} />
+            ))}
+            <div className="container mx-auto px-6 pt-6">
+                <BreadcrumbNav
+                    items={[
+                        { label: 'Home', href: '/' },
+                        { label: 'Packages' },
+                    ]}
+                />
+            </div>
             {/* ═══════ COMPACT HERO ═══════ */}
             <section className="relative pt-14 pb-16 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-b from-safari-900 via-safari-800 to-[#2a3c28]" />
@@ -109,24 +276,24 @@ export default function PackagesPage() {
                     <div className="flex items-center justify-center gap-2 mb-4">
                         <Compass size={16} className="text-secondary-400" />
                         <span className="text-secondary-300 text-sm tracking-[0.25em] uppercase font-medium">
-                            Curated Experiences
+                            {t.curated}
                         </span>
                     </div>
                     <h1 className="text-4xl md:text-5xl font-bold mb-3">
                         Our{' '}
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary-300 to-secondary-500">
-                            Packages
+                            {t.packages}
                         </span>
                     </h1>
                     <p className="text-safari-200/70 text-base max-w-md mx-auto">
-                        Immerse yourself in Sri Lanka&apos;s culture, cuisine, and countryside.
+                        {t.heroDescription}
                     </p>
                 </div>
             </section>
 
             {/* ═══════ PACKAGES ═══════ */}
             <section className="container mx-auto px-6 py-16 space-y-24">
-                {packages.map((pkg, index) => {
+                {localizedPackages.map((pkg, index) => {
                     const isEven = index % 2 === 0;
 
                     return (
@@ -151,10 +318,12 @@ export default function PackagesPage() {
                                     {/* Image with creative shape */}
                                     <div className="w-full lg:w-[55%] relative">
                                         <div className="relative rounded-[2rem] overflow-hidden aspect-[16/10] shadow-2xl shadow-safari-900/10">
-                                            <img
-                                                src={pkg.image}
-                                                alt={pkg.title}
-                                                className="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-105"
+                                            <Image
+                                                src={optimizeCloudinaryUrl(pkg.image, { width: 1200, quality: 70 })}
+                                                alt={`${pkg.title} experience in Sigiriya Sri Lanka`}
+                                                fill
+                                                sizes="(max-width: 1024px) 100vw, 55vw"
+                                                className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-105"
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                         </div>
@@ -164,9 +333,9 @@ export default function PackagesPage() {
                                             className={`absolute -bottom-5 ${isEven ? 'right-6 md:right-10' : 'left-6 md:left-10'
                                                 } ${pkg.accent} text-white px-6 py-3 rounded-2xl shadow-xl`}
                                         >
-                                            <span className="text-white/60 text-xs block">From</span>
+                                            <span className="text-white/60 text-xs block">{t.from}</span>
                                             <span className="text-2xl font-bold">${pkg.price}</span>
-                                            <span className="text-white/60 text-sm"> /person</span>
+                                            <span className="text-white/60 text-sm"> {t.perPerson}</span>
                                         </div>
 
                                         {/* Decorative accent dot */}
@@ -216,7 +385,7 @@ export default function PackagesPage() {
                                                 }`}
                                         >
                                             <span className="text-safari-900 font-semibold group-hover:text-secondary-600 transition-colors">
-                                                Explore this experience
+                                                {t.exploreExperience}
                                             </span>
                                             <div className="w-10 h-10 rounded-full border-2 border-safari-200 group-hover:border-secondary-500 group-hover:bg-secondary-600 flex items-center justify-center transition-all duration-500">
                                                 <ArrowRight
@@ -240,20 +409,20 @@ export default function PackagesPage() {
 
                 <div className="container mx-auto px-6 relative text-center">
                     <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                        Combine experiences. Make it yours.
+                        {t.closingTitle}
                     </h2>
                     <p className="text-safari-300/70 text-base max-w-lg mx-auto mb-3">
-                        Pair any package with a safari for the complete Sri Lankan adventure.
+                        {t.closingDescription}
                     </p>
                     <p className="text-safari-400/50 text-sm mb-8">
-                        USD 5 advance for packages · USD 8 advance for safaris (non-refundable)
+                        {t.closingNote}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <Link
                             href="/booking"
                             className="group bg-secondary-600 hover:bg-secondary-500 text-white font-bold py-3.5 px-8 rounded-full transition-all hover:scale-105 active:scale-95 shadow-xl inline-flex items-center justify-center gap-2"
                         >
-                            Book a Safari
+                            {t.bookSafari}
                             <ArrowRight
                                 size={16}
                                 className="group-hover:translate-x-1 transition-transform"
@@ -263,7 +432,7 @@ export default function PackagesPage() {
                             href="/contact"
                             className="bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-semibold py-3.5 px-8 rounded-full transition-all border border-white/10 hover:border-white/20"
                         >
-                            Get in Touch
+                            {t.contact}
                         </Link>
                     </div>
                 </div>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
-import { PACKAGE_INFO } from '@/lib/constants';
+import { getPackagePrice } from '@/lib/packages';
 
 export async function POST(request: NextRequest) {
     try {
@@ -108,8 +108,7 @@ export async function POST(request: NextRequest) {
             // ... code ...
 
             // Calculate discount amount for storage
-            const packageInfo = PACKAGE_INFO[package_type as keyof typeof PACKAGE_INFO];
-            const price = packageInfo ? packageInfo.price : 0;
+            const price = await getPackagePrice(package_type);
             const total = price * parseInt(group_size);
 
             if (promo.type === 'percentage') {
