@@ -1,16 +1,13 @@
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
-import { useGlobalData } from '@/providers/GlobalDataProvider';
+import { getDestinationsWithImages } from '@/lib/queries/destinations';
 import { ArrowRight, MapPin, Clock, Calendar, Camera, Car, ChevronDown } from 'lucide-react';
 import { formatUsd } from '@/lib/constants';
 import JsonLd from '@/components/seo/JsonLd';
 import { breadcrumbSchema, faqSchema, touristTripSchema } from '@/lib/schema';
 import { optimizeCloudinaryUrl } from '@/lib/images';
-import BreadcrumbNav from '@/components/layout/BreadcrumbNav';
 
-// export const revalidate = 3600; // Not needed for client component
+export const revalidate = 3600;
 
 const seasonInfo: Record<string, { months: string; color: string; bgColor: string; label: string }> = {
     'minneriya-national-park': { months: 'Jul - Sep', color: 'text-green-600', bgColor: 'bg-green-100', label: 'Minneriya' },
@@ -50,8 +47,8 @@ function sortDestinationsByCurrentSeason<T extends { slug: string }>(destination
     return ordered;
 }
 
-export default function DestinationsPage() {
-    const { destinations, isLoading } = useGlobalData();
+export default async function DestinationsPage() {
+    const destinations = await getDestinationsWithImages();
     const currentMonth = new Date().getMonth() + 1; // 1–12
     const currentSeasonSlug = getCurrentSeasonParkSlug(currentMonth);
     const sortedDestinations = sortDestinationsByCurrentSeason(destinations, currentSeasonSlug);
@@ -83,27 +80,11 @@ export default function DestinationsPage() {
         ),
     ];
 
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary-600"></div>
-            </div>
-        );
-    }
-
     return (
         <div className="min-h-screen bg-secondary-50">
             {schemas.map((schema, index) => (
                 <JsonLd key={`destinations-schema-${index}`} data={schema} />
             ))}
-            <div className="container mx-auto px-4 sm:px-6 pt-6">
-                <BreadcrumbNav
-                    items={[
-                        { label: 'Home', href: '/' },
-                        { label: 'Destinations' },
-                    ]}
-                />
-            </div>
             {/* Hero Header */}
             <div className="relative min-h-[60vh] sm:min-h-[70vh] md:min-h-[75vh] bg-safari-900 overflow-hidden flex items-end">
                 {/* Full-bleed background image */}
@@ -301,7 +282,7 @@ export default function DestinationsPage() {
                                                     {destination.images.slice(1, 4).map((img, idx) => (
                                                         <div
                                                             key={img.id}
-                                                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white overflow-hidden shadow-md"
+                                                            className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white overflow-hidden shadow-md"
                                                             style={{ zIndex: 3 - idx }}
                                                         >
                                                             <Image
