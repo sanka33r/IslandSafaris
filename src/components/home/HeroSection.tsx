@@ -1,79 +1,136 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { useLocale } from '@/providers/LocaleProvider';
 import { optimizeCloudinaryUrl } from '@/lib/images';
 
+const HERO_IMAGE = 'https://res.cloudinary.com/dxau42ovy/image/upload/v1770663701/IMG_6199.JPG_mxebtr.jpg';
+
 export default function HeroSection() {
     const heroRef = useRef<HTMLElement>(null);
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    const [scrollY, setScrollY] = useState(0);
-    const [isMobile, setIsMobile] = useState(false);
-    const loaded = true;
+    const bgRef = useRef<HTMLDivElement>(null);
+    const fogRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
+    const terrainRef = useRef<HTMLDivElement>(null);
+    const compassRef = useRef<HTMLDivElement>(null);
     const { messages } = useLocale();
 
     useEffect(() => {
-        const updateViewport = () => {
-            setIsMobile(window.innerWidth < 768);
+        const hero = heroRef.current;
+        if (!hero) return;
+
+        const desktop = window.matchMedia('(min-width: 768px) and (hover: hover)');
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (reduceMotion.matches) return;
+
+        // Parallax targets (raw input) and current (smoothed) values.
+        // Smoothing happens in the rAF loop via lerp, and transforms are
+        // written straight to the DOM so scroll/mouse never re-renders React.
+        const target = { x: 0, y: 0, scroll: 0 };
+        const current = { x: 0, y: 0, scroll: 0 };
+        let rafId = 0;
+        let running = false;
+
+        const render = () => {
+            current.x += (target.x - current.x) * 0.08;
+            current.y += (target.y - current.y) * 0.08;
+            current.scroll += (target.scroll - current.scroll) * 0.14;
+
+            if (bgRef.current) {
+                bgRef.current.style.transform = `translate3d(${current.x * -15}px, ${current.y * -15 + current.scroll * 0.4}px, 0) scale(1.15)`;
+            }
+            if (fogRef.current) {
+                fogRef.current.style.transform = `translate3d(${current.x * -8}px, ${current.scroll * 0.2}px, 0)`;
+            }
+            if (contentRef.current) {
+                contentRef.current.style.transform = `translate3d(${current.x * 12}px, ${current.y * 8 - current.scroll * 0.1}px, 0)`;
+            }
+            if (terrainRef.current) {
+                terrainRef.current.style.transform = `translate3d(${current.x * 20}px, 0, 0)`;
+            }
+            if (compassRef.current) {
+                compassRef.current.style.transform = `rotate(${current.scroll * 0.05 + current.x * 20}deg)`;
+            }
+
+            const settled =
+                Math.abs(target.x - current.x) < 0.0005 &&
+                Math.abs(target.y - current.y) < 0.0005 &&
+                Math.abs(target.scroll - current.scroll) < 0.1;
+
+            if (settled) {
+                running = false;
+                return;
+            }
+            rafId = requestAnimationFrame(render);
         };
 
-        updateViewport();
+        const kick = () => {
+            if (!running) {
+                running = true;
+                rafId = requestAnimationFrame(render);
+            }
+        };
 
         const handleScroll = () => {
-            setScrollY(window.scrollY);
+            if (!desktop.matches) return;
+            // Hero parallax only matters while the hero is on screen
+            target.scroll = Math.min(window.scrollY, window.innerHeight * 1.5);
+            kick();
         };
 
         const handleMouseMove = (e: MouseEvent) => {
-            if (isMobile) return;
-            if (!heroRef.current) return;
-            const rect = heroRef.current.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width - 0.5;
-            const y = (e.clientY - rect.top) / rect.height - 0.5;
-            setMousePos({ x, y });
+            if (!desktop.matches) return;
+            const rect = hero.getBoundingClientRect();
+            target.x = (e.clientX - rect.left) / rect.width - 0.5;
+            target.y = (e.clientY - rect.top) / rect.height - 0.5;
+            kick();
         };
 
-        window.addEventListener('resize', updateViewport, { passive: true });
+        const handleMouseLeave = () => {
+            target.x = 0;
+            target.y = 0;
+            kick();
+        };
+
         window.addEventListener('scroll', handleScroll, { passive: true });
-        if (!isMobile) {
-            window.addEventListener('mousemove', handleMouseMove, { passive: true });
-        }
+        window.addEventListener('mousemove', handleMouseMove, { passive: true });
+        hero.addEventListener('mouseleave', handleMouseLeave);
+        handleScroll();
 
         return () => {
-            window.removeEventListener('resize', updateViewport);
+            cancelAnimationFrame(rafId);
             window.removeEventListener('scroll', handleScroll);
             window.removeEventListener('mousemove', handleMouseMove);
+            hero.removeEventListener('mouseleave', handleMouseLeave);
         };
-    }, [isMobile]);
-
-    const parallaxBg = isMobile ? 0 : scrollY * 0.4;
-    const parallaxMid = isMobile ? 0 : scrollY * 0.2;
-    const parallaxFg = isMobile ? 0 : scrollY * 0.1;
+    }, []);
 
     return (
         <section
             ref={heroRef}
-            className="relative min-h-[100dvh] md:min-h-screen flex flex-col items-center justify-start md:justify-center overflow-hidden bg-safari-900 pt-24 sm:pt-28 md:pt-0 pb-20 sm:pb-24 md:pb-0 px-4 sm:px-6"
-            style={{ perspective: isMobile ? 'none' : '1200px', backgroundColor: '#1e2b1b' }}
+            className="relative min-h-[calc(100svh-5rem)] md:min-h-screen flex flex-col items-center justify-center overflow-hidden bg-safari-900 pt-14 md:pt-0 pb-8 md:pb-0 px-4 sm:px-6"
+            style={{ backgroundColor: '#1e2b1b' }}
         >
             {/* ── Deep Background Layer (moves slowest) ── */}
-            <div
-                className="absolute inset-0 scale-110"
-                style={{
-                    transform: `translate3d(${mousePos.x * -15}px, ${mousePos.y * -15 + parallaxBg}px, -100px) scale(1.15)`,
-                    transition: 'transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)',
-                }}
-            >
-                <Image
-                    src={optimizeCloudinaryUrl('https://res.cloudinary.com/dxau42ovy/image/upload/v1770663701/IMG_6199.JPG_mxebtr.jpg', { width: 1920, quality: 75 })}
-                    alt="Sri Lanka safari wilderness landscape with elephants"
-                    fill
-                    priority
-                    sizes="100vw"
-                    className="object-cover"
-                />
+            {/* Mobile gets a portrait, subject-aware Cloudinary crop instead of a
+                brutal center-slice of the wide desktop photo. Desktop keeps the
+                1.15 overscan so the parallax never exposes edges. */}
+            <div ref={bgRef} className="absolute inset-0 md:scale-[1.15] md:will-change-transform">
+                <picture>
+                    <source
+                        media="(max-width: 767px)"
+                        srcSet={optimizeCloudinaryUrl(HERO_IMAGE, { width: 900, height: 1600, quality: 72 })}
+                    />
+                    <img
+                        src={optimizeCloudinaryUrl(HERO_IMAGE, { width: 1920, quality: 75 })}
+                        alt="Sri Lanka safari wilderness landscape with elephants"
+                        fetchPriority="high"
+                        decoding="async"
+                        className="absolute inset-0 h-full w-full object-cover"
+                    />
+                </picture>
             </div>
 
             {/* ── Color Overlays for depth ── */}
@@ -81,22 +138,16 @@ export default function HeroSection() {
             <div className="absolute inset-0 bg-gradient-to-r from-safari-950/50 via-transparent to-safari-950/50" />
 
             {/* ── Atmospheric Fog Layer ── */}
-            <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                    transform: `translate3d(${mousePos.x * -8}px, ${parallaxMid}px, 0)`,
-                    transition: 'transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1)',
-                }}
-            >
+            <div ref={fogRef} className="absolute inset-0 pointer-events-none will-change-transform">
                 <div className="absolute bottom-0 left-0 right-0 h-[60%] bg-gradient-to-t from-safari-950/90 via-safari-900/20 to-transparent" />
-                {/* Horizontal mist bands */}
-                <div className="absolute bottom-[20%] left-0 right-0 h-24 bg-white/[0.03] blur-2xl hero-mist-drift" />
-                <div className="absolute bottom-[35%] left-0 right-0 h-16 bg-white/[0.02] blur-3xl hero-mist-drift-slow" />
+                {/* Horizontal mist bands — desktop only (static bands look muddy on mobile) */}
+                <div className="hidden md:block absolute bottom-[20%] left-0 right-0 h-24 bg-white/[0.03] blur-2xl hero-mist-drift" />
+                <div className="hidden md:block absolute bottom-[35%] left-0 right-0 h-16 bg-white/[0.02] blur-3xl hero-mist-drift-slow" />
             </div>
 
             {/* ── Floating Particles (fireflies/dust motes) ── */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                {[...Array(isMobile ? 8 : 18)].map((_, i) => (
+                {[...Array(14)].map((_, i) => (
                     <div
                         key={i}
                         className="hero-particle"
@@ -113,8 +164,8 @@ export default function HeroSection() {
                 ))}
             </div>
 
-            {/* ── Birds ── */}
-            <div className="absolute top-6 sm:top-10 left-0 w-full h-[35vh] sm:h-[45vh] md:h-[60vh] pointer-events-none z-10 opacity-20 sm:opacity-25 md:opacity-30">
+            {/* ── Birds — desktop only ── */}
+            <div className="absolute top-10 left-0 w-full h-[60vh] pointer-events-none z-10 opacity-30 hidden md:block">
                 <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
                     <g className="bird-fly text-safari-950">
                         <path d="M10,50 Q25,30 40,50" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
@@ -128,11 +179,8 @@ export default function HeroSection() {
 
             {/* ── Decorative Safari Compass ── */}
             <div
-                className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8 w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 opacity-10 pointer-events-none hidden md:block"
-                style={{
-                    transform: `rotate(${scrollY * 0.05 + mousePos.x * 20}deg)`,
-                    transition: 'transform 1s cubic-bezier(0.25, 0.1, 0.25, 1)',
-                }}
+                ref={compassRef}
+                className="absolute bottom-8 left-8 w-28 h-28 opacity-10 pointer-events-none hidden md:block will-change-transform"
             >
                 <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="50" cy="50" r="48" stroke="currentColor" strokeWidth="1" className="text-secondary-400" />
@@ -148,19 +196,13 @@ export default function HeroSection() {
                 </svg>
             </div>
 
-            {/* ── Main Content with 3D depth ── */}
+            {/* ── Main Content ── */}
             <div
-                className="relative z-40 text-center px-2 sm:px-4 max-w-5xl mx-auto text-white mt-6 sm:mt-8 md:mt-0"
-                style={{
-                    transform: `translate3d(${mousePos.x * 12}px, ${mousePos.y * 8 - parallaxFg}px, 50px)`,
-                    transition: 'transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1)',
-                }}
+                ref={contentRef}
+                className="relative z-40 text-center px-2 sm:px-4 max-w-5xl mx-auto text-white will-change-transform"
             >
                 {/* Tag */}
-                <div
-                    className={`inline-flex items-center gap-2 bg-secondary-600/20 backdrop-blur-md border border-secondary-400/30 rounded-full px-3 py-2 sm:px-5 sm:py-2.5 mb-5 sm:mb-6 md:mb-8 transition-all duration-1000 max-w-[95vw] sm:max-w-none ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-6'
-                        }`}
-                >
+                <div className="hero-enter inline-flex items-center gap-2 bg-secondary-600/20 backdrop-blur-md border border-secondary-400/30 rounded-full px-3 py-2 sm:px-5 sm:py-2.5 mb-5 sm:mb-6 md:mb-8 max-w-[95vw] sm:max-w-none">
                     <span className="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5 shrink-0">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-400 opacity-75" />
                         <span className="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-secondary-400" />
@@ -171,39 +213,27 @@ export default function HeroSection() {
                 </div>
 
                 {/* Heading with staggered entrance */}
-                <h1
-                    className={`text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-[5.5rem] font-bold mb-4 sm:mb-6 md:mb-8 tracking-tight leading-[1.08] sm:leading-[1.05] transition-all duration-1000 delay-200 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                        }`}
-                >
+                <h1 className="hero-enter hero-enter-1 text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-[5.5rem] font-bold mb-4 sm:mb-6 md:mb-8 tracking-tight leading-[1.08] sm:leading-[1.05]">
                     <span className="block">{messages.hero.titleTop}</span>
                     <span className="relative inline-block">
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary-300 via-secondary-400 to-secondary-500 hero-text-shimmer">
                             {messages.hero.titleHighlight}
                         </span>
                         {/* Animated underline accent */}
-                        <span
-                            className={`absolute -bottom-2 left-0 h-[3px] bg-gradient-to-r from-secondary-400 via-secondary-500 to-transparent rounded-full transition-all duration-1000 delay-700 ${loaded ? 'w-full' : 'w-0'
-                                }`}
-                        />
+                        <span className="hero-underline absolute bottom-0 md:-bottom-2 left-0 w-full h-[2px] md:h-[3px] bg-gradient-to-r from-secondary-400 via-secondary-500 to-transparent rounded-full" />
                     </span>
                     <span className="block">{messages.hero.titleBottom}</span>
                 </h1>
 
                 {/* Description */}
-                <p
-                    className={`text-base sm:text-lg md:text-xl text-white/70 mb-8 sm:mb-10 md:mb-12 font-light max-w-2xl mx-auto leading-relaxed px-1 sm:px-0 transition-all duration-1000 delay-400 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                        }`}
-                >
+                <p className="hero-enter hero-enter-2 text-base sm:text-lg md:text-xl text-white/70 mb-8 sm:mb-10 md:mb-12 font-light max-w-2xl mx-auto leading-relaxed px-1 sm:px-0">
                     {messages.hero.descriptionTop}
                     {' '}
                     {messages.hero.descriptionBottom}
                 </p>
 
                 {/* CTA buttons */}
-                <div
-                    className={`flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center w-full sm:w-auto max-w-sm sm:max-w-none mx-auto transition-all duration-1000 delay-[600ms] ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                        }`}
-                >
+                <div className="hero-enter hero-enter-3 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center w-full sm:w-auto max-w-sm sm:max-w-none mx-auto">
                     <Link
                         href="/booking"
                         className="group relative bg-gradient-to-r from-secondary-600 to-secondary-500 hover:from-secondary-500 hover:to-secondary-400 text-white font-bold py-3.5 sm:py-4 px-8 sm:px-10 rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl shadow-secondary-900/50 active:scale-95 inline-flex items-center justify-center gap-2 sm:gap-3 overflow-hidden min-h-[44px] sm:min-h-0"
@@ -223,10 +253,7 @@ export default function HeroSection() {
                 </div>
 
                 {/* Stats strip */}
-                <div
-                    className={`mt-10 sm:mt-12 md:mt-16 flex flex-wrap justify-center gap-6 sm:gap-8 md:gap-12 transition-all duration-1000 delay-[800ms] ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-                        }`}
-                >
+                <div className="hero-enter hero-enter-4 mt-10 sm:mt-12 md:mt-16 flex flex-wrap justify-center gap-6 sm:gap-8 md:gap-12">
                     {[
                         { value: '300+', label: messages.hero.statElephants },
                         { value: '3', label: messages.hero.statParks },
@@ -240,14 +267,8 @@ export default function HeroSection() {
                 </div>
             </div>
 
-            {/* ── Bottom Terrain Silhouette (fixed to bottom, no scroll lift) ── */}
-            <div
-                className="absolute bottom-0 left-0 right-0 pointer-events-none z-30"
-                style={{
-                    transform: `translate3d(${mousePos.x * 20}px, 0, 80px)`,
-                    transition: 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
-                }}
-            >
+            {/* ── Bottom Terrain Silhouette ── */}
+            <div ref={terrainRef} className="absolute bottom-0 left-0 right-0 pointer-events-none z-30 will-change-transform">
                 <svg
                     viewBox="0 0 1440 120"
                     preserveAspectRatio="none"
@@ -264,8 +285,6 @@ export default function HeroSection() {
                     />
                 </svg>
             </div>
-
-
         </section>
     );
 }

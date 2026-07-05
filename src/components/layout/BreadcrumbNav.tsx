@@ -14,8 +14,10 @@ interface BreadcrumbNavProps {
 export default function BreadcrumbNav({ items, className = '' }: BreadcrumbNavProps) {
   if (!items.length) return null;
 
+  // Visually hidden by design: the path stays available to screen readers
+  // (and breadcrumb JSON-LD handles SEO), but no bar is shown under the header.
   return (
-    <nav aria-label="Breadcrumb" className={className}>
+    <nav aria-label="Breadcrumb" className={`sr-only ${className}`}>
       <ol className="flex flex-wrap items-center gap-1.5 text-sm text-safari-500">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;

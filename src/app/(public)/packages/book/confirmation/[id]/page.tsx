@@ -217,7 +217,7 @@ export default async function BookingConfirmationPage(props: ConfirmationPagePro
                                     <div className="flex-shrink-0 w-8 h-8 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold text-sm">1</div>
                                     <div>
                                         <div className="font-semibold text-safari-900 mb-1">Complete Payment</div>
-                                        <div className="text-safari-600 text-sm">Use the PayPal button above to pay the USD {Number(booking.advance_payment_amount) || 5} advance. Your booking will be confirmed instantly.</div>
+                                        <div className="text-safari-600 text-sm">Pay the USD {Number(booking.advance_payment_amount) || 5} advance above with PayPal or PayHere. Your booking will be confirmed instantly.</div>
                                     </div>
                                 </li>
                                 <li className="flex gap-4">

@@ -38,6 +38,14 @@ export default function PayPalButton({
     const [loading, setLoading] = useState(true);
     const [paid, setPaid] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [retryToken, setRetryToken] = useState(0);
+
+    const handleRetry = () => {
+        renderedRef.current = false;
+        setError(null);
+        setLoading(true);
+        setRetryToken((t) => t + 1);
+    };
 
     // Never show raw API/JSON errors to users; show a safe fallback
     const safeErrorMessage = (msg: string): string => {
@@ -168,7 +176,7 @@ export default function PayPalButton({
             renderedRef.current = false;
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [clientId, bookingId, paid, disabled]);
+    }, [clientId, bookingId, paid, disabled, retryToken]);
 
     if (!clientId) {
         return (
@@ -189,9 +197,16 @@ export default function PayPalButton({
 
     if (error) {
         return (
-            <p className="text-sm text-red-600">
-                {error}
-            </p>
+            <div className={className}>
+                <p className="text-sm text-red-600 mb-2">{error}</p>
+                <button
+                    type="button"
+                    onClick={handleRetry}
+                    className="w-full rounded-lg border-2 border-safari-200 bg-white px-5 py-3 font-bold text-safari-900 transition-colors hover:border-secondary-400 hover:bg-secondary-50"
+                >
+                    Try again
+                </button>
+            </div>
         );
     }
 

@@ -1,16 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Destination } from '@/types/db';
 import { submitBooking } from '@/lib/actions/booking';
 import { validatePromoCode } from '@/lib/actions/promo-codes';
 import { BookingFormData } from '@/lib/schemas/booking';
-import { Loader2, CheckCircle, CreditCard, Car, MapPin, ExternalLink, Tag, AlertCircle } from 'lucide-react';
+import { Loader2, CheckCircle, CreditCard, Car, MapPin, ExternalLink, Tag, AlertCircle, Users, Minus, Plus } from 'lucide-react';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
-import { formatUsd, SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE, EXTRA_HOUR_PRICE_USD } from '@/lib/constants';
+import { formatUsd, SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE, SAFARI_MAX_BOOKING_SIZE, EXTRA_HOUR_PRICE_USD } from '@/lib/constants';
 import PaymentSection from '@/components/payments/PaymentSection';
 
 const COUNTRY_CODES = [
@@ -67,7 +67,7 @@ const step1Schema = z.object({
 const step2Schema = z.object({
     date: z.string().min(1, 'Date is required'),
     time: z.string().min(1, 'Time is required'),
-    group_size: z.coerce.number().min(1, 'At least 1 person is required').max(SAFARI_MAX_GROUP_SIZE, `Maximum group size for safari is ${SAFARI_MAX_GROUP_SIZE}`),
+    group_size: z.coerce.number().min(1, 'At least 1 person is required').max(SAFARI_MAX_BOOKING_SIZE, `Maximum group size for safari is ${SAFARI_MAX_BOOKING_SIZE}`),
 });
 const step3Schema = z.object({
     pickup_required: z.boolean(),
@@ -99,6 +99,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitResult, setSubmitResult] = useState<any>(null);
+    const [submitError, setSubmitError] = useState<string | null>(null);
     const [estimatedPrice, setEstimatedPrice] = useState<any>(null);
 
     const [discount, setDiscount] = useState<{ amount: number; code: string } | null>(null);
@@ -124,7 +125,8 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                 const ticketCost = dest.ticket_pricing_type === 'per_person' ? dest.ticket_price * groupSize : dest.ticket_price;
                 const extraHours = formData.extra_hours || 0;
                 const extraCost = extraHours * extraHourPriceUsd * vehicles;
-                const extraPersonCount = Math.max(0, groupSize - 3);
+                // Base vehicle price covers 3 per jeep; 4th & 5th seat charged per person
+                const extraPersonCount = Math.max(0, groupSize - 3 * vehicles);
                 const extraPersonCostUsd = extraPersonCount * SAFARI_EXTRA_PERSON_USD;
 
                 const ourCharge = vehicleCost + extraCost + extraPersonCostUsd;
@@ -219,6 +221,17 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
         return errors;
     }
 
+    const scrollToWizardTop = () => {
+        // Keep the step content in view when the step changes (matters on mobile)
+        requestAnimationFrame(() => {
+            const el = document.getElementById('booking-wizard-top');
+            if (el) {
+                const top = el.getBoundingClientRect().top + window.scrollY - 96;
+                window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+            }
+        });
+    };
+
     const handleNext = () => {
         const errors = validateStep(currentStep);
         const hasErrors = Object.keys(errors).length > 0;
@@ -228,14 +241,17 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
         }
         setStepErrors(prev => ({ ...prev, [currentStep]: {} }));
         setCurrentStep(prev => Math.min(prev + 1, 5));
+        scrollToWizardTop();
     };
 
     const handleBack = () => {
         setCurrentStep(prev => Math.max(prev - 1, 1));
+        scrollToWizardTop();
     };
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
+        setSubmitError(null);
         try {
             const fullPhone = formData.country_code && formData.phone
                 ? `${formData.country_code} ${formData.phone}`
@@ -248,11 +264,14 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
             if (res.success) {
                 setSubmitResult(res);
             } else {
-                alert('Validation failed: ' + JSON.stringify(res.errors));
+                const messages = res.errors
+                    ? Object.values(res.errors).flat().filter(Boolean).join(' ')
+                    : '';
+                setSubmitError(messages || 'Please check your details and try again.');
             }
         } catch (e) {
             console.error(e);
-            alert('An error occurred');
+            setSubmitError('Something went wrong while saving your booking. Please try again, or contact us on WhatsApp.');
         } finally {
             setIsSubmitting(false);
         }
@@ -327,7 +346,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
     const selectedDest = destinations.find(d => d.id === formData.destination_id);
 
     return (
-        <div className="max-w-4xl mx-auto">
+        <div id="booking-wizard-top" className="max-w-4xl mx-auto">
             {/* Desktop Stepper */}
             <div className="mb-8 hidden md:flex items-center justify-between px-12">
                 {steps.map((step) => (
@@ -365,10 +384,10 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                 <div className="lg:col-span-2 space-y-6">
                     <motion.div
                         key={currentStep}
-                        initial={{ opacity: 0, x: 20 }}
+                        initial={{ opacity: 0, x: 24 }}
                         animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        className="bg-white rounded-3xl p-5 md:p-8 shadow-sm border border-safari-100 min-h-[400px] mb-20 md:mb-0"
+                        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                        className="bg-white rounded-3xl p-5 md:p-8 shadow-sm border border-safari-100 min-h-[400px] mb-24 md:mb-0"
                     >
                         {currentStep === 1 && (
                             <div className="space-y-4">
@@ -453,28 +472,46 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                                             <p className="text-sm text-red-600 font-medium">{stepErrors[2].time}</p>
                                         )}
                                     </div>
-                                    <div className="col-span-full space-y-4">
+                                    <div className="col-span-full space-y-3">
                                         <label className="text-sm font-semibold text-safari-700">Group Size</label>
-                                        <div className="flex items-center gap-6">
-                                            <input
-                                                type="range"
-                                                min="1"
-                                                max={SAFARI_MAX_GROUP_SIZE}
-                                                value={formData.group_size || 1}
-                                                onChange={(e) => updateField('group_size', parseInt(e.target.value))}
-                                                className="flex-1 accent-secondary-600 h-3 bg-safari-100 rounded-lg appearance-none cursor-pointer"
-                                            />
-                                            <div className={cn(
-                                                "w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-2xl shadow-inner",
-                                                stepErrors[2]?.group_size ? "bg-red-50 border-2 border-red-300 text-red-700" : "bg-secondary-50 border-2 border-secondary-200 text-safari-900"
-                                            )}>
-                                                {formData.group_size}
+                                        <div className={cn(
+                                            "flex items-center justify-between rounded-xl border p-3",
+                                            stepErrors[2]?.group_size ? "border-red-300 bg-red-50" : "border-safari-200 bg-safari-50"
+                                        )}>
+                                            <div className="flex items-center gap-2 text-safari-700">
+                                                <Users size={20} className="text-secondary-600" />
+                                                <span className="font-semibold text-safari-900">
+                                                    {formData.group_size} {formData.group_size === 1 ? 'person' : 'people'}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateField('group_size', Math.max(1, (formData.group_size || 1) - 1))}
+                                                    disabled={(formData.group_size || 1) <= 1}
+                                                    aria-label="Decrease group size"
+                                                    className="w-11 h-11 rounded-xl bg-white border border-safari-200 hover:border-secondary-400 hover:bg-secondary-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                                                >
+                                                    <Minus size={18} className="text-safari-900" />
+                                                </button>
+                                                <div className="w-12 text-center font-bold text-2xl text-safari-900 tabular-nums">
+                                                    {formData.group_size}
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateField('group_size', Math.min(SAFARI_MAX_BOOKING_SIZE, (formData.group_size || 1) + 1))}
+                                                    disabled={(formData.group_size || 1) >= SAFARI_MAX_BOOKING_SIZE}
+                                                    aria-label="Increase group size"
+                                                    className="w-11 h-11 rounded-xl bg-white border border-safari-200 hover:border-secondary-400 hover:bg-secondary-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                                                >
+                                                    <Plus size={18} className="text-safari-900" />
+                                                </button>
                                             </div>
                                         </div>
                                         {stepErrors[2]?.group_size && (
                                             <p className="text-sm text-red-600 font-medium">{stepErrors[2].group_size}</p>
                                         )}
-                                        <p className="text-xs text-safari-500">Maximum {SAFARI_MAX_GROUP_SIZE} people. USD {SAFARI_EXTRA_PERSON_USD} per person for the 4th and 5th.</p>
+                                        <p className="text-xs text-safari-500">Maximum {SAFARI_MAX_GROUP_SIZE} people per jeep. USD {SAFARI_EXTRA_PERSON_USD} per person for the 4th and 5th.</p>
                                     </div>
                                 </div>
                             </div>
@@ -687,6 +724,12 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                         {currentStep === 5 && (
                             <div className="space-y-6">
                                 <h2 className="text-2xl font-bold text-safari-900">Review & Submit</h2>
+                                {submitError && (
+                                    <div className="flex items-start gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm font-medium">
+                                        <AlertCircle size={18} className="shrink-0 mt-0.5" />
+                                        {submitError}
+                                    </div>
+                                )}
                                 <div className="bg-safari-50 p-6 rounded-2xl space-y-3 text-sm text-safari-800">
                                     <div className="flex justify-between border-b pb-2 border-safari-200">
                                         <span className="text-safari-500">Destination</span>
@@ -776,7 +819,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                         )}
                     </motion.div>
 
-                    <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-lg border-t border-safari-100 md:relative md:bg-transparent md:backdrop-blur-none md:border-none md:p-0 md:flex md:justify-between md:pt-4 z-30">
+                    <div id="mobile-action-bar" className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-lg border-t border-safari-100 md:relative md:bg-transparent md:backdrop-blur-none md:border-none md:p-0 md:flex md:justify-between md:pt-4 z-30">
                         <div className="flex md:w-full items-center justify-between gap-4">
                             <button
                                 onClick={handleBack}

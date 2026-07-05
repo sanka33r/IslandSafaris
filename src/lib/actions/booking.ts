@@ -28,7 +28,9 @@ async function calculatePrice(data: BookingFormData) {
 
     const extraHourPriceUsd = await getExtraHourPriceUsd();
     const extraHoursCost = data.extra_hours * extraHourPriceUsd * vehicleCount;
-    const extraPersonCount = Math.max(0, data.group_size - 3);
+    // Each jeep seats up to 5; the base vehicle price covers 3, so the 4th and
+    // 5th seat in each jeep is charged per person.
+    const extraPersonCount = Math.max(0, data.group_size - 3 * vehicleCount);
     const extraPersonCostUsd = extraPersonCount * SAFARI_EXTRA_PERSON_USD;
 
     const ourCharge = vehicleCost + extraHoursCost + extraPersonCostUsd;

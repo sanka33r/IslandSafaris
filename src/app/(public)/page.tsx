@@ -244,9 +244,12 @@ export default async function HomePage() {
         <JsonLd key={`home-schema-${index}`} data={schema} />
       ))}
       <HeroSection />
+      {/* Safari trail scroll companion — disabled for now, re-enable with <SafariTrail /> */}
 
       {/* About Section - The Rhythm of the Wild */}
-      <section className="py-12 md:py-16 bg-secondary-50">
+      {/* relative -mt-px: paints 1px over the hero's bottom edge so DPR
+          rounding never shows the dark body background as a seam line */}
+      <section className="relative -mt-px py-12 md:py-16 bg-secondary-50">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Image Stack - The Rhythm of the Wild (Cloudinary) */}

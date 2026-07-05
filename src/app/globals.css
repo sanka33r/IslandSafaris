@@ -202,6 +202,61 @@
     }
   }
 
+  /* Hero staggered entrance (CSS-driven so it plays on first paint) */
+  .hero-enter {
+    opacity: 0;
+    animation: heroEnter 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .hero-enter-1 {
+    animation-delay: 0.1s;
+  }
+
+  .hero-enter-2 {
+    animation-delay: 0.25s;
+  }
+
+  .hero-enter-3 {
+    animation-delay: 0.4s;
+  }
+
+  .hero-enter-4 {
+    animation-delay: 0.55s;
+  }
+
+  .hero-enter-5 {
+    animation-delay: 0.7s;
+  }
+
+  @keyframes heroEnter {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Hero title underline draw-in */
+  .hero-underline {
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: heroUnderline 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.9s both;
+  }
+
+  @keyframes heroUnderline {
+    from {
+      transform: scaleX(0);
+    }
+
+    to {
+      transform: scaleX(1);
+    }
+  }
+
   /* Bird flight animation */
   .bird-fly {
     animation: birdFly 35s linear infinite;
@@ -276,8 +331,10 @@
 
 .content-visibility-auto {
   content-visibility: auto;
-  contain-intrinsic-size: 1px 900px;
+  /* "auto" remembers the last rendered size, preventing scrollbar jumps */
+  contain-intrinsic-size: auto 900px;
 }
+
 
 /* Focus states */
 button:focus-visible,
@@ -304,13 +361,3 @@ textarea:focus-visible {
   }
 }
 
-@media (max-width: 768px) {
-  .hero-particle,
-  .hero-mist-drift,
-  .hero-mist-drift-slow,
-  .hero-btn-shine,
-  .hero-text-shimmer,
-  .bird-fly {
-    animation: none !important;
-  }
-}

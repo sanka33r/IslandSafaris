@@ -25,8 +25,11 @@ export const PACKAGE_INFO = {
 /** Safari: USD per person when group size exceeds 3 (4th and 5th person). */
 export const SAFARI_EXTRA_PERSON_USD = 5;
 
-/** Safari: max group size. */
+/** Safari: max people per jeep. */
 export const SAFARI_MAX_GROUP_SIZE = 5;
+
+/** Safari: max total group size per booking (split across multiple jeeps). */
+export const SAFARI_MAX_BOOKING_SIZE = 20;
 
 /** Safari: USD per extra hour per jeep. */
 export const EXTRA_HOUR_PRICE_USD = 16;
