@@ -6,6 +6,7 @@ import { CheckCircle, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import PayPalButton from './PayPalButton';
 import PayHereButton from './PayHereButton';
+import IPayButton from './IPayButton';
 
 interface PaymentSectionProps {
     bookingId: string;
@@ -28,11 +29,17 @@ const METHODS = [
         description: 'Cards & Sri Lankan bank payments',
         badge: null,
     },
+    {
+        id: 'ipay' as const,
+        name: 'iPay',
+        description: 'Cards, iPay app & LankaQR',
+        badge: null,
+    },
 ];
 
 export default function PaymentSection({ bookingId, amount, alreadyPaid, onPaymentSuccess }: PaymentSectionProps) {
     const router = useRouter();
-    const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'payhere'>('paypal');
+    const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'payhere' | 'ipay'>('paypal');
 
     const handlePaymentSuccess = () => {
         if (onPaymentSuccess) {
@@ -113,17 +120,24 @@ export default function PaymentSection({ bookingId, amount, alreadyPaid, onPayme
                             </div>
                         </fieldset>
 
-                        {paymentMethod === 'paypal' ? (
+                        {paymentMethod === 'paypal' && (
                             <PayPalButton
                                 bookingId={bookingId}
                                 amount={amount}
                                 onSuccess={handlePaymentSuccess}
                                 className="min-h-[45px]"
                             />
-                        ) : (
+                        )}
+                        {paymentMethod === 'payhere' && (
                             <PayHereButton
                                 bookingId={bookingId}
                                 onSuccess={handlePaymentSuccess}
+                                className="min-h-[45px]"
+                            />
+                        )}
+                        {paymentMethod === 'ipay' && (
+                            <IPayButton
+                                bookingId={bookingId}
                                 className="min-h-[45px]"
                             />
                         )}
