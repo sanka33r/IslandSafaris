@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Compass, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
+import { Menu, X, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
@@ -43,17 +44,14 @@ export default function Header() {
                     <div className="flex items-center justify-between">
                         {/* Logo */}
                         <Link href="/" className="flex items-center gap-3 group relative z-[60]">
-                            <div
-                                className={cn(
-                                    'w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 border',
-                                    'bg-white/5 border-white/10 group-hover:bg-secondary-500/20 group-hover:border-secondary-500/30'
-                                )}
-                            >
-                                <Compass
-                                    size={20}
-                                    className="text-secondary-400 group-hover:rotate-45 transition-transform duration-500"
-                                />
-                            </div>
+                            <Image
+                                src="/logo-mark.svg"
+                                alt="Island Safaris logo"
+                                width={40}
+                                height={40}
+                                className="w-10 h-10 transition-transform duration-500 group-hover:scale-105"
+                                priority
+                            />
                             <span className="text-xl font-bold tracking-tight text-secondary-100 transition-colors">
                                 ISLAND
                                 <span className="text-secondary-400 ml-0.5">SAFARIS</span>
