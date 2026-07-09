@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 140" role="img" aria-label="Island Safaris">
+  <!-- Monogram seal -->
+  <g transform="translate(10,10)">
+    <circle cx="60" cy="60" r="58" fill="#2b3d26"/>
+    <circle cx="60" cy="60" r="53" fill="none" stroke="#d5a054" stroke-width="2.5"/>
+    <circle cx="60" cy="60" r="47" fill="none" stroke="#d5a054" stroke-width="1" opacity="0.55"/>
+    <text x="60" y="74" text-anchor="middle" font-family="Outfit, Georgia, 'Times New Roman', serif"
+          font-size="42" font-weight="700" letter-spacing="3" fill="#fef2d0">IS</text>
+    <line x1="42" y1="84" x2="78" y2="84" stroke="#d5a054" stroke-width="1.5"/>
+    <circle cx="60" cy="34" r="2.2" fill="#d5a054"/>
+  </g>
+  <!-- Wordmark -->
+  <g font-family="Outfit, 'Segoe UI', Arial, sans-serif">
+    <text x="150" y="68" font-size="50" font-weight="800" letter-spacing="2" fill="#2b3d26">ISLAND</text>
+    <text x="152" y="112" font-size="30" font-weight="600" letter-spacing="13.5" fill="#a25b27">SAFARIS</text>
+  </g>
+</svg>

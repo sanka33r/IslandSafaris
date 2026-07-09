@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Island Safaris monogram">
+  <!-- Seal -->
+  <circle cx="60" cy="60" r="58" fill="#2b3d26"/>
+  <circle cx="60" cy="60" r="53" fill="none" stroke="#d5a054" stroke-width="2.5"/>
+  <circle cx="60" cy="60" r="47" fill="none" stroke="#d5a054" stroke-width="1" opacity="0.55"/>
+  <!-- Monogram -->
+  <text x="60" y="74" text-anchor="middle" font-family="Outfit, Georgia, 'Times New Roman', serif"
+        font-size="42" font-weight="700" letter-spacing="3" fill="#fef2d0">IS</text>
+  <!-- Formal detail: rule and dot -->
+  <line x1="42" y1="84" x2="78" y2="84" stroke="#d5a054" stroke-width="1.5"/>
+  <circle cx="60" cy="34" r="2.2" fill="#d5a054"/>
+</svg>
