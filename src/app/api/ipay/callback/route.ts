@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import {
     createIPayCallbackChecksum,
-    formatIPayAmount,
     fromIPayOrderId,
     secureEquals,
 } from '@/lib/ipay';
+import { getUsdToLkrRate } from '@/lib/exchange-rate';
 import { sendSafariBookingConfirmation } from '@/lib/email/send-safari-confirmation';
 
 async function parseCallbackBody(request: Request): Promise<Record<string, string>> {
@@ -58,9 +58,12 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
         }
 
-        const expectedAmount = Number(formatIPayAmount(Number(booking.advance_payment_amount ?? 8)));
+        // The live USD->LKR rate can tick between checkout and callback, so
+        // allow 3% drift instead of an exact match.
+        const usdToLkrRate = await getUsdToLkrRate();
+        const expectedAmount = Number(booking.advance_payment_amount ?? 8) * usdToLkrRate;
         const paidAmount = Number(transactionAmount);
-        if (!Number.isFinite(paidAmount) || Math.abs(expectedAmount - paidAmount) > 0.01) {
+        if (!Number.isFinite(paidAmount) || Math.abs(expectedAmount - paidAmount) > expectedAmount * 0.03) {
             return NextResponse.json({ error: 'Payment amount mismatch' }, { status: 400 });
         }
 

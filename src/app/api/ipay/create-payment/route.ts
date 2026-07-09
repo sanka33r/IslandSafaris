@@ -7,6 +7,7 @@ import {
     getIPayMerchantWebToken,
     toIPayOrderId,
 } from '@/lib/ipay';
+import { getUsdToLkrRate } from '@/lib/exchange-rate';
 
 export async function POST(request: Request) {
     try {
@@ -33,7 +34,8 @@ export async function POST(request: Request) {
 
         const merchantWebToken = getIPayMerchantWebToken();
         const orderId = toIPayOrderId(booking.id);
-        const totalAmount = formatIPayAmount(Number(booking.advance_payment_amount ?? 8));
+        const usdToLkrRate = await getUsdToLkrRate();
+        const totalAmount = formatIPayAmount(Number(booking.advance_payment_amount ?? 8), usdToLkrRate);
         const origin = new URL(request.url).origin;
         const confirmationUrl = `${origin}/packages/book/confirmation/${booking.id}`;
 

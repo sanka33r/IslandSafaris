@@ -27,15 +27,13 @@ function getIPaySecret(): string {
 
 /**
  * iPay processes amounts in LKR while bookings are priced in USD.
- * IPAY_USD_TO_LKR_RATE must be set explicitly (use 1 for a USD-settled
- * merchant account) so we never silently charge LKR 8 for a USD 8 advance.
+ * The rate comes from getUsdToLkrRate() (live, cached hourly).
  */
-export function formatIPayAmount(amountUsd: number): string {
-    const rate = Number(process.env.IPAY_USD_TO_LKR_RATE);
-    if (!Number.isFinite(rate) || rate <= 0) {
-        throw new Error('Missing or invalid IPAY_USD_TO_LKR_RATE');
+export function formatIPayAmount(amountUsd: number, usdToLkrRate: number): string {
+    if (!Number.isFinite(usdToLkrRate) || usdToLkrRate <= 0) {
+        throw new Error('Invalid USD to LKR rate');
     }
-    const amount = amountUsd * rate;
+    const amount = amountUsd * usdToLkrRate;
     if (!Number.isFinite(amount) || amount <= 0) {
         throw new Error('Invalid iPay amount');
     }
