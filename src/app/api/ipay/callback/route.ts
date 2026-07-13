@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import {
     createIPayCallbackChecksum,
@@ -20,6 +20,11 @@ async function parseCallbackBody(request: Request): Promise<Record<string, strin
     return Object.fromEntries([...formData.entries()].map(([key, value]) => [key, String(value)]));
 }
 
+function reject(status: number, error: string, context: Record<string, unknown>) {
+    console.error(`iPay callback rejected (${status}): ${error}`, context);
+    return NextResponse.json({ error }, { status });
+}
+
 export async function POST(request: Request) {
     try {
         const payload = await parseCallbackBody(request);
@@ -32,7 +37,7 @@ export async function POST(request: Request) {
         const checksum = payload.checksum || '';
 
         if (!transactionReference || !orderId || !transactionAmount || !transactionStatus || !transactionTimeInMillis || !checksum) {
-            return NextResponse.json({ error: 'Missing iPay callback fields' }, { status: 400 });
+            return reject(400, 'Missing iPay callback fields', { receivedKeys: Object.keys(payload) });
         }
 
         const localChecksum = createIPayCallbackChecksum({
@@ -44,33 +49,52 @@ export async function POST(request: Request) {
         });
 
         if (!secureEquals(localChecksum, checksum)) {
-            return NextResponse.json({ error: 'Invalid checksum' }, { status: 400 });
+            return reject(400, 'Invalid checksum', { orderId, transactionReference });
         }
 
         const bookingId = fromIPayOrderId(orderId);
         const { data: booking, error: bookingError } = await supabaseAdmin
             .from('bookings')
-            .select('id, advance_payment_amount, advance_payment_status')
+            .select('id, advance_payment_amount, advance_payment_lkr, advance_payment_status')
             .eq('id', bookingId)
             .single();
 
         if (bookingError || !booking) {
-            return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
-        }
-
-        // The live USD->LKR rate can tick between checkout and callback, so
-        // allow 3% drift instead of an exact match.
-        const usdToLkrRate = await getUsdToLkrRate();
-        const expectedAmount = Number(booking.advance_payment_amount ?? 8) * usdToLkrRate;
-        const paidAmount = Number(transactionAmount);
-        if (!Number.isFinite(paidAmount) || Math.abs(expectedAmount - paidAmount) > expectedAmount * 0.03) {
-            return NextResponse.json({ error: 'Payment amount mismatch' }, { status: 400 });
+            return reject(404, 'Booking not found', { orderId, bookingId, bookingError });
         }
 
         // 'A' = accepted; 'P' = customer paid, settlement to merchant happens end of day.
         const isPaid = transactionStatus === 'A' || transactionStatus === 'P';
 
-        if (isPaid && booking.advance_payment_status !== 'paid') {
+        // Declined/cancelled notifications carry nothing to validate or record;
+        // acknowledge them before the amount check so they never bounce.
+        if (!isPaid) {
+            return NextResponse.json({ success: true });
+        }
+
+        const paidAmount = Number(transactionAmount.replace(/,/g, ''));
+        if (!Number.isFinite(paidAmount)) {
+            return reject(400, 'Unparseable payment amount', { orderId, transactionAmount });
+        }
+
+        const storedLkr = Number(booking.advance_payment_lkr);
+        if (Number.isFinite(storedLkr) && storedLkr > 0) {
+            // Compare against the exact LKR amount stored at checkout; 1 LKR of
+            // slack covers formatting/rounding differences on the gateway side.
+            if (Math.abs(storedLkr - paidAmount) > 1) {
+                return reject(400, 'Payment amount mismatch', { orderId, expected: storedLkr, paid: paidAmount });
+            }
+        } else {
+            // Legacy bookings from before the LKR amount was stored: re-derive
+            // from the live rate and allow 3% drift since checkout.
+            const usdToLkrRate = await getUsdToLkrRate();
+            const expectedAmount = Number(booking.advance_payment_amount ?? 8) * usdToLkrRate;
+            if (Math.abs(expectedAmount - paidAmount) > expectedAmount * 0.03) {
+                return reject(400, 'Payment amount mismatch', { orderId, expected: expectedAmount, paid: paidAmount, usdToLkrRate });
+            }
+        }
+
+        if (booking.advance_payment_status !== 'paid') {
             const { error: updateError } = await supabaseAdmin
                 .from('bookings')
                 .update({
@@ -80,14 +104,17 @@ export async function POST(request: Request) {
                 .eq('id', bookingId);
 
             if (updateError) {
-                console.error('Failed to update booking after iPay callback:', updateError);
-                return NextResponse.json({ error: 'Booking update failed' }, { status: 500 });
+                return reject(500, 'Booking update failed', { orderId, bookingId, updateError });
             }
 
-            const emailResult = await sendSafariBookingConfirmation(bookingId);
-            if (!emailResult.success) {
-                console.error('Failed to send iPay booking confirmation email:', emailResult.error);
-            }
+            // Send the confirmation after responding so a slow email provider
+            // can't make iPay time out waiting for the acknowledgement.
+            after(async () => {
+                const emailResult = await sendSafariBookingConfirmation(bookingId);
+                if (!emailResult.success) {
+                    console.error('Failed to send iPay booking confirmation email:', emailResult.error);
+                }
+            });
         }
 
         return NextResponse.json({ success: true });

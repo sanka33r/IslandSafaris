@@ -4,17 +4,25 @@ const RATE_API_URL = 'https://open.er-api.com/v6/latest/USD';
 const MIN_PLAUSIBLE_LKR_RATE = 100;
 const MAX_PLAUSIBLE_LKR_RATE = 1000;
 
+const CACHE_TTL_MS = 60 * 60 * 1000;
+let cachedRate: { value: number; fetchedAt: number } | null = null;
+
 /**
- * Live USD -> LKR rate, cached for an hour via Next's fetch cache.
+ * Live USD -> LKR rate, cached in memory for an hour (Next's fetch cache is
+ * disabled inside POST route handlers, so `revalidate` alone does nothing here).
  * Falls back to the IPAY_USD_TO_LKR_RATE env var when the API is unavailable.
  */
 export async function getUsdToLkrRate(): Promise<number> {
+    if (cachedRate && Date.now() - cachedRate.fetchedAt < CACHE_TTL_MS) {
+        return cachedRate.value;
+    }
     try {
-        const res = await fetch(RATE_API_URL, { next: { revalidate: 3600 } });
+        const res = await fetch(RATE_API_URL, { signal: AbortSignal.timeout(5000) });
         if (res.ok) {
             const data = await res.json();
             const rate = Number(data?.rates?.LKR);
             if (Number.isFinite(rate) && rate >= MIN_PLAUSIBLE_LKR_RATE && rate <= MAX_PLAUSIBLE_LKR_RATE) {
+                cachedRate = { value: rate, fetchedAt: Date.now() };
                 return rate;
             }
             console.error('Exchange rate API returned an implausible LKR rate:', data?.rates?.LKR);

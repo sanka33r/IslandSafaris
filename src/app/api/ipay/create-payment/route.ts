@@ -36,6 +36,22 @@ export async function POST(request: Request) {
         const orderId = toIPayOrderId(booking.id);
         const usdToLkrRate = await getUsdToLkrRate();
         const totalAmount = formatIPayAmount(Number(booking.advance_payment_amount ?? 8), usdToLkrRate);
+
+        // Persist the exact LKR amount sent to iPay so the callback can
+        // validate against it instead of re-deriving it from a live rate.
+        const { error: lkrUpdateError } = await supabaseAdmin
+            .from('bookings')
+            .update({ advance_payment_lkr: Number(totalAmount) })
+            .eq('id', booking.id);
+
+        if (lkrUpdateError) {
+            console.error('iPay create-payment: failed to store LKR amount for booking', booking.id, lkrUpdateError);
+            return NextResponse.json(
+                { error: 'iPay is temporarily unavailable. Please try again later or contact us.' },
+                { status: 500 }
+            );
+        }
+
         const origin = new URL(request.url).origin;
         const confirmationUrl = `${origin}/packages/book/confirmation/${booking.id}`;
 
