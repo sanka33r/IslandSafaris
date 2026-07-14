@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { updateBookingStatus } from '@/lib/actions/admin';
+import { updateBookingStatus, cancelBooking } from '@/lib/actions/admin';
 import {
     X, Loader2, User, MapPin, Calendar, Users, Phone, Mail,
     MessageSquare, Tag, Car, Building2,
@@ -9,19 +9,26 @@ import {
 import { cn } from '@/lib/utils';
 import { PACKAGE_INFO, SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE, EXTRA_HOUR_PRICE_USD } from '@/lib/constants';
 import { useRouter } from 'next/navigation';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function BookingDetailModal({ booking, onClose, extraHourPriceUsd }: { booking: any; onClose: () => void; extraHourPriceUsd?: number }) {
     const hourPrice = extraHourPriceUsd ?? EXTRA_HOUR_PRICE_USD;
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
+    const [cancelling, setCancelling] = useState(false);
+    const [cancelReason, setCancelReason] = useState('');
+    const [justConfirmed, setJustConfirmed] = useState(false);
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+
+    const displayStatus = justConfirmed ? 'confirmed' : booking.status;
 
     const statusColors = {
         new: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
         confirmed: { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200' },
         cancelled: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' },
     };
-    const config = statusColors[booking.status as keyof typeof statusColors] || statusColors.new;
+    const config = statusColors[displayStatus as keyof typeof statusColors] || statusColors.new;
 
     const formatPackageName = (type: string) => {
         return type?.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') || '';
@@ -30,14 +37,21 @@ export default function BookingDetailModal({ booking, onClose, extraHourPriceUsd
         ? formatPackageName(booking.package_type)
         : (booking.destinations?.name || 'Safari');
 
-    const handleUpdate = async (status: 'confirmed' | 'cancelled') => {
-        if (confirm(`Mark this booking as ${status}?`)) {
-            startTransition(async () => {
-                await updateBookingStatus(booking.id, status);
-                router.refresh();
-                if (status === 'cancelled') onClose();
-            });
-        }
+    const handleConfirmBooking = () => {
+        setShowConfirmDialog(false);
+        startTransition(async () => {
+            const result = await updateBookingStatus(booking.id, 'confirmed');
+            if (result.success) setJustConfirmed(true);
+            router.refresh();
+        });
+    };
+
+    const handleCancelBooking = () => {
+        startTransition(async () => {
+            await cancelBooking(booking.id, cancelReason.trim());
+            router.refresh();
+            onClose();
+        });
     };
 
     const dest = booking.destinations;
@@ -72,6 +86,7 @@ export default function BookingDetailModal({ booking, onClose, extraHourPriceUsd
         ) : null;
 
     const isMapLink = (s: string | null | undefined) => typeof s === 'string' && s.includes('google.com/maps');
+    const toMapsHref = (s: string) => isMapLink(s) ? s : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s)}`;
 
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={onClose}>
@@ -93,9 +108,15 @@ export default function BookingDetailModal({ booking, onClose, extraHourPriceUsd
                             <p className="text-xl font-bold text-safari-900">{booking.customer_name}</p>
                         </div>
                         <span className={cn('px-2 py-1 rounded-full text-base font-bold uppercase', config.bg, config.text, config.border)}>
-                            {booking.status}
+                            {displayStatus}
                         </span>
                     </div>
+
+                    {justConfirmed && (
+                        <div className="mb-4 p-3 rounded-xl bg-green-50 border border-green-200 text-green-700 font-semibold text-base">
+                            Booking confirmed successfully, a confirmation email has been sent to the guest.
+                        </div>
+                    )}
 
                     {/* Trip details */}
                     <div className="mb-4">
@@ -149,13 +170,9 @@ export default function BookingDetailModal({ booking, onClose, extraHourPriceUsd
                                         <div className="min-w-0">
                                             <p className="text-sm font-bold text-safari-500 uppercase">Pickup location</p>
                                             {booking.pickup_location ? (
-                                                isMapLink(booking.pickup_location) ? (
-                                                    <a href={booking.pickup_location} target="_blank" rel="noopener noreferrer" className="text-base font-medium text-secondary-600 hover:underline break-all">
-                                                        {booking.pickup_location}
-                                                    </a>
-                                                ) : (
-                                                    <p className="text-base font-medium text-safari-900 break-words">{booking.pickup_location}</p>
-                                                )
+                                                <a href={toMapsHref(booking.pickup_location)} target="_blank" rel="noopener noreferrer" className="text-base font-medium text-secondary-600 hover:underline break-all">
+                                                    {booking.pickup_location}
+                                                </a>
                                             ) : (
                                                 <p className="text-base text-safari-500">—</p>
                                             )}
@@ -166,13 +183,9 @@ export default function BookingDetailModal({ booking, onClose, extraHourPriceUsd
                                         <div className="min-w-0">
                                             <p className="text-sm font-bold text-safari-500 uppercase">Dropoff location</p>
                                             {booking.dropoff_location ? (
-                                                isMapLink(booking.dropoff_location) ? (
-                                                    <a href={booking.dropoff_location} target="_blank" rel="noopener noreferrer" className="text-base font-medium text-secondary-600 hover:underline break-all">
-                                                        {booking.dropoff_location}
-                                                    </a>
-                                                ) : (
-                                                    <p className="text-base font-medium text-safari-900 break-words">{booking.dropoff_location}</p>
-                                                )
+                                                <a href={toMapsHref(booking.dropoff_location)} target="_blank" rel="noopener noreferrer" className="text-base font-medium text-secondary-600 hover:underline break-all">
+                                                    {booking.dropoff_location}
+                                                </a>
                                             ) : (
                                                 <p className="text-base text-safari-500">—</p>
                                             )}
@@ -209,7 +222,7 @@ export default function BookingDetailModal({ booking, onClose, extraHourPriceUsd
                             <p className="text-base font-bold text-safari-500 uppercase">Payment</p>
                             <div className="flex justify-between text-base">
                                 <span className="text-safari-600">Total</span>
-                                <span className="font-semibold">${Number(totalPrice).toFixed(2)}</span>
+                                <span className="font-semibold text-secondary-700">${Number(totalPrice).toFixed(2)}</span>
                             </div>
                             {discountUsd > 0 && (
                                 <div className="flex justify-between text-base text-green-600">
@@ -219,7 +232,7 @@ export default function BookingDetailModal({ booking, onClose, extraHourPriceUsd
                             )}
                             <div className="flex justify-between text-base">
                                 <span className="text-safari-600">Advance Paid</span>
-                                <span className="font-semibold">${advance.toFixed(2)}</span>
+                                <span className="font-semibold text-secondary-700">${advance.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-base pt-2 border-t border-safari-200">
                                 <span className="font-bold text-secondary-700">Balance Due</span>
@@ -231,11 +244,18 @@ export default function BookingDetailModal({ booking, onClose, extraHourPriceUsd
                         </div>
                     </div>
 
-                    {booking.status !== 'cancelled' && (
+                    {booking.status === 'cancelled' && booking.cancellation_reason && (
+                        <div className="mt-6 p-3 rounded-xl bg-red-50 border border-red-100">
+                            <p className="text-sm font-bold text-red-700 uppercase">Cancellation reason</p>
+                            <p className="text-base text-red-800 mt-1">{booking.cancellation_reason}</p>
+                        </div>
+                    )}
+
+                    {displayStatus !== 'cancelled' && !cancelling && (
                         <div className="flex gap-2 mt-6">
-                            {booking.status !== 'confirmed' && (
+                            {displayStatus !== 'confirmed' && (
                                 <button
-                                    onClick={() => handleUpdate('confirmed')}
+                                    onClick={() => setShowConfirmDialog(true)}
                                     disabled={isPending}
                                     className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 font-bold transition-all disabled:opacity-50"
                                 >
@@ -244,17 +264,61 @@ export default function BookingDetailModal({ booking, onClose, extraHourPriceUsd
                                 </button>
                             )}
                             <button
-                                onClick={() => handleUpdate('cancelled')}
+                                onClick={() => setCancelling(true)}
                                 disabled={isPending}
                                 className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 font-bold transition-all disabled:opacity-50"
                             >
-                                {isPending ? <Loader2 size={16} className="animate-spin" /> : <X size={16} />}
+                                <X size={16} />
                                 Cancel Booking
                             </button>
                         </div>
                     )}
+
+                    {booking.status !== 'cancelled' && cancelling && (
+                        <div className="mt-6 p-4 rounded-xl border border-red-200 bg-red-50 space-y-3">
+                            <p className="text-sm font-bold text-red-700">Cancel this booking?</p>
+                            <div>
+                                <label className="text-sm font-bold text-red-700 uppercase">Reason for cancellation</label>
+                                <textarea
+                                    value={cancelReason}
+                                    onChange={(e) => setCancelReason(e.target.value)}
+                                    placeholder="e.g. Fully booked, weather conditions, guest requested a change..."
+                                    rows={3}
+                                    className="mt-1 w-full rounded-lg border border-red-200 bg-white p-2.5 text-base text-safari-900 focus:outline-none focus:ring-2 focus:ring-red-300"
+                                />
+                                <p className="text-sm text-red-600 mt-1">This reason will be included in the cancellation email sent to the guest.</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => { setCancelling(false); setCancelReason(''); }}
+                                    disabled={isPending}
+                                    className="flex-1 py-2.5 rounded-xl border border-safari-200 text-safari-600 hover:bg-safari-50 font-bold transition-all disabled:opacity-50"
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    onClick={handleCancelBooking}
+                                    disabled={isPending || !cancelReason.trim()}
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-600 text-white hover:bg-red-700 font-bold transition-all disabled:opacity-50"
+                                >
+                                    {isPending ? <Loader2 size={16} className="animate-spin" /> : <X size={16} />}
+                                    Confirm Cancellation
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
+
+            <ConfirmDialog
+                open={showConfirmDialog}
+                title="Confirm booking"
+                message={`Mark this booking for ${booking.customer_name} as confirmed? A confirmation email will be sent to the guest.`}
+                confirmLabel="Confirm"
+                loading={isPending}
+                onConfirm={handleConfirmBooking}
+                onCancel={() => setShowConfirmDialog(false)}
+            />
         </div>
     );
 }

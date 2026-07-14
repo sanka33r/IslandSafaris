@@ -66,7 +66,7 @@ export async function POST(request: Request) {
             email: booking.email,
             phone: booking.phone,
             address: booking.pickup_location || booking.hotel_name || 'Island Safaris booking',
-            city: 'Habarana',
+            city: 'Sigiriya',
             country: 'Sri Lanka',
             custom_1: booking.id,
             custom_2: 'safari-advance',

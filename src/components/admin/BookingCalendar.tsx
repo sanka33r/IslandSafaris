@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useTransition, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, X, Loader2, User, MapPin, Calendar, Users, Phone, Mail, MessageSquare, Download } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, User, MapPin, Calendar, Users, Phone, Mail, MessageSquare, Download } from 'lucide-react';
 import { updateBookingStatus } from '@/lib/actions/admin';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { PACKAGE_INFO, SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE } from '@/lib/constants';
 import BookingDetailModal from '@/components/admin/BookingDetailModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 // ── Native date helpers ────────────────────────────────────────────
 function startOfDay(d: Date) { const r = new Date(d); r.setHours(0, 0, 0, 0); return r; }
@@ -158,64 +159,54 @@ function getBookingIncomeUSD(booking: Booking, extraHourPriceUsd: number): numbe
 }
 
 // ── Sub-components ─────────────────────────────────────────────────
-function BookingPill({ booking, onCancel, onViewDetails }: { booking: Booking; onCancel: (id: string) => void; onViewDetails?: (b: Booking) => void }) {
-    const [isPending, startTransition] = useTransition();
+function BookingPill({ booking, onViewDetails }: { booking: Booking; onViewDetails?: (b: Booking) => void }) {
     const status = getBookingStatus(booking);
     const config = statusConfig[status];
     const name = !booking.package_type
         ? (booking.destinations?.name || 'Safari')
         : formatPackageName(booking.package_type);
 
-    const handleCancel = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (confirm(`Cancel booking for ${booking.customer_name}?`)) {
-            startTransition(() => { onCancel(booking.id); });
-        }
-    };
-
     return (
         <div
-            className={cn('flex items-center gap-1 px-2 py-1 rounded-md text-base font-semibold border transition-all group', config.bg, config.text, config.border, onViewDetails && 'cursor-pointer')}
+            className={cn('flex items-center gap-1 px-2 py-1 rounded-md text-base font-semibold border transition-all', config.bg, config.text, config.border, onViewDetails && 'cursor-pointer')}
             title={`${booking.customer_name} — ${name} — ${booking.time} — ${booking.group_size} pax — ${config.label}. Click to view details.`}
             onClick={onViewDetails ? (e) => { e.stopPropagation(); onViewDetails(booking); } : undefined}
         >
             <span className={cn('w-2 h-2 rounded-full flex-shrink-0', config.dot)} />
             <span className="truncate flex-1 leading-tight">{booking.customer_name.split(' ')[0]}</span>
-            {status !== 'cancelled' && (
-                <button onClick={handleCancel} disabled={isPending}
-                    className="opacity-0 group-hover:opacity-100 flex-shrink-0 p-0.5 rounded hover:bg-red-200/60 text-red-500 transition-all"
-                    title="Cancel booking">
-                    {isPending ? <Loader2 size={12} className="animate-spin" /> : <X size={12} />}
-                </button>
-            )}
         </div>
     );
 }
 
-function DetailRow({ booking, onCancel, onViewDetails }: { booking: Booking; onCancel: (id: string) => void; onViewDetails: (b: Booking) => void }) {
+function DetailRow({ booking, onConfirm, onViewDetails }: { booking: Booking; onConfirm: (id: string) => void; onViewDetails: (b: Booking) => void }) {
     const [isPending, startTransition] = useTransition();
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const status = getBookingStatus(booking);
     const config = statusConfig[status];
     const name = !booking.package_type
         ? (booking.destinations?.name || 'Safari')
         : formatPackageName(booking.package_type);
 
-    const handleCancel = () => {
-        if (confirm(`Cancel booking for ${booking.customer_name}?`)) {
-            startTransition(() => { onCancel(booking.id); });
-        }
+    const handleConfirmClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setShowConfirmDialog(true);
+    };
+
+    const handleConfirm = () => {
+        setShowConfirmDialog(false);
+        startTransition(() => { onConfirm(booking.id); });
     };
 
     return (
         <div
-            className={cn('rounded-xl border p-3 flex items-start justify-between gap-3 cursor-pointer hover:ring-2 hover:ring-safari-200 transition-all', config.bg, config.border)}
+            className={cn('rounded-xl border p-3 flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-3 cursor-pointer hover:ring-2 hover:ring-safari-200 transition-all', config.bg, config.border)}
             onClick={() => onViewDetails(booking)}
         >
             <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex flex-wrap items-center gap-1.5 mb-1">
                     <span className={cn('w-2 h-2 rounded-full flex-shrink-0', config.dot)} />
-                    <span className={cn('text-base font-bold', config.text)}>{booking.customer_name}</span>
-                    <span className={cn('text-base font-bold uppercase px-2 py-0.5 rounded-full border', config.bg, config.text, config.border)}>
+                    <span className={cn('text-base font-bold truncate max-w-full', config.text)}>{booking.customer_name}</span>
+                    <span className={cn('text-base font-bold uppercase px-2 py-0.5 rounded-full border flex-shrink-0', config.bg, config.text, config.border)}>
                         {config.label}
                     </span>
                 </div>
@@ -224,16 +215,26 @@ function DetailRow({ booking, onCancel, onViewDetails }: { booking: Booking; onC
                     <p>{booking.group_size} person{booking.group_size > 1 ? 's' : ''}</p>
                 </div>
             </div>
-            <div className="flex items-center gap-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-start" onClick={(e) => e.stopPropagation()}>
                 <span className="text-base font-medium text-safari-500">View details</span>
-                {status !== 'cancelled' && (
-                    <button onClick={handleCancel} disabled={isPending}
-                        className="flex items-center gap-1 px-2 py-1 text-base font-bold rounded-lg bg-red-100 text-red-600 hover:bg-red-200 border border-red-200 transition-all disabled:opacity-50">
-                        {isPending ? <Loader2 size={12} className="animate-spin" /> : <X size={12} />}
-                        Cancel
+                {status === 'new' && (
+                    <button onClick={handleConfirmClick} disabled={isPending}
+                        className="flex items-center gap-1 px-2 py-1 text-base font-bold rounded-lg bg-green-100 text-green-700 hover:bg-green-200 border border-green-200 transition-all disabled:opacity-50">
+                        {isPending ? <Loader2 size={12} className="animate-spin" /> : null}
+                        Confirm
                     </button>
                 )}
             </div>
+
+            <ConfirmDialog
+                open={showConfirmDialog}
+                title="Confirm booking"
+                message={`Confirm booking for ${booking.customer_name}? A confirmation email will be sent to the guest.`}
+                confirmLabel="Confirm"
+                loading={isPending}
+                onConfirm={handleConfirm}
+                onCancel={() => setShowConfirmDialog(false)}
+            />
         </div>
     );
 }
@@ -242,13 +243,9 @@ function DetailRow({ booking, onCancel, onViewDetails }: { booking: Booking; onC
 function DownloadDayPdf({
     date,
     activities,
-    totalIncome,
-    extraHourPriceUsd,
 }: {
     date: Date;
     activities: { key: string; label: string; bookings: Booking[] }[];
-    totalIncome: number;
-    extraHourPriceUsd: number;
 }) {
     const [loading, setLoading] = useState(false);
     const handleDownload = async () => {
@@ -256,25 +253,48 @@ function DownloadDayPdf({
         try {
             const { jsPDF } = await import('jspdf');
             const doc = new jsPDF();
+            const colName = 14, colPhone = 58, colTime = 90, colStatus = 112, colDest = 138;
             let y = 20;
             doc.setFontSize(18);
             doc.text(`Activities for ${friendlyDate(date)}`, 14, y);
-            y += 12;
-            doc.setFontSize(11);
-            doc.text(`Total income: USD ${totalIncome.toFixed(2)}`, 14, y);
             y += 14;
             for (const { label, bookings } of activities) {
-                const income = bookings.reduce((s, b) => s + getBookingIncomeUSD(b, extraHourPriceUsd), 0);
+                if (y > 260) { doc.addPage(); y = 20; }
+                doc.setFontSize(11);
                 doc.setFont('helvetica', 'bold');
-                doc.text(`Total No. of ${label} — ${bookings.length}`, 14, y);
-                y += 6;
+                doc.text(`${label} — ${bookings.length}`, 14, y);
+                y += 8;
+
+                doc.setFontSize(9);
+                doc.text('Name', colName, y);
+                doc.text('Contact', colPhone, y);
+                doc.text('Time', colTime, y);
+                doc.text('Status', colStatus, y);
+                doc.text('Destination/Package', colDest, y);
+                y += 5;
                 doc.setFont('helvetica', 'normal');
-                doc.text(`Income of the Day — USD ${income.toFixed(2)}`, 14, y);
-                y += 6;
-                bookings.forEach((b, i) => {
+
+                bookings.forEach((b) => {
                     if (y > 270) { doc.addPage(); y = 20; }
-                    doc.text(`${i + 1}. ${b.customer_name}`, 18, y);
-                    y += 6;
+                    const destOrPackage = b.package_type
+                        ? formatPackageName(b.package_type)
+                        : (b.destinations?.name || 'Safari');
+                    doc.text(b.customer_name, colName, y, { maxWidth: colPhone - colName - 2 });
+                    doc.text(b.phone || '-', colPhone, y, { maxWidth: colTime - colPhone - 2 });
+                    doc.text(b.time || '-', colTime, y);
+                    doc.text(statusConfig[getBookingStatus(b)].label, colStatus, y, { maxWidth: colDest - colStatus - 2 });
+                    doc.text(destOrPackage, colDest, y, { maxWidth: 195 - colDest });
+                    y += 5;
+                    if (b.pickup_required) {
+                        if (y > 270) { doc.addPage(); y = 20; }
+                        doc.setFontSize(8);
+                        doc.setTextColor(100);
+                        doc.text(`Pickup: ${b.hotel_name || 'Yes (hotel not specified)'}`, colName + 4, y, { maxWidth: 195 - colName - 4 });
+                        doc.setTextColor(0);
+                        doc.setFontSize(9);
+                        y += 5;
+                    }
+                    y += 1;
                 });
                 y += 6;
             }
@@ -353,8 +373,8 @@ export default function BookingCalendar({ bookings, currentMonth, extraHourPrice
         router.push(`/admin/calendar?month=${formatYM(m)}`);
     };
 
-    const handleCancel = async (id: string) => {
-        await updateBookingStatus(id, 'cancelled');
+    const handleConfirm = async (id: string) => {
+        await updateBookingStatus(id, 'confirmed');
         router.refresh();
     };
 
@@ -396,8 +416,8 @@ export default function BookingCalendar({ bookings, currentMonth, extraHourPrice
                     ))}
                 </div>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-2 bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl shadow-sm border border-safari-100 text-sm sm:text-base font-bold text-safari-600">
-                    <span>🦒 Safari: {totalSafari}</span>
-                    <span>📦 Package: {totalPackage}</span>
+                    <span>Safari: {totalSafari}</span>
+                    <span>Package: {totalPackage}</span>
                     <span className="text-green-600">↑ {upcoming}</span>
                     <span className="text-yellow-600">✓ {finished}</span>
                     <span className="text-red-600">✕ {cancelled}</span>
@@ -446,7 +466,7 @@ export default function BookingCalendar({ bookings, currentMonth, extraHourPrice
                                 {inMonth && db && (
                                     <div className="space-y-0.5">
                                         {[...db.safari, ...db.packages].slice(0, 3).map(b => (
-                                            <BookingPill key={b.id} booking={b} onCancel={handleCancel} onViewDetails={(b) => setSelectedBooking(b)} />
+                                            <BookingPill key={b.id} booking={b} onViewDetails={(b) => setSelectedBooking(b)} />
                                         ))}
                                         {total > 3 && <div className="text-base font-bold text-safari-400 text-center py-0.5">+{total - 3} more</div>}
                                     </div>
@@ -474,8 +494,6 @@ export default function BookingCalendar({ bookings, currentMonth, extraHourPrice
                                 <DownloadDayPdf
                                     date={selectedDay}
                                     activities={activitiesForDay}
-                                    totalIncome={totalIncomeForDay}
-                                    extraHourPriceUsd={extraHourPriceUsd}
                                 />
                             </div>
                         </div>
@@ -493,7 +511,7 @@ export default function BookingCalendar({ bookings, currentMonth, extraHourPrice
                                             <p className="text-base font-semibold text-safari-600">
                                                 Income of the Day — USD {income.toFixed(2)}
                                             </p>
-                                            <ol className="list-decimal list-inside space-y-1.5">
+                                            <ol className="list-decimal list-inside space-y-1.5 marker:text-safari-800 marker:font-semibold">
                                                 {activityBookings.map((booking, idx) => (
                                                     <li key={booking.id}>
                                                         <button
@@ -530,14 +548,14 @@ export default function BookingCalendar({ bookings, currentMonth, extraHourPrice
                             <div className="p-3 space-y-3">
                                 {dd.safari.length > 0 && (
                                     <div>
-                                        <p className="text-base font-bold uppercase text-safari-400 mb-1.5">🦒 Safari</p>
-                                        <div className="space-y-1.5">{dd.safari.map(b => <DetailRow key={b.id} booking={b} onCancel={handleCancel} onViewDetails={setSelectedBooking} />)}</div>
+                                        <p className="text-base font-bold uppercase text-safari-400 mb-1.5">Safari</p>
+                                        <div className="space-y-1.5">{dd.safari.map(b => <DetailRow key={b.id} booking={b} onConfirm={handleConfirm} onViewDetails={setSelectedBooking} />)}</div>
                                     </div>
                                 )}
                                 {dd.packages.length > 0 && (
                                     <div>
-                                        <p className="text-base font-bold uppercase text-purple-500 mb-1.5">📦 Package</p>
-                                        <div className="space-y-1.5">{dd.packages.map(b => <DetailRow key={b.id} booking={b} onCancel={handleCancel} onViewDetails={setSelectedBooking} />)}</div>
+                                        <p className="text-base font-bold uppercase text-purple-500 mb-1.5">Package</p>
+                                        <div className="space-y-1.5">{dd.packages.map(b => <DetailRow key={b.id} booking={b} onConfirm={handleConfirm} onViewDetails={setSelectedBooking} />)}</div>
                                     </div>
                                 )}
                             </div>

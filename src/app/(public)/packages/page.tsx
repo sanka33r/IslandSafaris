@@ -259,20 +259,18 @@ export default async function PackagesPage() {
             {schemas.map((schema, index) => (
                 <JsonLd key={`packages-schema-${index}`} data={schema} />
             ))}
-            <div className="container mx-auto px-6 pt-6">
-                <BreadcrumbNav
-                    items={[
-                        { label: 'Home', href: '/' },
-                        { label: 'Packages' },
-                    ]}
-                />
-            </div>
             {/* ═══════ COMPACT HERO ═══════ */}
             <section className="relative pt-14 pb-16 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-b from-safari-900 via-safari-800 to-[#2a3c28]" />
                 <div className="absolute inset-0 opacity-15 bg-[radial-gradient(ellipse_at_30%_40%,rgba(210,180,140,0.4),transparent_70%)]" />
 
                 <div className="container mx-auto px-6 relative text-white text-center">
+                    <BreadcrumbNav
+                        items={[
+                            { label: 'Home', href: '/' },
+                            { label: 'Packages' },
+                        ]}
+                    />
                     <div className="flex items-center justify-center gap-2 mb-4">
                         <Compass size={16} className="text-secondary-400" />
                         <span className="text-secondary-300 text-sm tracking-[0.25em] uppercase font-medium">

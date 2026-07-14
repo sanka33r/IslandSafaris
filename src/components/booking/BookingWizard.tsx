@@ -7,11 +7,14 @@ import { Destination } from '@/types/db';
 import { submitBooking } from '@/lib/actions/booking';
 import { validatePromoCode } from '@/lib/actions/promo-codes';
 import { BookingFormData } from '@/lib/schemas/booking';
-import { Loader2, CheckCircle, CreditCard, Car, MapPin, ExternalLink, Tag, AlertCircle, Users, Minus, Plus } from 'lucide-react';
+import { Loader2, CheckCircle, CreditCard, Car, MapPin, ExternalLink, Tag, AlertCircle, Users, Minus, Plus, Download } from 'lucide-react';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import { formatUsd, SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE, SAFARI_MAX_BOOKING_SIZE, EXTRA_HOUR_PRICE_USD } from '@/lib/constants';
+import { extractPlaceNameFromMapsUrl, isGoogleMapsLink, isShortGoogleMapsLink } from '@/lib/maps';
+import { downloadBookingReceipt } from '@/lib/receipt';
 import PaymentSection from '@/components/payments/PaymentSection';
+import LocationPickerModal from '@/components/booking/LocationPickerModal';
 
 const COUNTRY_CODES = [
     { code: '+94', country: 'Sri Lanka', flag: '🇱🇰' },
@@ -51,6 +54,14 @@ interface BookingWizardProps {
     preselectedDestinationId?: string;
     /** Extra hour charge USD (per hour per jeep). From admin settings when provided. */
     extraHourPriceUsd?: number;
+}
+
+function formatTime12h(time: string): string {
+    const [hStr, mStr] = time.split(':');
+    let h = parseInt(hStr, 10);
+    const period = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return `${h}:${mStr} ${period}`;
 }
 
 const steps = [
@@ -107,6 +118,49 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
     const [promoMessage, setPromoMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
     const [stepErrors, setStepErrors] = useState<Record<number, Record<string, string>>>({});
+    const [resolvingHotelName, setResolvingHotelName] = useState(false);
+    const [showLocationPicker, setShowLocationPicker] = useState(false);
+    const [downloadingReceipt, setDownloadingReceipt] = useState(false);
+
+    const applyHotelNameFromMapsUrl = async (rawUrl: string) => {
+        const url = rawUrl.trim();
+        if (!url || !isGoogleMapsLink(url)) return;
+
+        const directName = extractPlaceNameFromMapsUrl(url);
+        if (directName) {
+            updateField('hotel_name', directName);
+            return;
+        }
+        if (!isShortGoogleMapsLink(url)) return;
+
+        setResolvingHotelName(true);
+        try {
+            const res = await fetch('/api/maps/resolve-place', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url }),
+            });
+            const data = await res.json();
+            if (data.placeName) {
+                updateField('hotel_name', data.placeName);
+            }
+        } catch {
+            // Auto-fill is a convenience; the customer can still type the hotel name manually.
+        } finally {
+            setResolvingHotelName(false);
+        }
+    };
+
+    // Resolve immediately on paste so a newly pasted link updates the hotel
+    // name right away, rather than waiting for the field to lose focus.
+    const handlePickupLocationPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+        const pasted = e.clipboardData.getData('text');
+        if (pasted) applyHotelNameFromMapsUrl(pasted);
+    };
+
+    const handlePickupLocationBlur = () => {
+        applyHotelNameFromMapsUrl((formData as any).pickup_location || '');
+    };
 
     useEffect(() => {
         if (preselectedDestinationId && currentStep === 1) {
@@ -168,7 +222,17 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
     };
 
     const updateField = (field: keyof BookingFormData, value: any) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
+        setFormData(prev => {
+            const next = { ...prev, [field]: value };
+            // Hotel Name is read-only and derived from Pickup Location: mirror
+            // plain-text entries live. Maps links are handled separately by
+            // applyHotelNameFromMapsUrl (paste/blur), which extracts a readable
+            // place name instead of dumping the raw URL into the field.
+            if (field === ('pickup_location' as keyof BookingFormData) && !isGoogleMapsLink(value || '')) {
+                (next as any).hotel_name = value;
+            }
+            return next;
+        });
         setStepErrors(prev => {
             const next = { ...prev };
             if (next[currentStep]) delete next[currentStep];
@@ -277,11 +341,41 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
         }
     };
 
+    const selectedDest = destinations.find(d => d.id === formData.destination_id);
+
     // Payment confirmed state
     if (submitResult?.paid) {
         const referenceNumber = submitResult.bookingId
             ? `IS-${submitResult.bookingId.substring(0, 8).toUpperCase()}`
             : null;
+
+        const handleDownloadReceipt = async () => {
+            if (!referenceNumber) return;
+            setDownloadingReceipt(true);
+            try {
+                await downloadBookingReceipt({
+                    referenceNumber,
+                    customerName: formData.customer_name || '',
+                    email: formData.email || '',
+                    phone: formData.country_code && formData.phone ? `${formData.country_code} ${formData.phone}` : undefined,
+                    itemName: selectedDest?.name ? `${selectedDest.name} Safari` : 'Safari',
+                    date: formData.date || '',
+                    time: formData.time ? formatTime12h(formData.time) : null,
+                    groupSize: formData.group_size ?? null,
+                    hotelName: formData.hotel_name ?? null,
+                    pickupRequired: !!formData.pickup_required,
+                    entranceNote: !formData.pickup_required && selectedDest
+                        ? `Pick up point: ${selectedDest.name} Safari Entrance gate`
+                        : null,
+                    advancePaidUsd: 8,
+                    remainingUsd: submitResult.pricing.total,
+                    ticketsUsd: submitResult.pricing.tickets ?? null,
+                });
+            } finally {
+                setDownloadingReceipt(false);
+            }
+        };
+
         return (
             <div className="max-w-xl mx-auto bg-white rounded-3xl p-12 text-center shadow-lg border border-green-100">
                 <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -290,16 +384,26 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                 <h2 className="text-3xl font-bold text-safari-900 mb-4">Booking Confirmed!</h2>
                 {referenceNumber && (
                     <div className="bg-safari-900 text-white rounded-xl py-4 px-6 mb-6">
-                        <div className="text-safari-300 text-sm font-medium mb-1">Reference number</div>
+                        <div className="text-safari-50 text-sm font-medium mb-1">Reference number</div>
                         <div className="text-2xl font-bold font-mono tracking-wider">{referenceNumber}</div>
-                        <div className="text-safari-400 text-xs mt-1">Save this for your records. A confirmation email has been sent to {formData.email}.</div>
+                        <div className="text-safari-100 text-xs mt-1">Save this for your records. A confirmation email has been sent to {formData.email}.</div>
                     </div>
                 )}
-                <p className="text-safari-600 mb-8">
+                <p className="text-safari-900 mb-8">
                     Thank you, {formData.customer_name}! Your advance payment has been received and your safari booking for {formData.date} is confirmed.
                 </p>
+                {!formData.pickup_required && selectedDest && (
+                    <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-left mb-6">
+                        <p className="font-semibold text-amber-900">
+                            Pick up point: {selectedDest.name} Safari Entrance gate
+                        </p>
+                        {formData.time && (
+                            <p className="text-sm text-amber-800 mt-1">Please be at {formatTime12h(formData.time)}.</p>
+                        )}
+                    </div>
+                )}
                 <div className="bg-safari-50 p-6 rounded-xl text-left mb-6 space-y-3">
-                    <h3 className="font-semibold text-safari-900 mb-2">Safari jeep (remaining balance — pay at destination)</h3>
+                    <h3 className="font-semibold text-safari-900 mb-2">Safari jeep (remaining balance - pay at destination)</h3>
                     <p className="text-2xl font-bold text-secondary-600">USD {formatUsd(submitResult.pricing.total)}</p>
                     {submitResult.pricing.tickets != null && submitResult.pricing.tickets > 0 && (
                         <p className="text-sm text-safari-600">
@@ -307,6 +411,14 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                         </p>
                     )}
                 </div>
+                <button
+                    onClick={handleDownloadReceipt}
+                    disabled={downloadingReceipt}
+                    className="w-full flex items-center justify-center gap-2 border-2 border-safari-900 text-safari-900 rounded-lg py-3 font-semibold hover:bg-safari-50 disabled:opacity-60 mb-3"
+                >
+                    {downloadingReceipt ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                    Download Receipt
+                </button>
                 <button onClick={() => window.location.href = '/'} className="w-full bg-secondary-600 text-white rounded-lg py-3 font-semibold hover:bg-secondary-700">Back to Home</button>
             </div>
         );
@@ -342,8 +454,6 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
             </div>
         );
     }
-
-    const selectedDest = destinations.find(d => d.id === formData.destination_id);
 
     return (
         <div id="booking-wizard-top" className="max-w-4xl mx-auto">
@@ -541,13 +651,13 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                                         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-3">
                                             <input
                                                 type="text"
-                                                placeholder="Enter Hotel Name"
+                                                placeholder="Filled in automatically from Pickup Location below"
+                                                readOnly
                                                 className={cn(
-                                                    "w-full mt-3 p-3 text-sm rounded-lg border text-safari-900 placeholder:text-safari-500 focus:ring-2 focus:ring-secondary-500 outline-none",
+                                                    "w-full mt-3 p-3 text-sm rounded-lg border bg-safari-100/70 text-safari-700 placeholder:text-safari-400 outline-none cursor-not-allowed",
                                                     stepErrors[3]?.hotel_name ? "border-red-400" : "border-safari-200"
                                                 )}
                                                 value={formData.hotel_name || ''}
-                                                onChange={(e) => updateField('hotel_name', e.target.value)}
                                             />
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -561,20 +671,25 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                                                             className="w-full p-3 pr-9 text-sm rounded-lg border border-safari-200 text-safari-900 placeholder:text-safari-500 focus:ring-2 focus:ring-secondary-500 outline-none"
                                                             value={(formData as any).pickup_location || ''}
                                                             onChange={(e) => updateField('pickup_location' as any, e.target.value)}
+                                                            onPaste={handlePickupLocationPaste}
+                                                            onBlur={handlePickupLocationBlur}
                                                         />
                                                         <MapPin size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-safari-400" />
                                                     </div>
+                                                    <p className="text-[10px] text-safari-400">Tip: type the hotel name or paste a Google Maps link here - we&apos;ll automatically fill in the Hotel Name field above.</p>
+                                                    {resolvingHotelName && (
+                                                        <p className="text-[10px] text-safari-400">Detecting hotel name…</p>
+                                                    )}
                                                     <div className="flex items-center gap-2">
-                                                        <a
-                                                            href="https://www.google.com/maps/@7.8731,80.7718,9z"
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setShowLocationPicker(true)}
                                                             className="inline-flex items-center gap-1 text-[11px] font-semibold text-secondary-600 hover:text-secondary-700 bg-secondary-50 hover:bg-secondary-100 px-2 py-1 rounded-md transition-colors"
                                                         >
                                                             <MapPin size={10} />
-                                                            Pick on Maps
-                                                        </a>
-                                                        {(formData as any).pickup_location && (formData as any).pickup_location.includes('google.com/maps') && (
+                                                            Pick on map
+                                                        </button>
+                                                        {(formData as any).pickup_location && isGoogleMapsLink((formData as any).pickup_location) && (
                                                             <a
                                                                 href={(formData as any).pickup_location}
                                                                 target="_blank"
@@ -586,7 +701,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                                                             </a>
                                                         )}
                                                     </div>
-                                                    {(formData as any).pickup_location && (formData as any).pickup_location.includes('google.com/maps') && (
+                                                    {(formData as any).pickup_location && (
                                                         <div className="rounded-lg overflow-hidden border border-safari-100">
                                                             <iframe
                                                                 src={`https://maps.google.com/maps?q=${encodeURIComponent((formData as any).pickup_location)}&output=embed`}
@@ -605,6 +720,15 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                                         </motion.div>
                                     )}
                                 </div>
+
+                                {showLocationPicker && (
+                                    <LocationPickerModal
+                                        title="Pick pickup location"
+                                        initialLabel={(formData as any).pickup_location}
+                                        onSelect={(value) => updateField('pickup_location' as any, value)}
+                                        onClose={() => setShowLocationPicker(false)}
+                                    />
+                                )}
                                 <div className="space-y-2">
                                     <label className="text-lg font-semibold text-safari-900">Extra Hours</label>
                                     <div className="flex gap-4">

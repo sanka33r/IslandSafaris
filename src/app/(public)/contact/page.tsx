@@ -8,7 +8,7 @@ import { CONTACT_DETAILS } from '@/lib/constants';
 
 export const metadata = buildMetadata({
     title: 'Contact Island Safaris Sri Lanka',
-    description: 'Talk to our local safari team for quick help with bookings, timing, pickup planning, and custom experiences in Sigiriya and Habarana.',
+    description: 'Talk to our local safari team for quick help with bookings, timing, pickup planning, and custom experiences in Sigiriya.',
     path: '/contact',
 });
 
@@ -54,7 +54,7 @@ export default function ContactPage() {
                             </span>
                             <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Island Safaris</h1>
                             <p className="text-safari-200 text-lg leading-relaxed max-w-3xl">
-                                Have questions? Our local team can help with safari timing, pickup planning, payment questions, and custom experiences around Sigiriya and Habarana.
+                                Have questions? Our local team can help with safari timing, pickup planning, payment questions, and custom experiences around Sigiriya.
                             </p>
                         </div>
 
@@ -98,14 +98,14 @@ export default function ContactPage() {
                         <p className="text-sm text-safari-500 mt-2">Send booking details, questions, or payment gateway requests.</p>
                     </a>
 
-                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-safari-100">
-                        <div className="bg-secondary-100 p-3 rounded-2xl text-secondary-600 w-fit mb-5">
+                    <a href={CONTACT_DETAILS.mapUrl} target="_blank" rel="noopener noreferrer" className="group bg-white p-6 rounded-3xl shadow-sm border border-safari-100 hover:-translate-y-1 hover:shadow-md transition-all">
+                        <div className="bg-secondary-100 p-3 rounded-2xl text-secondary-600 w-fit mb-5 group-hover:bg-secondary-600 group-hover:text-white transition-colors">
                             <MapPin size={24} />
                         </div>
                         <h2 className="text-xl font-bold text-safari-900 mb-2">Location</h2>
                         <p className="text-safari-700 font-semibold">{CONTACT_DETAILS.location}</p>
-                        <p className="text-sm text-safari-500 mt-2">{CONTACT_DETAILS.locationNote}, close to Sri Lanka&apos;s cultural triangle safari routes.</p>
-                    </div>
+                        <p className="text-sm text-safari-500 mt-2">{CONTACT_DETAILS.locationNote}</p>
+                    </a>
                 </section>
 
                 <section className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 max-w-6xl mx-auto">
@@ -123,7 +123,7 @@ export default function ContactPage() {
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-safari-700">
                             <div className="rounded-2xl bg-safari-50 border border-safari-100 p-4">Safari timing and destination guidance</div>
-                            <div className="rounded-2xl bg-safari-50 border border-safari-100 p-4">Pickup planning from Sigiriya or Habarana</div>
+                            <div className="rounded-2xl bg-safari-50 border border-safari-100 p-4">Pickup planning from Sigiriya and nearby areas</div>
                             <div className="rounded-2xl bg-safari-50 border border-safari-100 p-4">Cooking class, village tour, and bicycle rental support</div>
                             <div className="rounded-2xl bg-safari-50 border border-safari-100 p-4">Payment, deposit, and booking confirmation help</div>
                         </div>

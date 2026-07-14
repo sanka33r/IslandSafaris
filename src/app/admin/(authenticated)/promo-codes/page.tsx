@@ -87,7 +87,7 @@ export default function PromoCodesPage() {
                             placeholder="Search promo codes..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-9 sm:pl-10 pr-4 py-2 text-sm sm:text-base rounded-xl border border-safari-200 focus:border-secondary-500 outline-none"
+                            className="w-full pl-9 sm:pl-10 pr-4 py-2 text-sm sm:text-base rounded-xl border border-safari-200 text-safari-900 placeholder:text-safari-400 focus:border-secondary-500 outline-none"
                         />
                     </div>
                 </div>

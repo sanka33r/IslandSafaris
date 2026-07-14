@@ -1,22 +1,42 @@
 'use client';
 
 import { useState } from 'react';
-import { updateBookingStatus } from '@/lib/actions/admin';
+import { useRouter } from 'next/navigation';
+import { updateBookingStatus, cancelBooking } from '@/lib/actions/admin';
 import { Loader2, Check, X, User, MapPin, Calendar, Users, Phone, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PACKAGE_INFO, SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE, EXTRA_HOUR_PRICE_USD } from '@/lib/constants';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function BookingCard({ booking, onViewDetails, extraHourPriceUsd }: { booking: any; onViewDetails?: () => void; extraHourPriceUsd?: number }) {
     const hourPrice = extraHourPriceUsd ?? EXTRA_HOUR_PRICE_USD;
+    const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [justConfirmed, setJustConfirmed] = useState(false);
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [showCancelDialog, setShowCancelDialog] = useState(false);
+    const [cancelReason, setCancelReason] = useState('');
+    const displayStatus = justConfirmed ? 'confirmed' : booking.status;
 
-    const handleUpdate = async (status: 'confirmed' | 'cancelled') => {
-        if (confirm(`Mark this booking as ${status}?`)) {
-            setLoading(true);
-            await updateBookingStatus(booking.id, status);
-            setLoading(false);
+    const handleUpdate = async (status: 'confirmed') => {
+        setShowConfirmDialog(false);
+        setLoading(true);
+        const result = await updateBookingStatus(booking.id, status);
+        setLoading(false);
+        if (result.success) {
+            setJustConfirmed(true);
+            router.refresh();
         }
+    };
+
+    const handleCancel = async () => {
+        setShowCancelDialog(false);
+        setLoading(true);
+        await cancelBooking(booking.id, cancelReason);
+        setCancelReason('');
+        setLoading(false);
+        router.refresh();
     };
 
     const statusColors = {
@@ -44,10 +64,16 @@ export default function BookingCard({ booking, onViewDetails, extraHourPriceUsd 
                         <span className="font-bold text-safari-900">{booking.customer_name}</span>
                     </div>
                 </div>
-                <span className={cn("px-2 py-1 rounded-full text-sm font-bold uppercase tracking-wider", statusColors[booking.status as keyof typeof statusColors])}>
-                    {booking.status}
+                <span className={cn("px-2 py-1 rounded-full text-sm font-bold uppercase tracking-wider", statusColors[displayStatus as keyof typeof statusColors])}>
+                    {displayStatus}
                 </span>
             </div>
+
+            {justConfirmed && (
+                <div className="p-2.5 rounded-xl bg-green-50 border border-green-200 text-green-700 font-semibold text-sm">
+                    Booking confirmed — confirmation email sent to the guest.
+                </div>
+            )}
 
             <div className="grid grid-cols-2 gap-y-4 gap-x-2 pt-2 text-base border-t border-safari-50">
                 <div className="flex items-start gap-2">
@@ -140,10 +166,10 @@ export default function BookingCard({ booking, onViewDetails, extraHourPriceUsd 
             </div>
 
             <div className="pt-4 flex gap-2" onClick={(e) => e.stopPropagation()}>
-                {booking.status !== 'confirmed' && booking.status !== 'cancelled' && (
+                {displayStatus !== 'confirmed' && displayStatus !== 'cancelled' && (
                     <>
                         <button
-                            onClick={() => handleUpdate('confirmed')}
+                            onClick={() => setShowConfirmDialog(true)}
                             disabled={loading}
                             className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 font-bold transition-all disabled:opacity-50"
                         >
@@ -151,7 +177,7 @@ export default function BookingCard({ booking, onViewDetails, extraHourPriceUsd 
                             Confirm
                         </button>
                         <button
-                            onClick={() => handleUpdate('cancelled')}
+                            onClick={() => setShowCancelDialog(true)}
                             disabled={loading}
                             className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 font-bold transition-all disabled:opacity-50"
                         >
@@ -160,20 +186,49 @@ export default function BookingCard({ booking, onViewDetails, extraHourPriceUsd 
                         </button>
                     </>
                 )}
-                {booking.status === 'confirmed' && (
+                {displayStatus === 'confirmed' && (
                     <button
-                        onClick={() => handleUpdate('cancelled')}
+                        onClick={() => setShowCancelDialog(true)}
                         className="w-full py-2.5 text-base text-red-500 hover:text-red-600 font-bold bg-red-50 rounded-xl transition-all"
                     >
                         Cancel Booking
                     </button>
                 )}
-                {booking.status === 'cancelled' && (
+                {displayStatus === 'cancelled' && (
                     <div className="w-full text-center py-2.5 text-base text-safari-400 font-medium bg-safari-50 rounded-xl">
                         Cancelled
                     </div>
                 )}
             </div>
+
+            <ConfirmDialog
+                open={showConfirmDialog}
+                title="Confirm booking"
+                message={`Mark this booking for ${booking.customer_name} as confirmed? A confirmation email will be sent to the guest.`}
+                confirmLabel="Confirm"
+                loading={loading}
+                onConfirm={() => handleUpdate('confirmed')}
+                onCancel={() => setShowConfirmDialog(false)}
+            />
+
+            <ConfirmDialog
+                open={showCancelDialog}
+                title="Cancel booking"
+                variant="danger"
+                confirmLabel="Cancel booking"
+                cancelLabel="Back"
+                loading={loading}
+                textarea={{
+                    value: cancelReason,
+                    onChange: setCancelReason,
+                    label: 'Reason for cancellation',
+                    placeholder: 'e.g. Fully booked, weather conditions, guest requested a change...',
+                    helperText: 'This reason will be included in the cancellation email sent to the guest.',
+                    required: true,
+                }}
+                onConfirm={handleCancel}
+                onCancel={() => { setShowCancelDialog(false); setCancelReason(''); }}
+            />
         </div>
     );
 }

@@ -22,6 +22,7 @@ import {
     DollarSign,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import BookingDetailModal from '@/components/admin/BookingDetailModal';
 
 interface Booking {
     id: string;
@@ -95,11 +96,13 @@ function DailySection({
     count,
     bookings,
     config,
+    onSelect,
 }: {
     title: string;
     count: number;
     bookings: Booking[];
     config: (typeof activityConfig)[ActivityType];
+    onSelect: (b: Booking) => void;
 }) {
     const Icon = config.icon;
     return (
@@ -118,9 +121,15 @@ function DailySection({
             ) : (
                 <ul className="space-y-2">
                     {bookings.slice(0, 5).map((b) => (
-                        <li key={b.id} className="flex items-center justify-between gap-2 text-sm bg-white/90 rounded-xl px-3 py-2 border border-safari-100/80">
-                            <span className="font-medium text-safari-900 truncate">{b.customer_name}</span>
-                            <span className="text-safari-600 font-semibold tabular-nums flex-shrink-0">{b.time}</span>
+                        <li key={b.id}>
+                            <button
+                                type="button"
+                                onClick={() => onSelect(b)}
+                                className="w-full flex items-center justify-between gap-2 text-sm bg-white/90 rounded-xl px-3 py-2 border border-safari-100/80 hover:ring-2 hover:ring-safari-300 transition-all text-left"
+                            >
+                                <span className="font-medium text-safari-900 truncate">{b.customer_name}</span>
+                                <span className="text-safari-600 font-semibold tabular-nums flex-shrink-0">{b.time}</span>
+                            </button>
                         </li>
                     ))}
                     {bookings.length > 5 && (
@@ -180,6 +189,7 @@ export default function AdminDashboard({
 }: AdminDashboardProps) {
     const router = useRouter();
     const [modal, setModal] = useState<{ type: ActivityType; period: 'last' | 'next' } | null>(null);
+    const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
     const daily = categorizeBookings(dailyBookings);
     const lastWeek = categorizeBookings(lastWeekBookings);
@@ -315,6 +325,34 @@ export default function AdminDashboard({
                 </div>
             </div>
 
+            {/* Today’s schedule – activity breakdown */}
+            <section className="space-y-4">
+                <h2 className="text-lg font-bold text-safari-800 flex items-center gap-2">
+                    <span className="w-9 h-9 rounded-xl bg-secondary-100 flex items-center justify-center">
+                        <CalendarDays size={18} className="text-secondary-700" />
+                    </span>
+                    Today’s schedule — {formatDate(selectedDate)}
+                </h2>
+                {dailyTotal === 0 ? (
+                    <p className="text-sm text-safari-500 italic">No bookings scheduled for this day.</p>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {daily.safaris.length > 0 && (
+                            <DailySection title="Safaris" count={daily.safaris.length} bookings={daily.safaris} config={activityConfig.safari} onSelect={setSelectedBooking} />
+                        )}
+                        {daily.cookingClasses.length > 0 && (
+                            <DailySection title="Cooking" count={daily.cookingClasses.length} bookings={daily.cookingClasses} config={activityConfig['cooking-class']} onSelect={setSelectedBooking} />
+                        )}
+                        {daily.bicycles.length > 0 && (
+                            <DailySection title="Bikes" count={daily.bicycles.length} bookings={daily.bicycles} config={activityConfig['bicycle-rent']} onSelect={setSelectedBooking} />
+                        )}
+                        {daily.villageTours.length > 0 && (
+                            <DailySection title="Village" count={daily.villageTours.length} bookings={daily.villageTours} config={activityConfig['village-tour']} onSelect={setSelectedBooking} />
+                        )}
+                    </div>
+                )}
+            </section>
+
             {/* Revenue – Daily, Weekly, Monthly */}
             <section className="space-y-4">
                 <div className="flex flex-wrap items-center gap-3">
@@ -333,105 +371,95 @@ export default function AdminDashboard({
                     </div>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div className="bg-white rounded-2xl border-2 border-safari-100 overflow-hidden shadow-sm">
+                    <div className="bg-white rounded-2xl border-2 border-safari-100 overflow-hidden shadow-sm flex flex-col">
                         <div className="px-4 py-3 bg-green-50 border-b border-green-100 flex flex-wrap items-center gap-2">
                             <DollarSign size={18} className="text-green-600 shrink-0" />
                             <h3 className="font-bold text-safari-800 text-sm">Daily</h3>
                             <span className="text-sm text-safari-600 ml-auto">{formatShortDate(selectedDate)}</span>
                         </div>
-                        <div className="p-3 space-y-2">
-                            {(Object.keys(activityConfig) as ActivityType[]).map((type) => {
-                                const config = activityConfig[type];
-                                const amount = incomeDaily[type];
-                                const Icon = config.icon;
-                                return (
-                                    <div key={type} className={cn('flex items-center justify-between p-3 rounded-xl border', config.bg)}>
-                                        <div className="flex items-center gap-2">
-                                            <Icon className={cn('w-4 h-4', config.color)} />
-                                            <span className={cn('font-medium text-sm', config.color)}>{config.label}</span>
+                        <div className="p-3 flex flex-col flex-1">
+                            <div className="space-y-2">
+                                {(Object.keys(activityConfig) as ActivityType[]).filter((type) => incomeDaily[type] > 0).map((type) => {
+                                    const config = activityConfig[type];
+                                    const amount = incomeDaily[type];
+                                    const Icon = config.icon;
+                                    return (
+                                        <div key={type} className={cn('flex items-center justify-between p-3 rounded-xl border', config.bg)}>
+                                            <div className="flex items-center gap-2">
+                                                <Icon className={cn('w-4 h-4', config.color)} />
+                                                <span className={cn('font-medium text-sm', config.color)}>{config.label}</span>
+                                            </div>
+                                            <span className="font-bold text-safari-900 tabular-nums">USD {amount}</span>
                                         </div>
-                                        <span className="font-bold text-safari-900 tabular-nums">USD {amount}</span>
-                                    </div>
-                                );
-                            })}
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-safari-100 border border-safari-200 font-bold text-safari-900">
+                                    );
+                                })}
+                            </div>
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-safari-100 border border-safari-200 font-bold text-safari-900 mt-auto pt-3">
                                 <span>Total</span>
                                 <span className="tabular-nums">USD {dailyTotalIncome}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl border-2 border-safari-100 overflow-hidden shadow-sm">
+                    <div className="bg-white rounded-2xl border-2 border-safari-100 overflow-hidden shadow-sm flex flex-col">
                         <div className="px-4 py-3 bg-green-50 border-b border-green-100 flex flex-wrap items-center gap-2">
                             <DollarSign size={18} className="text-green-600 shrink-0" />
                             <h3 className="font-bold text-safari-800 text-sm">Weekly</h3>
                             <span className="text-sm text-safari-600 ml-auto">{formatShortDate(thisWeekRange.start)} – {formatShortDate(thisWeekRange.end)}</span>
                         </div>
-                        <div className="p-3 space-y-2">
-                            {(Object.keys(activityConfig) as ActivityType[]).map((type) => {
-                                const config = activityConfig[type];
-                                const amount = incomeWeekly[type];
-                                const Icon = config.icon;
-                                return (
-                                    <div key={type} className={cn('flex items-center justify-between p-3 rounded-xl border', config.bg)}>
-                                        <div className="flex items-center gap-2">
-                                            <Icon className={cn('w-4 h-4', config.color)} />
-                                            <span className={cn('font-medium text-sm', config.color)}>{config.label}</span>
+                        <div className="p-3 flex flex-col flex-1">
+                            <div className="space-y-2">
+                                {(Object.keys(activityConfig) as ActivityType[]).filter((type) => incomeWeekly[type] > 0).map((type) => {
+                                    const config = activityConfig[type];
+                                    const amount = incomeWeekly[type];
+                                    const Icon = config.icon;
+                                    return (
+                                        <div key={type} className={cn('flex items-center justify-between p-3 rounded-xl border', config.bg)}>
+                                            <div className="flex items-center gap-2">
+                                                <Icon className={cn('w-4 h-4', config.color)} />
+                                                <span className={cn('font-medium text-sm', config.color)}>{config.label}</span>
+                                            </div>
+                                            <span className="font-bold text-safari-900 tabular-nums">USD {amount}</span>
                                         </div>
-                                        <span className="font-bold text-safari-900 tabular-nums">USD {amount}</span>
-                                    </div>
-                                );
-                            })}
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-safari-100 border border-safari-200 font-bold text-safari-900">
+                                    );
+                                })}
+                            </div>
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-safari-100 border border-safari-200 font-bold text-safari-900 mt-auto pt-3">
                                 <span>Total</span>
                                 <span className="tabular-nums">USD {weeklyTotalIncome}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl border-2 border-safari-100 overflow-hidden shadow-sm">
+                    <div className="bg-white rounded-2xl border-2 border-safari-100 overflow-hidden shadow-sm flex flex-col">
                         <div className="px-4 py-3 bg-green-50 border-b border-green-100 flex flex-wrap items-center gap-2">
                             <DollarSign size={18} className="text-green-600 shrink-0" />
                             <h3 className="font-bold text-safari-800 text-sm">Monthly</h3>
                             <span className="text-sm text-safari-600 ml-auto">{MONTHS[new Date(selectedDate).getMonth()]} {new Date(selectedDate).getFullYear()}</span>
                         </div>
-                        <div className="p-3 space-y-2">
-                            {(Object.keys(activityConfig) as ActivityType[]).map((type) => {
-                                const config = activityConfig[type];
-                                const amount = incomeMonthly[type];
-                                const Icon = config.icon;
-                                return (
-                                    <div key={type} className={cn('flex items-center justify-between p-3 rounded-xl border', config.bg)}>
-                                        <div className="flex items-center gap-2">
-                                            <Icon className={cn('w-4 h-4', config.color)} />
-                                            <span className={cn('font-medium text-sm', config.color)}>{config.label}</span>
+                        <div className="p-3 flex flex-col flex-1">
+                            <div className="space-y-2">
+                                {(Object.keys(activityConfig) as ActivityType[]).filter((type) => incomeMonthly[type] > 0).map((type) => {
+                                    const config = activityConfig[type];
+                                    const amount = incomeMonthly[type];
+                                    const Icon = config.icon;
+                                    return (
+                                        <div key={type} className={cn('flex items-center justify-between p-3 rounded-xl border', config.bg)}>
+                                            <div className="flex items-center gap-2">
+                                                <Icon className={cn('w-4 h-4', config.color)} />
+                                                <span className={cn('font-medium text-sm', config.color)}>{config.label}</span>
+                                            </div>
+                                            <span className="font-bold text-safari-900 tabular-nums">USD {amount}</span>
                                         </div>
-                                        <span className="font-bold text-safari-900 tabular-nums">USD {amount}</span>
-                                    </div>
-                                );
-                            })}
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-safari-100 border border-safari-200 font-bold text-safari-900">
+                                    );
+                                })}
+                            </div>
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-safari-100 border border-safari-200 font-bold text-safari-900 mt-auto pt-3">
                                 <span>Total</span>
                                 <span className="tabular-nums">USD {monthlyTotalIncome}</span>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-
-            {/* Today’s schedule – activity breakdown */}
-            <section className="space-y-4">
-                <h2 className="text-lg font-bold text-safari-800 flex items-center gap-2">
-                    <span className="w-9 h-9 rounded-xl bg-secondary-100 flex items-center justify-center">
-                        <CalendarDays size={18} className="text-secondary-700" />
-                    </span>
-                    Today’s schedule — {formatDate(selectedDate)}
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <DailySection title="Safaris" count={daily.safaris.length} bookings={daily.safaris} config={activityConfig.safari} />
-                    <DailySection title="Cooking" count={daily.cookingClasses.length} bookings={daily.cookingClasses} config={activityConfig['cooking-class']} />
-                    <DailySection title="Bikes" count={daily.bicycles.length} bookings={daily.bicycles} config={activityConfig['bicycle-rent']} />
-                    <DailySection title="Village" count={daily.villageTours.length} bookings={daily.villageTours} config={activityConfig['village-tour']} />
                 </div>
             </section>
 
@@ -534,6 +562,13 @@ export default function AdminDashboard({
                     title={`${activityConfig[modal.type].label} – ${modal.period === 'next' ? 'Coming Week' : 'Last Week'}`}
                     bookings={modal.period === 'next' ? getActivityBookings(nextWeekBookings, modal.type) : getActivityBookings(lastWeekBookings, modal.type)}
                     onClose={() => setModal(null)}
+                />
+            )}
+
+            {selectedBooking && (
+                <BookingDetailModal
+                    booking={selectedBooking}
+                    onClose={() => setSelectedBooking(null)}
                 />
             )}
         </div>

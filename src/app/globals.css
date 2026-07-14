@@ -18,6 +18,22 @@
   }
 }
 
+/* Leaflet safety overrides: guarantee the map fills its box and clips its
+   panes, and undo Tailwind's img reset (max-width:100%/height:auto) which
+   otherwise distorts map tiles. These sit outside @layer so they win. */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  background: #ddd;
+}
+.leaflet-container img {
+  max-width: none !important;
+  max-height: none !important;
+  height: auto;
+}
+
 @layer components {
 
   /* Animated gradient background */

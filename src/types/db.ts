@@ -54,7 +54,8 @@ export interface Booking {
     discount_amount?: number
     advance_payment_amount?: number
     advance_payment_status?: 'pending' | 'paid' | 'refunded'
-    status: 'new' | 'confirmed' | 'cancelled'
+    status: 'new' | 'payment_pending' | 'confirmed' | 'upcoming' | 'finished' | 'cancelled'
+    cancellation_reason?: string | null
     created_at: string
 }
 

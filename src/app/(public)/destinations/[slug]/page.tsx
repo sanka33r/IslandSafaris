@@ -327,7 +327,8 @@ export default function DestinationDetailPage() {
             {schemas.map((schema, index) => (
                 <JsonLd key={`destination-schema-${index}`} data={schema} />
             ))}
-            <div className="container mx-auto px-4 sm:px-6 pt-6">
+            {/* Hero Header */}
+            <div className="relative h-[55vh] min-h-[280px] sm:h-[65vh] md:h-[75vh] lg:h-[85vh] bg-safari-900 text-white overflow-hidden group">
                 <BreadcrumbNav
                     items={[
                         { label: 'Home', href: '/' },
@@ -335,9 +336,6 @@ export default function DestinationDetailPage() {
                         { label: destination.name },
                     ]}
                 />
-            </div>
-            {/* Hero Header */}
-            <div className="relative h-[55vh] min-h-[280px] sm:h-[65vh] md:h-[75vh] lg:h-[85vh] bg-safari-900 text-white overflow-hidden group">
                 <div className="absolute inset-0 bg-black/30 z-10" />
                 <div className="absolute inset-0 bg-gradient-to-t from-safari-950 via-transparent to-transparent z-20 opacity-90" />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent z-20" />

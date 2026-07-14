@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Calendar, Clock, Users, MapPin, Mail, Phone, Globe, MessageSquare, Loader2, CheckCircle, AlertCircle, ExternalLink, Tag, ChevronDown } from 'lucide-react';
 import { validatePromoCode } from '@/lib/actions/promo-codes';
+import { extractPlaceNameFromMapsUrl, isGoogleMapsLink, isShortGoogleMapsLink } from '@/lib/maps';
 import Link from 'next/link';
+import LocationPickerModal from '@/components/booking/LocationPickerModal';
 
 interface BookingFormProps {
     preselectedPackage?: 'cooking-class' | 'village-tour' | 'bicycle-rent';
@@ -150,8 +152,62 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
         validateField(name, value);
     };
 
+    const [resolvingHotelName, setResolvingHotelName] = useState(false);
+    const [showLocationPicker, setShowLocationPicker] = useState(false);
+
+    const applyHotelNameFromMapsUrl = async (rawUrl: string) => {
+        const url = rawUrl.trim();
+        if (!url || !isGoogleMapsLink(url)) return;
+
+        const directName = extractPlaceNameFromMapsUrl(url);
+        if (directName) {
+            handleChange('hotel_name', directName);
+            return;
+        }
+        if (!isShortGoogleMapsLink(url)) return;
+
+        setResolvingHotelName(true);
+        try {
+            const res = await fetch('/api/maps/resolve-place', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url }),
+            });
+            const data = await res.json();
+            if (data.placeName) {
+                handleChange('hotel_name', data.placeName);
+            }
+        } catch {
+            // Auto-fill is a convenience; the customer can still type the hotel name manually.
+        } finally {
+            setResolvingHotelName(false);
+        }
+    };
+
+    // Resolve immediately on paste so a newly pasted link updates the hotel
+    // name right away, rather than waiting for the field to lose focus.
+    const handlePickupLocationPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+        const pasted = e.clipboardData.getData('text');
+        if (pasted) applyHotelNameFromMapsUrl(pasted);
+    };
+
+    const handlePickupLocationBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+        handleBlur(e);
+        applyHotelNameFromMapsUrl(e.target.value);
+    };
+
     const handleChange = (name: string, value: any) => {
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => {
+            const next = { ...prev, [name]: value };
+            // Hotel Name is read-only and derived from Pickup Location: mirror
+            // plain-text entries live. Maps links are handled separately by
+            // applyHotelNameFromMapsUrl (paste/blur), which extracts a readable
+            // place name instead of dumping the raw URL into the field.
+            if (name === 'pickup_location' && !isGoogleMapsLink(value)) {
+                next.hotel_name = value;
+            }
+            return next;
+        });
 
         // Clear discount if critical params change
         if (['package_type', 'group_size'].includes(name)) {
@@ -161,6 +217,9 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
 
         if (touched[name]) {
             validateField(name, value);
+        }
+        if (name === 'pickup_location' && touched.hotel_name) {
+            validateField('hotel_name', isGoogleMapsLink(value) ? formData.hotel_name : value);
         }
     };
 
@@ -438,10 +497,9 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                                     type="text"
                                     name="hotel_name"
                                     value={formData.hotel_name}
-                                    onChange={(e) => handleChange('hotel_name', e.target.value)}
-                                    onBlur={handleBlur}
-                                    placeholder="Enter your hotel name"
-                                    className={`w-full p-3 sm:p-4 bg-safari-50/50 rounded-xl sm:rounded-2xl border text-safari-900 placeholder:text-safari-500 focus:bg-white outline-none transition-all ${errors.hotel_name ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
+                                    readOnly
+                                    placeholder="Filled in automatically from Pickup Location below"
+                                    className={`w-full p-3 sm:p-4 bg-safari-100/70 rounded-xl sm:rounded-2xl border text-safari-700 placeholder:text-safari-400 outline-none cursor-not-allowed ${errors.hotel_name ? 'border-red-300' : 'border-safari-100'}`}
                                 />
                                 {errors.hotel_name && <p className="text-red-500 text-xs ml-1">{errors.hotel_name}</p>}
                             </div>
@@ -454,25 +512,29 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                                         name="pickup_location"
                                         value={formData.pickup_location}
                                         onChange={(e) => handleChange('pickup_location', e.target.value)}
-                                        onBlur={handleBlur}
+                                        onPaste={handlePickupLocationPaste}
+                                        onBlur={handlePickupLocationBlur}
                                         placeholder="Paste Google Maps link or type location"
                                         className={`w-full p-3 sm:p-4 pr-10 bg-safari-50/50 rounded-xl sm:rounded-2xl border text-safari-900 placeholder:text-safari-500 focus:bg-white outline-none transition-all text-sm ${errors.pickup_location ? 'border-red-300 focus:border-red-500' : 'border-safari-100 focus:border-secondary-500'}`}
                                     />
                                     <MapPin size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-safari-400" />
                                 </div>
+                                <p className="text-[10px] text-safari-400 ml-1">Tip: type the hotel name or paste a Google Maps link here — we&apos;ll automatically fill in the Hotel Name field above.</p>
+                                {resolvingHotelName && (
+                                    <p className="text-[10px] text-safari-400 ml-1">Detecting hotel name…</p>
+                                )}
                                 {errors.pickup_location && <p className="text-red-500 text-xs ml-1">{errors.pickup_location}</p>}
 
                                 <div className="flex items-center gap-3">
-                                    <a
-                                        href="https://www.google.com/maps/@7.8731,80.7718,9z"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowLocationPicker(true)}
                                         className="inline-flex items-center gap-1.5 text-xs font-semibold text-secondary-600 hover:text-secondary-700 bg-secondary-50 hover:bg-secondary-100 px-3 py-1.5 rounded-lg transition-colors"
                                     >
                                         <MapPin size={12} />
-                                        Pick on Google Maps
-                                    </a>
-                                    {formData.pickup_location && formData.pickup_location.includes('google.com/maps') && (
+                                        Pick on map
+                                    </button>
+                                    {formData.pickup_location && isGoogleMapsLink(formData.pickup_location) && (
                                         <a
                                             href={formData.pickup_location}
                                             target="_blank"
@@ -484,7 +546,7 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                                         </a>
                                     )}
                                 </div>
-                                {formData.pickup_location && formData.pickup_location.includes('google.com/maps') && (
+                                {formData.pickup_location && (
                                     <div className="mt-1 rounded-xl overflow-hidden border border-safari-100">
                                         <iframe
                                             src={`https://maps.google.com/maps?q=${encodeURIComponent(formData.pickup_location)}&output=embed`}
@@ -502,6 +564,15 @@ export default function BookingForm({ preselectedPackage, locked = false }: Book
                         </div>
                     )}
                 </div>
+            )}
+
+            {showLocationPicker && (
+                <LocationPickerModal
+                    title="Pick pickup location"
+                    initialLabel={formData.pickup_location}
+                    onSelect={(value) => handleChange('pickup_location', value)}
+                    onClose={() => setShowLocationPicker(false)}
+                />
             )}
 
             {/* Contact Information */}

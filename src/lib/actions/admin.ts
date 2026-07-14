@@ -3,8 +3,10 @@
 import { supabaseAdmin } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 import { PACKAGE_SLUGS, upsertPackageOverride } from '@/lib/packages';
+import { sendBookingCancellationEmail } from '@/lib/email/send-cancellation';
+import { sendBookingConfirmedEmail } from '@/lib/email/send-booking-confirmed';
 
-export async function updateBookingStatus(id: string, status: 'new' | 'confirmed' | 'cancelled') {
+export async function updateBookingStatus(id: string, status: 'new' | 'confirmed') {
     const { error } = await supabaseAdmin
         .from('bookings')
         .update({ status })
@@ -19,6 +21,42 @@ export async function updateBookingStatus(id: string, status: 'new' | 'confirmed
     revalidatePath('/admin/bookings');
     revalidatePath('/admin/package-bookings');
     revalidatePath('/admin/calendar');
+
+    if (status === 'confirmed') {
+        const emailResult = await sendBookingConfirmedEmail(id);
+        if (!emailResult.success) {
+            console.error('Booking confirmation email failed to send:', emailResult.error);
+        }
+    }
+
+    return { success: true };
+}
+
+/**
+ * Cancels a booking with an admin-provided reason and emails the guest a
+ * cancellation notice that includes that reason.
+ */
+export async function cancelBooking(id: string, reason: string) {
+    const { error } = await supabaseAdmin
+        .from('bookings')
+        .update({ status: 'cancelled', cancellation_reason: reason.trim() || null })
+        .eq('id', id);
+
+    if (error) {
+        console.error('Error cancelling booking:', error);
+        return { success: false, message: 'Failed to cancel booking' };
+    }
+
+    revalidatePath('/admin');
+    revalidatePath('/admin/bookings');
+    revalidatePath('/admin/package-bookings');
+    revalidatePath('/admin/calendar');
+
+    const emailResult = await sendBookingCancellationEmail(id, reason);
+    if (!emailResult.success) {
+        console.error('Cancellation email failed to send:', emailResult.error);
+    }
+
     return { success: true };
 }
 

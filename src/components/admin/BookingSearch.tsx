@@ -38,7 +38,7 @@ export default function BookingSearch() {
                 placeholder="Search name, email, or ref..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full pl-11 pr-10 py-2.5 bg-white border border-safari-100 rounded-2xl text-base focus:outline-none focus:ring-2 focus:ring-secondary-500/20 focus:border-secondary-500 transition-all shadow-sm"
+                className="w-full pl-11 pr-10 py-2.5 bg-white border border-safari-100 rounded-2xl text-base text-safari-900 placeholder:text-safari-400 focus:outline-none focus:ring-2 focus:ring-secondary-500/20 focus:border-secondary-500 transition-all shadow-sm"
             />
             {query && (
                 <button

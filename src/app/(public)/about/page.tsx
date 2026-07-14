@@ -6,6 +6,7 @@ import { buildMetadata } from '@/lib/seo';
 import JsonLd from '@/components/seo/JsonLd';
 import { breadcrumbSchema, faqSchema } from '@/lib/schema';
 import { optimizeCloudinaryUrl } from '@/lib/images';
+import { CONTACT_DETAILS } from '@/lib/constants';
 
 export const metadata = buildMetadata({
     title: 'About Island Safaris',
@@ -25,15 +26,15 @@ const enCopy = {
     journeyBadge: 'Our Journey',
     journeyTitle: "Born from a Deep Love for Sri Lanka's Wild Heart",
     journeyBodyOne:
-        "Island Safaris was founded with a simple mission: to share the magic of Sri Lanka's incredible wildlife with travelers from around the world. Based in Habarana, at the gateway to the Cultural Triangle, we specialize in private jeep safaris to the region's most famous national parks.",
+        "Island Safaris was founded with a simple mission: to share the magic of Sri Lanka's incredible wildlife with travelers from around the world. Based in Sigiriya, at the gateway to the Cultural Triangle, we specialize in private jeep safaris to the region's most famous national parks.",
     journeyQuote:
         "A safari is more than seeing animals-it's about understanding the ecosystem, respecting the habitats, and creating memories that last a lifetime.",
     journeyBodyTwo:
         "Our team of experienced drivers not only navigate the terrain expertly but also serve as knowledgeable guides who can read the forest like a book. Over the years, we've developed an intimate understanding of the Great Elephant Migration-the seasonal movement of hundreds of Asian elephants between Minneriya, Kaudulla, and Hurulu Eco Park. This knowledge ensures you're always at the right place, at the right time.",
     corridorLabel: 'Elephant Corridor',
     corridorParks: 'Minneriya • Kaudulla • Hurulu',
-    basedTitle: 'Based in Habarana',
-    basedSubtitle: 'Heart of the Cultural Triangle',
+    basedTitle: 'Maapagala Resort Sigiriya',
+    basedSubtitle: '92c Thanyama Asala, Sigiriya',
     parksCta: 'Explore Our Parks',
     whyBadge: 'Why Choose Us',
     whyTitle: 'The Island Safaris Difference',
@@ -67,15 +68,15 @@ const esCopy = {
     journeyBadge: 'Nuestro recorrido',
     journeyTitle: 'Nacido de un amor profundo por la naturaleza de Sri Lanka',
     journeyBodyOne:
-        'Island Safaris nacio con una mision simple: compartir la magia de la increible vida silvestre de Sri Lanka con viajeros de todo el mundo. Con base en Habarana, nos especializamos en safaris privados en jeep por los parques nacionales mas emblematicos de la region.',
+        'Island Safaris nacio con una mision simple: compartir la magia de la increible vida silvestre de Sri Lanka con viajeros de todo el mundo. Con base en Sigiriya, nos especializamos en safaris privados en jeep por los parques nacionales mas emblematicos de la region.',
     journeyQuote:
         'Un safari es mas que ver animales: se trata de entender el ecosistema, respetar los habitats y crear recuerdos para toda la vida.',
     journeyBodyTwo:
         'Nuestro equipo de conductores expertos no solo domina el terreno, tambien actua como guia con gran conocimiento del bosque. Con los anos, desarrollamos un entendimiento unico de la Gran Migracion de Elefantes.',
     corridorLabel: 'Corredor de elefantes',
     corridorParks: 'Minneriya • Kaudulla • Hurulu',
-    basedTitle: 'Con base en Habarana',
-    basedSubtitle: 'Corazon del Triangulo Cultural',
+    basedTitle: 'Maapagala Resort Sigiriya',
+    basedSubtitle: '92c Thanyama Asala, Sigiriya',
     parksCta: 'Explora nuestros parques',
     whyBadge: 'Por que elegirnos',
     whyTitle: 'La diferencia de Island Safaris',
@@ -139,7 +140,7 @@ export default async function AboutPage() {
         faqSchema([
             {
                 question: 'Where is Island Safaris based?',
-                answer: 'Island Safaris is based in Habarana, Sri Lanka, close to Minneriya, Kaudulla, and Hurulu Eco Park.',
+                answer: 'Island Safaris is based in Sigiriya, Sri Lanka, close to Minneriya, Kaudulla, and Hurulu Eco Park.',
             },
             {
                 question: 'What makes your safaris different?',
@@ -269,7 +270,12 @@ export default async function AboutPage() {
 
                             {/* Location + CTA row */}
                             <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-                                <div className="inline-flex items-center gap-4 bg-secondary-50 rounded-2xl px-5 py-4 border border-safari-100">
+                                <a
+                                    href={CONTACT_DETAILS.mapUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-4 bg-secondary-50 rounded-2xl px-5 py-4 border border-safari-100 hover:border-secondary-300 transition-colors"
+                                >
                                     <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-safari-100">
                                         <MapPin className="text-secondary-600" size={24} />
                                     </div>
@@ -277,7 +283,7 @@ export default async function AboutPage() {
                                         <div className="font-bold text-safari-900">{t.basedTitle}</div>
                                         <div className="text-safari-600 text-sm">{t.basedSubtitle}</div>
                                     </div>
-                                </div>
+                                </a>
                                 <Link
                                     href="/destinations"
                                     className="inline-flex items-center gap-2 text-secondary-600 font-bold hover:gap-3 transition-all shrink-0"

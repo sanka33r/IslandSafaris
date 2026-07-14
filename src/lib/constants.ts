@@ -44,8 +44,9 @@ export const CONTACT_DETAILS = {
     phone: '0707682401',
     phoneHref: '+94707682401',
     email: 'islandsafariessrilanka@gmail.com',
-    location: 'Habarana, Sri Lanka',
-    locationNote: 'Main Safari Hub',
+    location: 'Maapagala Resort Sigiriya',
+    locationNote: '92c Thanyama Asala, Sigiriya, Sri Lanka',
+    mapUrl: 'https://maps.app.goo.gl/DkbLL5kxb2k2Gy7J6',
 };
 
 export const TIME_SLOTS = [

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Facebook, Instagram, Mail, Phone, MapPin } from 'lucide-react';
 import { useLocale } from '@/providers/LocaleProvider';
+import { CONTACT_DETAILS } from '@/lib/constants';
 
 export default function Footer() {
     const { messages } = useLocale();
@@ -114,12 +115,12 @@ export default function Footer() {
                                 </div>
                                 <span className="break-all pt-2.5">islandsafariessrilanka@gmail.com</span>
                             </a>
-                            <div className="flex items-start gap-4 text-safari-300">
-                                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
+                            <a href={CONTACT_DETAILS.mapUrl} target="_blank" rel="noopener noreferrer" className="flex items-start gap-4 text-safari-300 hover:text-secondary-400 transition-colors group">
+                                <div className="w-10 h-10 shrink-0 bg-white/10 group-hover:bg-secondary-600 rounded-xl flex items-center justify-center transition-colors">
                                     <MapPin size={18} />
                                 </div>
-                                <span>Habarana, Sri Lanka<br />Cultural Triangle</span>
-                            </div>
+                                <span>{CONTACT_DETAILS.location}<br />{CONTACT_DETAILS.locationNote}</span>
+                            </a>
                         </div>
                     </div>
                 </div>

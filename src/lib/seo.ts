@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 const SITE_NAME = 'Island Safaris Sri Lanka';
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.islandsafaris.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.islandsafarisl.com';
 
 type SeoInput = {
   title: string;

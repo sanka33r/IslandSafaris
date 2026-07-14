@@ -1,7 +1,7 @@
 import { CONTACT_DETAILS } from '@/lib/constants';
 import { Review } from '@/types/db';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.islandsafaris.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.islandsafarisl.com';
 const BUSINESS_NAME = 'Island Safaris Sri Lanka';
 
 export function getSiteUrl() {
@@ -19,7 +19,8 @@ export function localBusinessSchema() {
     email: CONTACT_DETAILS.email,
     address: {
       '@type': 'PostalAddress',
-      addressLocality: 'Habarana',
+      streetAddress: '92c Thanyama Asala',
+      addressLocality: 'Sigiriya',
       addressCountry: 'LK',
     },
     areaServed: 'Sri Lanka',

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { CheckCircle, Calendar, Clock, Users, MapPin, Mail, Phone, Globe, ArrowLeft, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import PaymentSection from '@/components/payments/PaymentSection';
+import DownloadReceiptButton from '@/components/booking/DownloadReceiptButton';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata = buildMetadata({
@@ -265,6 +266,26 @@ export default async function BookingConfirmationPage(props: ConfirmationPagePro
 
                 {/* Actions */}
                 <div className="flex flex-col sm:flex-row gap-4">
+                    {isPaid && (
+                        <DownloadReceiptButton
+                            receipt={{
+                                referenceNumber: booking.id.substring(0, 8).toUpperCase(),
+                                customerName: booking.customer_name,
+                                email: booking.email,
+                                phone: booking.phone || undefined,
+                                itemName: packageName,
+                                date: bookingDate,
+                                time: bookingTime,
+                                groupSize: booking.group_size,
+                                hotelName: booking.hotel_name,
+                                pickupRequired: !!booking.pickup_required,
+                                entranceNote: null,
+                                advancePaidUsd: Number(booking.advance_payment_amount) || 5,
+                                remainingUsd: null,
+                                ticketsUsd: null,
+                            }}
+                        />
+                    )}
                     <Link
                         href="/packages"
                         className="flex-1 bg-safari-900 hover:bg-safari-800 text-white font-bold py-4 px-6 rounded-full transition-all text-center inline-flex items-center justify-center gap-2"
