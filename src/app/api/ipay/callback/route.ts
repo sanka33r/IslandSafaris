@@ -66,9 +66,12 @@ export async function POST(request: Request) {
         // 'A' = accepted; 'P' = customer paid, settlement to merchant happens end of day.
         const isPaid = transactionStatus === 'A' || transactionStatus === 'P';
 
-        // Declined/cancelled notifications carry nothing to validate or record;
-        // acknowledge them before the amount check so they never bounce.
+        // Declined/cancelled notifications carry nothing to validate or record,
+        // but log the full payload — iPay may include a reason/status message
+        // under a field not otherwise used here, and this is the only record
+        // of *why* a specific card was declined.
         if (!isPaid) {
+            console.warn('iPay payment not accepted', { orderId, bookingId, transactionStatus, payload });
             return NextResponse.json({ success: true });
         }
 
