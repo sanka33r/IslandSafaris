@@ -69,7 +69,7 @@ export default function ReviewForm({ destinationId }: { destinationId?: string }
                         name="name"
                         required
                         placeholder="John Doe"
-                        className="w-full p-3 rounded-xl border border-safari-200 focus:ring-2 focus:ring-secondary-500 outline-none"
+                        className="w-full p-3 rounded-xl border border-safari-200 focus:ring-2 focus:ring-secondary-500 outline-none text-black"
                     />
                 </div>
 
@@ -80,7 +80,7 @@ export default function ReviewForm({ destinationId }: { destinationId?: string }
                         required
                         rows={4}
                         placeholder="Tell us about your safari..."
-                        className="w-full p-3 rounded-xl border border-safari-200 focus:ring-2 focus:ring-secondary-500 outline-none"
+                        className="w-full p-3 rounded-xl border border-safari-200 focus:ring-2 focus:ring-secondary-500 outline-none text-black"
                     />
                 </div>
 
