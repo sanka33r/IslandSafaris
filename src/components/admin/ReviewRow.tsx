@@ -7,14 +7,23 @@ import { Loader2, Check, Trash2, Star } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function ReviewRow({ review, readOnly = false }: { review: any, readOnly?: boolean }) {
     const [loading, setLoading] = useState(false);
+    const [deleted, setDeleted] = useState(false);
 
     const handleModerate = async (approve: boolean) => {
         if (confirm(approve ? "Approve this review?" : "Delete this review permanently?")) {
             setLoading(true);
-            await moderateReview(review.id, approve);
+            const result = await moderateReview(review.id, approve);
             setLoading(false);
+
+            if (result.success && !approve) {
+                setDeleted(true);
+            }
         }
     };
+
+    if (deleted) {
+        return null;
+    }
 
     return (
         <tr className="hover:bg-safari-50/50 transition-colors">
@@ -34,7 +43,18 @@ export default function ReviewRow({ review, readOnly = false }: { review: any, r
                 {review.comment}
             </td>
             <td className="p-4">
-                {!readOnly && (
+                {readOnly ? (
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => handleModerate(false)}
+                            disabled={loading}
+                            className="px-3 py-1 rounded bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 text-base font-semibold flex items-center gap-1"
+                        >
+                            {loading ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                            Delete
+                        </button>
+                    </div>
+                ) : (
                     <div className="flex gap-2">
                         <button
                             onClick={() => handleModerate(true)}
@@ -54,7 +74,6 @@ export default function ReviewRow({ review, readOnly = false }: { review: any, r
                         </button>
                     </div>
                 )}
-                {readOnly && <span className="text-green-600 text-base font-bold px-2 py-1 bg-green-50 rounded-full">Approved</span>}
             </td>
         </tr>
     );

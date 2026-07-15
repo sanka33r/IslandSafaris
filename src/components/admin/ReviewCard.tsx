@@ -8,14 +8,23 @@ import { cn } from '@/lib/utils';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function ReviewCard({ review, readOnly = false }: { review: any, readOnly?: boolean }) {
     const [loading, setLoading] = useState(false);
+    const [deleted, setDeleted] = useState(false);
 
     const handleModerate = async (approve: boolean) => {
         if (confirm(approve ? "Approve this review?" : "Delete this review permanently?")) {
             setLoading(true);
-            await moderateReview(review.id, approve);
+            const result = await moderateReview(review.id, approve);
             setLoading(false);
+
+            if (result.success && !approve) {
+                setDeleted(true);
+            }
         }
     };
+
+    if (deleted) {
+        return null;
+    }
 
     return (
         <div className={cn(
@@ -61,7 +70,18 @@ export default function ReviewCard({ review, readOnly = false }: { review: any, 
                 </p>
             </div>
 
-            {!readOnly && (
+            {readOnly ? (
+                <div className="pt-2">
+                    <button
+                        onClick={() => handleModerate(false)}
+                        disabled={loading}
+                        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 font-bold transition-all disabled:opacity-50"
+                    >
+                        {loading ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={18} />}
+                        Delete
+                    </button>
+                </div>
+            ) : (
                 <div className="pt-2 flex gap-2">
                     <button
                         onClick={() => handleModerate(true)}

@@ -1,3 +1,5 @@
+'use client';
+
 import { Review } from '@/types/db';
 import { Star } from 'lucide-react';
 
@@ -10,23 +12,41 @@ export default function ReviewList({ reviews }: { reviews: Review[] }) {
         );
     }
 
+    const duplicatedReviews = [...reviews, ...reviews];
+
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {reviews.map((review) => (
-                <div key={review.id} className="bg-white p-6 rounded-2xl shadow-sm border border-safari-100">
-                    <div className="flex items-center justify-between mb-4">
-                        <h4 className="font-bold text-safari-900">{review.name}</h4>
-                        <div className="flex text-yellow-400">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                                <Star key={i} size={16} fill={i < review.rating ? "currentColor" : "none"} stroke="currentColor" />
-                            ))}
+        <div className="overflow-hidden">
+            <div className="flex w-max gap-6 pr-6 motion-safe:animate-[scroll_28s_linear_infinite] hover:[animation-play-state:paused]">
+                {duplicatedReviews.map((review, index) => (
+                    <div
+                        key={`${review.id}-${index}`}
+                        className="w-[min(85vw,280px)] sm:w-[280px] flex-shrink-0 self-start bg-white p-6 rounded-2xl shadow-sm border border-safari-100"
+                    >
+                        <div className="flex items-center justify-between mb-4">
+                            <h4 className="font-bold text-safari-900">{review.name}</h4>
+                            <div className="flex text-yellow-400">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                    <Star key={i} size={16} fill={i < review.rating ? 'currentColor' : 'none'} stroke="currentColor" />
+                                ))}
+                            </div>
                         </div>
+                        <p className="text-safari-600 text-sm leading-relaxed whitespace-pre-line">
+                            &quot;{review.comment}&quot;
+                        </p>
                     </div>
-                    <p className="text-safari-600 text-sm leading-relaxed whitespace-pre-line">
-                        &quot;{review.comment}&quot;
-                    </p>
-                </div>
-            ))}
+                ))}
+            </div>
+
+            <style jsx>{`
+                @keyframes scroll {
+                    from {
+                        transform: translateX(0);
+                    }
+                    to {
+                        transform: translateX(-50%);
+                    }
+                }
+            `}</style>
         </div>
     );
 }
