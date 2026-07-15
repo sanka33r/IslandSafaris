@@ -4,20 +4,33 @@ import { Review } from '@/types/db';
 import { Star } from 'lucide-react';
 
 export default function ReviewList({ reviews }: { reviews: Review[] }) {
-    if (reviews.length === 0) {
-        return (
-            <div className="text-center py-12 bg-safari-50 rounded-2xl border border-dashed border-safari-200">
-                <p className="text-safari-500">No reviews yet. Be the first to share your experience!</p>
+    const shouldAnimate = reviews.length > 2;
+    const displayReviews = shouldAnimate ? [...reviews, ...reviews] : reviews;
+    const placeholderCards = Array.from({ length: 3 }, (_, index) => (
+        <div
+            key={`placeholder-${index}`}
+            className="w-[min(85vw,280px)] sm:w-[280px] flex-shrink-0 self-start bg-white p-6 rounded-2xl shadow-sm border border-safari-100 animate-pulse"
+        >
+            <div className="flex items-center justify-between mb-4">
+                <div className="h-4 w-24 rounded bg-safari-100" />
+                <div className="flex gap-1">
+                    {Array.from({ length: 5 }).map((_, starIndex) => (
+                        <div key={starIndex} className="h-4 w-4 rounded-full bg-safari-100" />
+                    ))}
+                </div>
             </div>
-        );
-    }
-
-    const duplicatedReviews = [...reviews, ...reviews];
+            <div className="space-y-2">
+                <div className="h-3 w-full rounded bg-safari-100" />
+                <div className="h-3 w-5/6 rounded bg-safari-100" />
+                <div className="h-3 w-3/4 rounded bg-safari-100" />
+            </div>
+        </div>
+    ));
 
     return (
         <div className="overflow-hidden">
-            <div className="flex w-max gap-6 pr-6 motion-safe:animate-[scroll_28s_linear_infinite] hover:[animation-play-state:paused]">
-                {duplicatedReviews.map((review, index) => (
+            <div className={`flex w-max gap-6 pr-6 ${shouldAnimate ? 'motion-safe:animate-[scroll_28s_linear_infinite] hover:[animation-play-state:paused]' : ''}`}>
+                {reviews.length === 0 ? placeholderCards : displayReviews.map((review, index) => (
                     <div
                         key={`${review.id}-${index}`}
                         className="w-[min(85vw,280px)] sm:w-[280px] flex-shrink-0 self-start bg-white p-6 rounded-2xl shadow-sm border border-safari-100"
@@ -37,16 +50,18 @@ export default function ReviewList({ reviews }: { reviews: Review[] }) {
                 ))}
             </div>
 
-            <style jsx>{`
-                @keyframes scroll {
-                    from {
-                        transform: translateX(0);
+            {shouldAnimate && (
+                <style jsx>{`
+                    @keyframes scroll {
+                        from {
+                            transform: translateX(0);
+                        }
+                        to {
+                            transform: translateX(-50%);
+                        }
                     }
-                    to {
-                        transform: translateX(-50%);
-                    }
-                }
-            `}</style>
+                `}</style>
+            )}
         </div>
     );
 }

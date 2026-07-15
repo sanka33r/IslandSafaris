@@ -10,15 +10,18 @@ export default function ReviewForm({ destinationId }: { destinationId?: string }
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
 
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
     async function handleSubmit(formData: FormData) {
         setIsSubmitting(true);
+        setErrorMessage(null);
         const res = await submitReview(destinationId, formData);
         setIsSubmitting(false);
 
         if (res.success) {
             setSuccess(true);
         } else {
-            alert('Failed to submit review. Please try again.');
+            setErrorMessage(res.message || 'Failed to submit review. Please try again.');
         }
     }
 
@@ -83,6 +86,12 @@ export default function ReviewForm({ destinationId }: { destinationId?: string }
                         className="w-full p-3 rounded-xl border border-safari-200 focus:ring-2 focus:ring-secondary-500 outline-none text-black"
                     />
                 </div>
+
+                {errorMessage && (
+                    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                        {errorMessage}
+                    </div>
+                )}
 
                 <button
                     type="submit"
