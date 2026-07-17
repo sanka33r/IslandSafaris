@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { CONTACT_DETAILS, EXTRA_HOUR_PRICE_USD, PACKAGE_INFO, SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE } from '@/lib/constants';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const OWNER_NOTIFICATION_EMAIL = process.env.OWNER_NOTIFICATION_EMAIL || CONTACT_DETAILS.email;
 
 function formatUsd(amount: number): string {
     return Number(amount).toFixed(2);
@@ -150,6 +151,7 @@ export async function sendBookingConfirmedEmail(bookingId: string): Promise<{ su
     const { error: sendError } = await resend.emails.send({
         from: `Island Safaris <${fromEmail}>`,
         to: [booking.email],
+        bcc: [OWNER_NOTIFICATION_EMAIL],
         replyTo: fromEmail,
         subject: `Booking confirmed: ${referenceNumber}`,
         html: buildConfirmedHtml(payload),

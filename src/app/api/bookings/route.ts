@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getPackagePrice } from '@/lib/packages';
+import { sendNewBookingNotification } from '@/lib/email/send-new-booking-notification';
+
+function formatPackageName(type: string): string {
+    return type.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
 
 export async function POST(request: NextRequest) {
     try {
@@ -55,6 +60,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        const packagePrice = await getPackagePrice(package_type);
+        const totalUsd = packagePrice * parseInt(group_size);
+
         // Validate promo code if provided
         let discountAmount = 0;
         if (promo_code) {
@@ -108,18 +116,15 @@ export async function POST(request: NextRequest) {
             // ... code ...
 
             // Calculate discount amount for storage
-            const price = await getPackagePrice(package_type);
-            const total = price * parseInt(group_size);
-
             if (promo.type === 'percentage') {
-                discountAmount = (total * promo.value) / 100;
+                discountAmount = (totalUsd * promo.value) / 100;
                 if (promo.max_discount && discountAmount > promo.max_discount) {
                     discountAmount = promo.max_discount;
                 }
             } else {
                 discountAmount = promo.value;
             }
-            if (discountAmount > total) discountAmount = total;
+            if (discountAmount > totalUsd) discountAmount = totalUsd;
         }
 
         // Insert booking - omit passport_number, pickup_location, promo_code, discount_amount if columns don't exist
@@ -153,8 +158,22 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        sendNewBookingNotification({
+            bookingId: booking.id,
+            referenceNumber: `IS-${booking.id.substring(0, 8).toUpperCase()}`,
+            customerName: customer_name,
+            customerEmail: email,
+            customerPhone: phone,
+            activityName: formatPackageName(package_type),
+            date,
+            time,
+            groupSize: parseInt(group_size),
+            totalUsd: Math.max(0, totalUsd - discountAmount),
+            hotelName: pickup_required ? hotel_name : null,
+            pickupRequired: !!pickup_required,
+        }).catch((err) => console.error('Failed to send new booking notification:', err));
+
         // TODO: Send confirmation email to customer
-        // TODO: Send notification email to admin
 
         return NextResponse.json({
             success: true,

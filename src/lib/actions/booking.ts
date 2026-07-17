@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 import { SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE } from '@/lib/constants';
 import { getExtraHourPriceUsd } from '@/lib/settings';
+import { sendNewBookingNotification } from '@/lib/email/send-new-booking-notification';
 
 // All amounts in USD. Destination ticket_price and vehicle_price_up_to_3 are stored in USD.
 async function calculatePrice(data: BookingFormData) {
@@ -42,7 +43,8 @@ async function calculatePrice(data: BookingFormData) {
         extra_person: extraPersonCostUsd,
         total: ourCharge,
         vehicle_count: vehicleCount,
-        currency: 'USD'
+        currency: 'USD',
+        destination_name: dest.name as string,
     };
 }
 
@@ -87,6 +89,21 @@ export async function submitBooking(prevState: any, formData: BookingFormData) {
     }
 
     revalidatePath('/admin/bookings');
+
+    sendNewBookingNotification({
+        bookingId: booking.id,
+        referenceNumber: `IS-${booking.id.substring(0, 8).toUpperCase()}`,
+        customerName: result.data.customer_name,
+        customerEmail: result.data.email,
+        customerPhone: result.data.phone,
+        activityName: pricing.destination_name,
+        date: result.data.date,
+        time: result.data.time,
+        groupSize: result.data.group_size,
+        totalUsd: pricing.total,
+        hotelName: result.data.hotel_name,
+        pickupRequired: result.data.pickup_required,
+    }).catch((err) => console.error('Failed to send new booking notification:', err));
 
     return { success: true, pricing, bookingId: booking.id };
 }
