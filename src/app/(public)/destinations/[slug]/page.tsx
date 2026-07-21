@@ -318,7 +318,7 @@ export default function DestinationDetailPage() {
                 answer: 'Entrance tickets are generally paid separately at the park gate unless stated otherwise during booking.',
             },
         ]),
-        ...reviewSchemas(reviews, `${destination.name} Safari`, `/destinations/${destination.slug}`),
+        ...reviewSchemas(reviews, `/destinations/${destination.slug}`),
     ];
 
 

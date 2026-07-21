@@ -235,7 +235,7 @@ export default async function HomePage() {
       duration: 'PT3H',
       location: 'Sigiriya, Minneriya, Kaudulla, Hurulu Eco Park',
     }),
-    ...reviewSchemas(reviews, 'Island Safaris Sri Lanka', '/'),
+    ...reviewSchemas(reviews, '/'),
   ];
 
   return (

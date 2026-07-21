@@ -83,7 +83,7 @@ export function touristTripSchema(input: {
   };
 }
 
-export function reviewSchemas(reviews: Review[], itemName: string, itemPath: string) {
+export function reviewSchemas(reviews: Review[], itemPath: string) {
   if (!reviews.length) return [];
 
   const average = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
@@ -91,34 +91,38 @@ export function reviewSchemas(reviews: Review[], itemName: string, itemPath: str
   return [
     {
       '@context': 'https://schema.org',
-      '@type': 'AggregateRating',
-      itemReviewed: {
-        '@type': 'Thing',
-        name: itemName,
-        url: `${SITE_URL}${itemPath}`,
+      '@type': 'LocalBusiness',
+      '@id': `${SITE_URL}/#localbusiness`,
+      name: BUSINESS_NAME,
+      url: `${SITE_URL}${itemPath}`,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: '92c Thanyama Asala',
+        addressLocality: 'Sigiriya',
+        addressCountry: 'LK',
       },
-      ratingValue: average.toFixed(1),
-      reviewCount: reviews.length,
-    },
-    ...reviews.slice(0, 5).map((review) => ({
-      '@context': 'https://schema.org',
-      '@type': 'Review',
-      itemReviewed: {
-        '@type': 'Thing',
-        name: itemName,
-      },
-      author: {
-        '@type': 'Person',
-        name: review.name,
-      },
-      reviewBody: review.comment,
-      reviewRating: {
-        '@type': 'Rating',
-        ratingValue: review.rating,
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: average.toFixed(1),
+        reviewCount: reviews.length,
         bestRating: 5,
         worstRating: 1,
       },
-      datePublished: review.created_at,
-    })),
+      review: reviews.slice(0, 5).map((review) => ({
+        '@type': 'Review',
+        author: {
+          '@type': 'Person',
+          name: review.name,
+        },
+        reviewBody: review.comment,
+        reviewRating: {
+          '@type': 'Rating',
+          ratingValue: review.rating,
+          bestRating: 5,
+          worstRating: 1,
+        },
+        datePublished: review.created_at,
+      })),
+    },
   ];
 }
