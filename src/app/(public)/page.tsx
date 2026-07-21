@@ -13,8 +13,8 @@ import { optimizeCloudinaryUrl } from '@/lib/images';
 
 export const revalidate = 3600;
 export const metadata = buildMetadata({
-  title: 'Minneriya Elephant Safari Sri Lanka',
-  description: 'Plan your Minneriya elephant safari in Sri Lanka with expert local guides, plus Kaudulla and Hurulu Eco Park options based on seasonal movement.',
+  title: 'Sigiriya Safari: Private Elephant Jeep Tours',
+  description: 'Book a Sigiriya safari with expert local guides. Private jeep tours to Minneriya, Kaudulla, and Hurulu Eco Park with hotel pickup from Sigiriya and Habarana.',
   path: '/',
 });
 
@@ -22,7 +22,7 @@ const enCopy = {
     migrationStory: 'The Migration Story',
     rhythmTitle: 'The Rhythm of the Wild',
     rhythmBody:
-      'Welcome to the heart of the Cultural Triangle, where the ancient pulse of nature dictates the journey. Unlike ordinary safari operators, we specialize in the Minneriya-Kaudulla-Hurulu Corridor - a vast, interconnected wilderness where hundreds of Asian elephants roam freely.',
+      'Welcome to Sigiriya, the heart of the Cultural Triangle, where the ancient pulse of nature dictates the journey. Unlike ordinary safari operators, we specialize in safaris from Sigiriya into the Minneriya-Kaudulla-Hurulu Corridor - a vast, interconnected wilderness where hundreds of Asian elephants roam freely.',
     whyBook: 'Why Book With Us?',
     whyBookBody:
       "Nature doesn't stay in one place, and neither do we. The Great Elephant Gathering is a seasonal masterpiece, and we ensure you're always in the front row. Our expert guides track the migration daily to bring you exactly where the magic is happening.",
@@ -217,9 +217,9 @@ export default async function HomePage() {
     breadcrumbSchema([{ name: 'Home', path: '/' }]),
     faqSchema([
       {
-        question: 'Which safari park is best right now?',
+        question: 'Which safari park near Sigiriya is best right now?',
         answer:
-          'It depends on seasonality. Our team recommends Minneriya, Kaudulla, or Hurulu Eco Park based on current elephant movement and weather.',
+          'It depends on seasonality. Our team recommends Minneriya, Kaudulla, or Hurulu Eco Park based on current elephant movement and weather, with pickup from Sigiriya and Habarana hotels.',
       },
       {
         question: 'What is included in safari pricing?',
@@ -228,12 +228,12 @@ export default async function HomePage() {
       },
     ]),
     touristTripSchema({
-      name: 'Minneriya Elephant Safari Sri Lanka',
-      description: 'Private safari experience in the Minneriya-Kaudulla-Hurulu corridor.',
+      name: 'Sigiriya Safari: Private Elephant Jeep Tours',
+      description: 'Private safari experience from Sigiriya in the Minneriya-Kaudulla-Hurulu elephant corridor.',
       path: '/booking',
       price: 65,
       duration: 'PT3H',
-      location: 'Minneriya, Kaudulla, Hurulu Eco Park',
+      location: 'Sigiriya, Minneriya, Kaudulla, Hurulu Eco Park',
     }),
     ...reviewSchemas(reviews, 'Island Safaris Sri Lanka', '/'),
   ];

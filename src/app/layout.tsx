@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     default: 'Island Safaris Sri Lanka',
     template: '%s | Island Safaris Sri Lanka',
   },
-  description: 'Private safari tours and authentic local experiences in Sri Lanka.',
+  description: 'Sigiriya safari tours and authentic local experiences in Sri Lanka - private elephant jeep safaris to Minneriya, Kaudulla & Hurulu Eco Park.',
   alternates: {
     canonical: '/',
   },
@@ -41,13 +41,13 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Island Safaris Sri Lanka',
     title: 'Island Safaris Sri Lanka',
-    description: 'Private safari tours and authentic local experiences in Sri Lanka.',
+    description: 'Sigiriya safari tours and authentic local experiences in Sri Lanka - private elephant jeep safaris to Minneriya, Kaudulla & Hurulu Eco Park.',
     images: [{ url: '/og-image.jpg' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Island Safaris Sri Lanka',
-    description: 'Private safari tours and authentic local experiences in Sri Lanka.',
+    description: 'Sigiriya safari tours and authentic local experiences in Sri Lanka - private elephant jeep safaris to Minneriya, Kaudulla & Hurulu Eco Park.',
     images: ['/og-image.jpg'],
   },
 };

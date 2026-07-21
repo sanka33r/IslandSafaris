@@ -50,10 +50,10 @@ const en: Messages = {
   },
   hero: {
     tag: 'The Great Elephant Gathering Awaits',
-    titleTop: 'Discover the',
-    titleHighlight: 'Wild Heart',
+    titleTop: 'Sigiriya Safari:',
+    titleHighlight: 'The Wild Heart',
     titleBottom: 'of Sri Lanka',
-    descriptionTop: 'Exclusive jeep safaris through the legendary Minneriya-Kaudulla-Hurulu corridor.',
+    descriptionTop: 'Private jeep safaris from Sigiriya through the legendary Minneriya-Kaudulla-Hurulu elephant corridor.',
     descriptionBottom: 'Where hundreds of Asian elephants roam free.',
     ctaBook: 'Book Your Safari',
     ctaExplore: 'Explore Destinations',
