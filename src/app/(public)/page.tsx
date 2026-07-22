@@ -31,7 +31,7 @@ const enCopy = {
     learnMore: 'Learn More About Us',
     destinations: 'Destinations',
     safariParks: 'Our Safari Parks',
-    parksBody: 'Discover the iconic parks of the elephant migration corridor',
+    parksBody: 'Discover the iconic parks of the elephant migration corridor, all within easy reach of Sigiriya and Habarana.',
     viewAllParks: 'View All Parks',
     nationalPark: 'National Park',
     hours: 'Hours',
@@ -86,7 +86,7 @@ const enCopy = {
     reviewsBody: 'Real experiences from visitors who explored the elephant corridor with us.',
     readyAdventure: 'Ready for Your Adventure?',
     ctaBody:
-      "Book your safari today and witness nature's greatest spectacle-the Great Elephant Gathering of Sri Lanka.",
+      "Book your Sigiriya safari today and witness nature's greatest spectacle-the Great Elephant Gathering of Sri Lanka.",
     bookNow: 'Book Now',
     contactUs: 'Contact Us',
   };
@@ -104,7 +104,7 @@ const esCopy = {
     learnMore: 'Conoce mas sobre nosotros',
     destinations: 'Destinos',
     safariParks: 'Nuestros parques de safari',
-    parksBody: 'Descubre los parques iconicos del corredor de migracion de elefantes',
+    parksBody: 'Descubre los parques iconicos del corredor de migracion de elefantes, todos cerca de Sigiriya y Habarana.',
     viewAllParks: 'Ver todos los parques',
     nationalPark: 'Parque nacional',
     hours: 'Horas',
@@ -159,7 +159,7 @@ const esCopy = {
     reviewsBody: 'Experiencias reales de visitantes que exploraron el corredor de elefantes con nosotros.',
     readyAdventure: 'Listo para tu aventura?',
     ctaBody:
-      'Reserva tu safari hoy y presencia el mayor espectaculo natural: la gran concentracion de elefantes de Sri Lanka.',
+      'Reserva tu safari en Sigiriya hoy y presencia el mayor espectaculo natural: la gran concentracion de elefantes de Sri Lanka.',
     bookNow: 'Reservar ahora',
     contactUs: 'Contactanos',
   };

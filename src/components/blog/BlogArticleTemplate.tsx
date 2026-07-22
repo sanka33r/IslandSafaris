@@ -95,8 +95,14 @@ export default function BlogArticleTemplate({
               </p>
               <div className="flex flex-wrap gap-2">
                 <Link
-                  href="/booking"
+                  href="/"
                   className="inline-flex px-3 py-2 rounded-full bg-secondary-600 text-white text-sm font-semibold hover:bg-secondary-700 transition-colors"
+                >
+                  Sigiriya safari tours
+                </Link>
+                <Link
+                  href="/booking"
+                  className="inline-flex px-3 py-2 rounded-full bg-white border border-safari-200 text-sm font-semibold text-safari-800 hover:bg-safari-50 transition-colors"
                 >
                   Book your Sri Lanka safari
                 </Link>
