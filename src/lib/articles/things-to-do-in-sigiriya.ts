@@ -2,9 +2,9 @@ import { BlogArticle, DEFAULT_AUTHOR } from '../blog';
 
 export const articleThingsToDoInSigiriya: BlogArticle = {
   slug: 'things-to-do-in-sigiriya-besides-rock',
-  title: 'Top Things To Do in Sigiriya Besides Sigiriya Rock (2026)',
+  title: 'Things To Do in Sigiriya: Best Places to Visit Nearby (2026)',
   excerpt:
-    'Climbing the rock is just the beginning. Discover the best things to do in Sigiriya, from world-class elephant safaris in Minneriya to hidden temples, village tours, and sunset viewpoints.',
+    'Wondering what to do in Sigiriya? Discover the best things to do and places to visit near Sigiriya, from world-class elephant safaris in Minneriya to hidden temples, village tours, and sunset viewpoints.',
   category: 'travel-planning',
   keywords: [
     'things to do in Sigiriya',

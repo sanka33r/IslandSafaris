@@ -9,8 +9,8 @@ import { Star, ShieldCheck, Clock3, BadgeCheck } from 'lucide-react';
 import BreadcrumbNav from '@/components/layout/BreadcrumbNav';
 
 export const metadata = buildMetadata({
-    title: 'Book Minneriya, Kaudulla & Hurulu Safari',
-    description: 'Book a private safari in Sri Lanka with instant support. Choose Minneriya, Kaudulla, or Hurulu Eco Park and confirm your ideal date and time in minutes.',
+    title: 'Book a Sri Lanka Elephant Safari',
+    description: 'Book a private Sri Lanka elephant safari with instant support. Choose Minneriya, Kaudulla, or Hurulu Eco Park and confirm your ideal date and time in minutes.',
     path: '/booking',
 });
 

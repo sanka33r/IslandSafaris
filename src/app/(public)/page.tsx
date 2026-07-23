@@ -15,7 +15,7 @@ export const revalidate = 3600;
 export const metadata = buildMetadata({
   title: 'Sigiriya Safari | Minneriya, Kaudulla & Hurulu Jeep Tours',
   titleAbsolute: true,
-  description: 'Private Sigiriya safari with Island Safaris Sri Lanka. Expert-guided jeep tours to Minneriya, Kaudulla & Hurulu Eco Park with hotel pickup from Sigiriya.',
+  description: 'Private Sri Lanka elephant safari from Sigiriya with expert local guides. Jeep tours to Minneriya, Kaudulla & Hurulu Eco Park with hotel pickup included.',
   path: '/',
 });
 

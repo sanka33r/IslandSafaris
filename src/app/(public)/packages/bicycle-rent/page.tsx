@@ -14,8 +14,8 @@ import { breadcrumbSchema, faqSchema, touristTripSchema } from '@/lib/schema';
 import { optimizeCloudinaryUrl } from '@/lib/images';
 
 export const metadata = buildMetadata({
-    title: 'Bicycle Rental Sigiriya',
-    description: 'Choose a Bicycle Rental in Sigiriya and explore village roads, paddy landscapes, and scenic viewpoints at your own pace.',
+    title: 'Bicycle Rental in Sigiriya, Sri Lanka',
+    description: 'Rent a bicycle in Sigiriya, Sri Lanka and explore village roads, paddy landscapes, and scenic viewpoints at your own pace. Flexible hourly and full-day hire.',
     path: '/packages/bicycle-rental',
 });
 

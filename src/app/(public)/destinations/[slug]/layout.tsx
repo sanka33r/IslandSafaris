@@ -18,7 +18,7 @@ const pageMap: Record<string, { title: string; description: string }> = {
   'kaudulla-national-park': {
     title: 'Kaudulla Safari Sri Lanka',
     description:
-      'Plan your Kaudulla safari in Sri Lanka with local experts who track migration timing for better elephant sightings.',
+      'See Kaudulla National Park elephants in Sri Lanka on a private safari, with local experts who track migration timing for the best sightings.',
   },
   'hurulu-eco-park': {
     title: 'Hurulu Eco Park Safari',
