@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Star, Shield, Leaf, MapPin, Clock, Camera, ChevronRight } from 'lucide-react';
+import { ArrowRight, Star, Shield, Leaf, MapPin, Clock, Camera, ChevronRight, Check } from 'lucide-react';
 import { getDestinationsWithImages } from '@/lib/queries/destinations';
 import { getApprovedReviews } from '@/lib/queries/reviews';
 import HeroSection from '@/components/home/HeroSection';
@@ -13,8 +13,9 @@ import { optimizeCloudinaryUrl } from '@/lib/images';
 
 export const revalidate = 3600;
 export const metadata = buildMetadata({
-  title: 'Sigiriya Safari: Private Elephant Jeep Tours',
-  description: 'Book a Sigiriya safari with expert local guides. Private jeep tours to Minneriya, Kaudulla, and Hurulu Eco Park with hotel pickup from Sigiriya and Habarana.',
+  title: 'Sigiriya Safari | Minneriya, Kaudulla & Hurulu Jeep Tours',
+  titleAbsolute: true,
+  description: 'Private Sigiriya safari with Island Safaris Sri Lanka. Expert-guided jeep tours to Minneriya, Kaudulla & Hurulu Eco Park with hotel pickup from Sigiriya.',
   path: '/',
 });
 
@@ -181,6 +182,30 @@ const copyByLocale = {
   nl: { ...enCopy, destinations: 'Bestemmingen', viewAllParks: 'Bekijk alle parken', bookNow: 'Boek nu' },
   de: { ...enCopy, destinations: 'Reiseziele', viewAllParks: 'Alle Parks ansehen', bookNow: 'Jetzt buchen' },
 } as const;
+
+const sigiriyaSeoContent = {
+  eyebrow: 'Your Local Safari Specialists',
+  heading: 'Sigiriya Safari: Private Jeep Safaris to Minneriya, Kaudulla & Hurulu Eco Park',
+  paragraphs: [
+    "Experience the ultimate Sigiriya safari with Island Safaris Sri Lanka, your trusted local safari specialist based in Sigiriya. We offer unforgettable private jeep safaris to Minneriya National Park, Kaudulla National Park, and Hurulu Eco Park, the heart of Sri Lanka's legendary elephant corridor, where hundreds of wild Asian elephants roam freely throughout the year.",
+    'Founded from a deep love for Sri Lanka\'s wildlife and natural heritage, Island Safaris is dedicated to providing authentic, safe, and memorable safari experiences for travelers from around the world. More than just a jeep ride, every safari is an opportunity to connect with nature, understand the unique ecosystem, and witness wildlife in its natural habitat while supporting responsible tourism.',
+    'Our experienced local drivers are passionate wildlife experts who know the parks like the back of their hand. They carefully track the seasonal movement of elephants between Minneriya, Kaudulla, and Hurulu Eco Park, ensuring you visit the park with the highest chance of seeing the famous Great Elephant Gathering. Along the way, you may also encounter leopards, sloth bears, spotted deer, sambar deer, crocodiles, water buffalo, monkeys, peacocks, eagles, and a wide variety of native birds.',
+    "We provide comfortable private safari jeeps, experienced English-speaking guides, flexible departure times, and convenient hotel pickup and drop-off from Sigiriya, Dambulla, Habarana, Kandalama, and nearby areas. Whether you're travelling as a couple, family, group, or solo adventurer, we tailor every safari to deliver an unforgettable wildlife experience.",
+  ],
+  whyHeading: 'Why choose Island Safaris?',
+  bullets: [
+    'Private jeep safaris with experienced local guides',
+    'Daily departures from Sigiriya and surrounding areas',
+    'Visits to Minneriya, Kaudulla, or Hurulu Eco Park based on elephant movements',
+    'Excellent opportunities to see hundreds of wild Asian elephants',
+    'Hotel pickup and drop-off included',
+    'Comfortable, well-maintained safari jeeps',
+    'Friendly service with local knowledge',
+    'Responsible and eco-friendly wildlife tourism',
+  ],
+  closing:
+    'If you are searching for the best Sigiriya safari, Minneriya safari, Kaudulla safari, or Hurulu Eco Park safari, Island Safaris is your trusted local choice. Join us for an unforgettable journey into Sri Lanka\'s wild heart and create memories that will last a lifetime.',
+};
 
 export default async function HomePage() {
   const locale = await getRequestLocale();
@@ -580,6 +605,48 @@ export default async function HomePage() {
             </p>
           </div>
           <ReviewList reviews={reviews.slice(0, 6)} />
+        </div>
+      </section>
+
+      {/* SEO Content — Sigiriya Safari specialists */}
+      <section className="py-14 md:py-20 bg-secondary-50 content-visibility-auto">
+        <div className="container mx-auto px-6 max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+            {/* Left: intro copy */}
+            <div>
+              <span className="inline-block text-secondary-600 font-bold uppercase tracking-widest text-xs mb-4 bg-secondary-100 px-4 py-2 rounded-full">
+                {sigiriyaSeoContent.eyebrow}
+              </span>
+              <h2 className="text-2xl md:text-3xl font-bold text-safari-900 mb-4 leading-tight">
+                {sigiriyaSeoContent.heading}
+              </h2>
+              <div className="space-y-3 text-safari-700 leading-relaxed text-sm md:text-base">
+                {sigiriyaSeoContent.paragraphs.map((paragraph) => (
+                  <p key={paragraph.slice(0, 32)}>{paragraph}</p>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: why choose us card */}
+            <div className="rounded-3xl bg-white border border-safari-100 shadow-sm p-6 md:p-8 lg:sticky lg:top-28">
+              <h3 className="text-xl md:text-2xl font-bold text-safari-900 mb-5">
+                {sigiriyaSeoContent.whyHeading}
+              </h3>
+              <ul className="space-y-3">
+                {sigiriyaSeoContent.bullets.map((bullet) => (
+                  <li key={bullet} className="flex items-start gap-3 text-safari-700 text-sm md:text-base">
+                    <span className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-secondary-600 text-white flex items-center justify-center">
+                      <Check size={13} />
+                    </span>
+                    <span>{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-6 pt-6 border-t border-safari-100 text-safari-600 leading-relaxed text-sm">
+                {sigiriyaSeoContent.closing}
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 

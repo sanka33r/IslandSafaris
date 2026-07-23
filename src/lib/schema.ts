@@ -15,7 +15,7 @@ export function localBusinessSchema() {
     '@id': `${SITE_URL}/#localbusiness`,
     name: BUSINESS_NAME,
     url: SITE_URL,
-    telephone: CONTACT_DETAILS.phone,
+    telephone: CONTACT_DETAILS.phoneHref,
     email: CONTACT_DETAILS.email,
     address: {
       '@type': 'PostalAddress',
@@ -23,6 +23,8 @@ export function localBusinessSchema() {
       addressLocality: 'Sigiriya',
       addressCountry: 'LK',
     },
+    hasMap: CONTACT_DETAILS.mapUrl,
+    sameAs: [CONTACT_DETAILS.mapUrl],
     areaServed: 'Sri Lanka',
     priceRange: '$$',
   };

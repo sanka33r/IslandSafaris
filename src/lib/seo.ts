@@ -10,6 +10,7 @@ type SeoInput = {
   image?: string;
   type?: 'website' | 'article';
   noIndex?: boolean;
+  titleAbsolute?: boolean;
 };
 
 export const metadataBase = new URL(SITE_URL);
@@ -22,11 +23,12 @@ export function buildMetadata({
   image = '/og-image.jpg',
   type = 'website',
   noIndex = false,
+  titleAbsolute = false,
 }: SeoInput): Metadata {
   const canonicalPath = path.startsWith('/') ? path : `/${path}`;
 
   return {
-    title,
+    title: titleAbsolute ? { absolute: title } : title,
     description,
     alternates: {
       canonical: canonicalPath,
