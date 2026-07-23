@@ -23,8 +23,8 @@ export function localBusinessSchema() {
       addressLocality: 'Sigiriya',
       addressCountry: 'LK',
     },
-    hasMap: CONTACT_DETAILS.mapUrl,
-    sameAs: [CONTACT_DETAILS.mapUrl],
+    hasMap: CONTACT_DETAILS.gbpUrl,
+    sameAs: [CONTACT_DETAILS.gbpUrl],
     areaServed: 'Sri Lanka',
     priceRange: '$$',
   };

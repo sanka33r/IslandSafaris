@@ -47,6 +47,8 @@ export const CONTACT_DETAILS = {
     location: 'Maapagala Resort Sigiriya',
     locationNote: '92c Thanyama Asala, Sigiriya, Sri Lanka',
     mapUrl: 'https://maps.app.goo.gl/DkbLL5kxb2k2Gy7J6',
+    // Canonical Google Business Profile / Maps place URL (stable CID form).
+    gbpUrl: 'https://www.google.com/maps?cid=5755243928026558246',
 };
 
 export const TIME_SLOTS = [
