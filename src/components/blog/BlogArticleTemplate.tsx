@@ -1,10 +1,61 @@
 import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 import { BlogArticle } from '@/lib/blog';
 
 type BlogArticleTemplateProps = {
   article: BlogArticle;
   relatedArticles: BlogArticle[];
 };
+
+type CtaLink = { label: string; href: string };
+
+const PARK_CTA: { heading: string; primary: CtaLink; links: CtaLink[] } = {
+  heading: 'Ready to see the elephants? Book your safari park',
+  primary: { label: 'Book a Sigiriya safari', href: '/booking' },
+  links: [
+    { label: 'Minneriya Safari', href: '/destinations/minneriya-national-park' },
+    { label: 'Kaudulla Safari', href: '/destinations/kaudulla-national-park' },
+    { label: 'Hurulu Eco Park', href: '/destinations/hurulu-eco-park' },
+    { label: 'All destinations', href: '/destinations' },
+  ],
+};
+
+const PACKAGE_CTA: { heading: string; primary: CtaLink; links: CtaLink[] } = {
+  heading: 'Make it a full Sigiriya trip — add an experience',
+  primary: { label: 'View all experiences', href: '/packages' },
+  links: [
+    { label: 'Village Tour', href: '/packages/village-tour' },
+    { label: 'Cooking Class', href: '/packages/cooking-class' },
+    { label: 'Bicycle Rental', href: '/packages/bicycle-rental' },
+  ],
+};
+
+function InlineCtaBand({ variant }: { variant: 'parks' | 'packages' }) {
+  const cta = variant === 'parks' ? PARK_CTA : PACKAGE_CTA;
+  return (
+    <div className="my-8 rounded-2xl bg-safari-900 p-5 sm:p-6 not-prose">
+      <p className="text-secondary-300 font-bold text-sm sm:text-base mb-4">{cta.heading}</p>
+      <div className="flex flex-wrap gap-2">
+        <Link
+          href={cta.primary.href}
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-secondary-600 text-white text-sm font-semibold hover:bg-secondary-500 transition-colors"
+        >
+          {cta.primary.label}
+          <ArrowRight size={15} />
+        </Link>
+        {cta.links.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 text-white text-sm font-semibold border border-white/20 hover:bg-white/20 hover:border-white/40 transition-colors"
+          >
+            {link.label}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function BlogArticleTemplate({
   article,
@@ -38,16 +89,21 @@ export default function BlogArticleTemplate({
             </section>
 
             <section className="space-y-6">
-              {article.sections.map((section) => (
-                <div key={section.id} id={section.id} className="scroll-mt-28">
-                  <h2 className="text-2xl font-bold text-safari-900 mb-3">{section.title}</h2>
-                  <div className="space-y-3">
-                    {section.content.map((paragraph) => (
-                      <p key={paragraph} className="text-safari-700 leading-relaxed">
-                        {paragraph}
-                      </p>
-                    ))}
+              {article.sections.map((section, index) => (
+                <div key={section.id}>
+                  <div id={section.id} className="scroll-mt-28">
+                    <h2 className="text-2xl font-bold text-safari-900 mb-3">{section.title}</h2>
+                    <div className="space-y-3">
+                      {section.content.map((paragraph) => (
+                        <p key={paragraph} className="text-safari-700 leading-relaxed">
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
                   </div>
+                  {index < article.sections.length - 1 && (
+                    <InlineCtaBand variant={index % 2 === 0 ? 'parks' : 'packages'} />
+                  )}
                 </div>
               ))}
             </section>
