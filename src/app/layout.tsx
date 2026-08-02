@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { Outfit } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
@@ -70,6 +71,15 @@ export default async function RootLayout({
           </LocaleProvider>
         </GlobalDataProvider>
       </body>
+      <Script src="https://www.googletagmanager.com/gtag/js?id=G-P122VD9L7F" strategy="afterInteractive" />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-P122VD9L7F');
+        `}
+      </Script>
     </html>
   );
 }
