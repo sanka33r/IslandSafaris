@@ -22,6 +22,9 @@ export const PACKAGE_INFO = {
     },
 };
 
+/** Safari: non-refundable advance paid online to confirm a booking; remainder is paid at the destination. */
+export const SAFARI_ADVANCE_USD = 8;
+
 /** Safari: USD per person when group size exceeds 3 (4th and 5th person). */
 export const SAFARI_EXTRA_PERSON_USD = 5;
 

@@ -3,7 +3,7 @@
 import { bookingSchema, BookingFormData } from '@/lib/schemas/booking';
 import { supabaseAdmin } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
-import { SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE } from '@/lib/constants';
+import { SAFARI_ADVANCE_USD, SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE } from '@/lib/constants';
 import { getExtraHourPriceUsd } from '@/lib/settings';
 import { sendNewBookingNotification } from '@/lib/email/send-new-booking-notification';
 
@@ -76,11 +76,11 @@ export async function submitBooking(prevState: any, formData: BookingFormData) {
             passport_number: result.data.passport_number || null,
             promo_code: result.data.promo_code || null,
             message: result.data.message,
-            advance_payment_amount: 8,
+            advance_payment_amount: SAFARI_ADVANCE_USD,
             advance_payment_status: 'pending',
             status: 'payment_pending',
         })
-        .select('id')
+        .select('id, advance_payment_amount')
         .single();
 
     if (error || !booking) {
@@ -105,5 +105,5 @@ export async function submitBooking(prevState: any, formData: BookingFormData) {
         pickupRequired: result.data.pickup_required,
     }).catch((err) => console.error('Failed to send new booking notification:', err));
 
-    return { success: true, pricing, bookingId: booking.id };
+    return { success: true, pricing, bookingId: booking.id, advanceAmount: Number(booking.advance_payment_amount) };
 }

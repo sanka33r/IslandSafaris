@@ -10,7 +10,7 @@ import { BookingFormData } from '@/lib/schemas/booking';
 import { Loader2, CheckCircle, CreditCard, Car, MapPin, ExternalLink, Tag, AlertCircle, Users, Minus, Plus, Download } from 'lucide-react';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
-import { formatUsd, SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE, SAFARI_MAX_BOOKING_SIZE, EXTRA_HOUR_PRICE_USD } from '@/lib/constants';
+import { formatUsd, SAFARI_ADVANCE_USD, SAFARI_EXTRA_PERSON_USD, SAFARI_MAX_GROUP_SIZE, SAFARI_MAX_BOOKING_SIZE, EXTRA_HOUR_PRICE_USD } from '@/lib/constants';
 import { extractPlaceNameFromMapsUrl, isGoogleMapsLink, isShortGoogleMapsLink } from '@/lib/maps';
 import { downloadBookingReceipt } from '@/lib/receipt';
 import PaymentSection from '@/components/payments/PaymentSection';
@@ -367,8 +367,8 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                     entranceNote: !formData.pickup_required && selectedDest
                         ? `Pick up point: ${selectedDest.name} Safari Entrance gate`
                         : null,
-                    advancePaidUsd: 8,
-                    remainingUsd: submitResult.pricing.total,
+                    advancePaidUsd: submitResult.advanceAmount,
+                    remainingUsd: Math.max(0, submitResult.pricing.total - submitResult.advanceAmount),
                     ticketsUsd: submitResult.pricing.tickets ?? null,
                 });
             } finally {
@@ -404,7 +404,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                 )}
                 <div className="bg-safari-50 p-6 rounded-xl text-left mb-6 space-y-3">
                     <h3 className="font-semibold text-safari-900 mb-2">Safari jeep (remaining balance - pay at destination)</h3>
-                    <p className="text-2xl font-bold text-secondary-600">USD {formatUsd(submitResult.pricing.total)}</p>
+                    <p className="text-2xl font-bold text-secondary-600">USD {formatUsd(Math.max(0, submitResult.pricing.total - submitResult.advanceAmount))}</p>
                     {submitResult.pricing.tickets != null && submitResult.pricing.tickets > 0 && (
                         <p className="text-sm text-safari-600">
                             Entrance ticket (approx. USD {formatUsd(submitResult.pricing.tickets)}) is paid separately at the park gate.
@@ -434,13 +434,13 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                     </div>
                     <h2 className="text-2xl font-bold text-safari-900 mb-2">Complete Your Payment</h2>
                     <p className="text-safari-600 text-sm">
-                        Almost done, {formData.customer_name}! Pay the USD 8 advance to confirm your safari booking for {formData.date}.
+                        Almost done, {formData.customer_name}! Pay the USD {submitResult.advanceAmount} advance to confirm your safari booking for {formData.date}.
                     </p>
                 </div>
 
                 <PaymentSection
                     bookingId={submitResult.bookingId}
-                    amount={8}
+                    amount={submitResult.advanceAmount}
                     alreadyPaid={false}
                     onPaymentSuccess={() => setSubmitResult({ ...submitResult, paid: true })}
                 />
@@ -448,7 +448,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                 <div className="bg-red-50 border border-red-200 p-4 rounded-xl text-xs text-red-800 mt-2">
                     <p className="flex items-start gap-2">
                         <AlertCircle size={14} className="text-red-500 flex-shrink-0 mt-0.5" />
-                        <span><strong>Non-Refundable Advance:</strong> The USD 8 advance payment is non-refundable. Remaining balance is paid at the destination.</span>
+                        <span><strong>Non-Refundable Advance:</strong> The USD {submitResult.advanceAmount} advance payment is non-refundable. Remaining balance is paid at the destination.</span>
                     </p>
                 </div>
             </div>
@@ -869,7 +869,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                                     </div>
                                     <div className="flex justify-between pb-2">
                                         <span className="text-safari-500">Advance Payment</span>
-                                        <span className="font-bold text-secondary-600">USD 8</span>
+                                        <span className="font-bold text-secondary-600">USD {SAFARI_ADVANCE_USD}</span>
                                     </div>
                                 </div>
 
@@ -915,7 +915,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                                     <p className="flex items-start gap-2">
                                         <AlertCircle size={14} className="text-red-500 flex-shrink-0 mt-0.5" />
                                         <span>
-                                            <strong>Non-Refundable Advance:</strong> The advance payment of USD 8 is non-refundable. Remaining balance is paid at the destination.
+                                            <strong>Non-Refundable Advance:</strong> The advance payment of USD {SAFARI_ADVANCE_USD} is non-refundable. Remaining balance is paid at the destination.
                                         </span>
                                     </p>
                                 </div>
@@ -1029,7 +1029,7 @@ export default function BookingWizard({ destinations, preselectedDestinationId, 
                                 <div className="border-t border-safari-100 pt-3 mt-3">
                                     <div className="flex justify-between items-center text-sm">
                                         <span className="text-safari-700 font-semibold">Advance Payment</span>
-                                        <span className="font-bold text-safari-900">USD 8</span>
+                                        <span className="font-bold text-safari-900">USD {SAFARI_ADVANCE_USD}</span>
                                     </div>
                                     <p className="text-xs text-red-500 font-semibold mt-1">Non-refundable</p>
                                 </div>
